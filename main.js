@@ -83,6 +83,8 @@ var core = core || {};
         this.tapeView.transform("t" + this.x + "," + this.y)
     }
 
+    core.TapeView = TapeView;
+
     var GridView = function GridView(paper, x, y, width, height, rows, cols) {
         this.paper = paper;
         this.grid = paper.g();
@@ -116,6 +118,8 @@ var core = core || {};
         this.grid.transform("t1,1t" + this.x + "," + this.y);
     }
 
+
+
     /**
        GridView.getCellMatrix(col, row, corner) -> Matrix
 
@@ -141,7 +145,7 @@ var core = core || {};
         return globalMatrix;
     }
 
-
+    core.GridView = GridView;
 
     core.main = function() {
 
@@ -161,7 +165,7 @@ var core = core || {};
 
 
         var field = new TapeView(paper, 0, 0, 400, 20);
-        field.drawTape(t)
+        field.drawTape(t);
 
         var grid = new GridView(paper, 0, 30, 400, 400, 10, 10);
 
@@ -171,14 +175,14 @@ var core = core || {};
             var m = grid.getCellMatrix(i, i);
             var c = paper.circle(0,0,2);
             c.transform(m.toTransformString());
-            c.attr({fill: "#000"})
+            c.attr({fill: "#000"});
         }
 
         for (var i = 0; i < 10; ++i) {
             var m = grid.getCellMatrix(i, i, true);
             var c = paper.circle(0,0,2);
             c.transform(m.toTransformString());
-            c.attr({fill: "#f00"})
+            c.attr({fill: "#f00"});
         }
     };
 
