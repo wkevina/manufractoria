@@ -37,11 +37,13 @@ var core = core || {};
 
     core.Tape = Tape;
 
-    var TapeView = function TapeView(paper, width, height) {
+    var TapeView = function TapeView(paper, x, y, width, height) {
         this.paper = paper;
         this.tapeView = paper.g();
         this.width = width;
         this.height = height;
+        this.x = x;
+        this.y = y;
     }
 
     TapeView.prototype.drawTape = function drawTape(t) {
@@ -53,7 +55,7 @@ var core = core || {};
         var MAX = Math.floor((this.width - sw) / sw);
 
         for (var i = 0; i < t.symbols.length && i < MAX; ++i) {
-            var circle = this.paper.circle(sw*i + sw/2, sw/2 + 5, sw/2 - 2);
+            var circle = this.paper.circle(sw*i + sw/2, sw/2, sw/2 - 2);
 
             var curSym = t.symbols[i];
 
@@ -76,41 +78,45 @@ var core = core || {};
             this.tapeView.append(circle);
 
         }
+
+        this.tapeView.transform("");
+        this.tapeView.transform("t" + this.x + "," + this.y)
     }
 
-    var GridView = function GridView(paper, width, height) {
+    var GridView = function GridView(paper, x, y, width, height, rows, cols) {
         this.paper = paper;
         this.grid = paper.g();
         this.width = width;
         this.height = height;
-        this.cols = 0;
-        this.rows = 0;
+        this.x = x;
+        this.y = y;
+        this.cols = cols;
+        this.rows = rows;
     }
 
-    GridView.prototype.drawGrid = function drawGrid(rows, cols) {
-        this.rows = rows;
-        this.cols = cols;
-        
+    GridView.prototype.drawGrid = function drawGrid() {
         this.grid.clear();
 
-        var sw = this.width / cols;
-        var sy = this.height / rows;
+        var sw = this.width / this.cols;
+        var sy = this.height / this.rows;
 
-        for (var x = 0; x <= cols; ++x) {
+        for (var x = 0; x <= this.cols; ++x) {
             var l = this.paper.line(x*sw, 0, x*sw, this.height);
             this.grid.append(l);
         }
 
-        for (var y = 0; y <= rows; ++y) {
+        for (var y = 0; y <= this.rows; ++y) {
             var l = this.paper.line(0, y*sy, this.width, y*sy);
             this.grid.append(l);
         }
 
         this.grid.attr({stroke: "#000", strokeWidth: 2});
-        this.grid.transform("t1,1");
+
+        this.grid.transform("");
+        this.grid.transform("t1,1t" + this.x + "," + this.y);
     }
 
-    
+
 
     core.main = function() {
 
@@ -123,18 +129,18 @@ var core = core || {};
             t.append(core.RED);
             t.append(core.EMPTY);
         }
-       
 
-        var paper = Snap(640, 480);
+
+        var paper = Snap(640, 640);
         paper.appendTo(document.getElementById("main"));
 
 
-        var field = new TapeView(paper, 640, 100);
+        var field = new TapeView(paper, 0, 0, 400, 20);
         field.drawTape(t)
 
-        var grid = new GridView(paper, 400, 400);
+        var grid = new GridView(paper, 0, 30, 400, 400, 10, 10);
 
-        grid.drawGrid(10, 10);
+        grid.drawGrid();
     };
 
 })(Snap);
