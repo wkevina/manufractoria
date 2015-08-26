@@ -116,6 +116,31 @@ var core = core || {};
         this.grid.transform("t1,1t" + this.x + "," + this.y);
     }
 
+    /**
+       GridView.getCellMatrix(col, row, corner) -> Matrix
+
+       Returns global matrix describing location of cell
+
+       If corner == true, uses top left corner of cell
+
+       Otherwise, uses center of cell
+
+       */
+    GridView.prototype.getCellMatrix = function getCellMatrix(col, row, corner) {
+        var transform = this.grid.transform();
+        var globalMatrix = transform.globalMatrix.clone();
+
+        var sw = this.width / this.cols;
+        var sy = this.height / this.rows;
+
+        if (!corner) {
+            globalMatrix.translate(sw / 2, sy / 2);
+        }
+        globalMatrix.translate(sw * col, sy * row);
+
+        return globalMatrix;
+    }
+
 
 
     core.main = function() {
@@ -141,6 +166,20 @@ var core = core || {};
         var grid = new GridView(paper, 0, 30, 400, 400, 10, 10);
 
         grid.drawGrid();
+
+        for (var i = 0; i < 10; ++i) {
+            var m = grid.getCellMatrix(i, i);
+            var c = paper.circle(0,0,2);
+            c.transform(m.toTransformString());
+            c.attr({fill: "#000"})
+        }
+
+        for (var i = 0; i < 10; ++i) {
+            var m = grid.getCellMatrix(i, i, true);
+            var c = paper.circle(0,0,2);
+            c.transform(m.toTransformString());
+            c.attr({fill: "#f00"})
+        }
     };
 
 })(Snap);
