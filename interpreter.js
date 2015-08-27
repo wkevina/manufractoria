@@ -26,9 +26,9 @@ var interpreter = interpreter || {};
         this.running = true;
 
         // Go to the start
-        for (var x = 0; x < this.program.cells.length; x ++) {
-            for (var y = 0; y < this.program.cells[x].length; y ++) {
-                if (this.program.cells[x][y].type == "Start") {
+        for (var x = 0; x < this.program.cols; x ++) {
+            for (var y = 0; y < this.program.rows; y ++) {
+                if (this.program.getCell(x, y).type == "Start") {
                     this.position.x = x;
                     this.position.y = y;
                 }
@@ -58,7 +58,7 @@ var interpreter = interpreter || {};
         if (this.facing == program.directions.RIGHT) this.position.x += 1;
 
         // Get state
-        var cell = this.program.cells[this.position.x][this.position.y];
+        var cell = this.program.getCell(this.position.x, this.position.y);
         var head = this.tape.head();
 
         // Check if done
