@@ -199,6 +199,8 @@ var core = core || {},
         var token = paper.circle(0, 0, 10);
         token.attr({fill: "#E0E"});
 
+        drawProgram(paper, p, grid);
+
         myInterpreter.start();
 
         function mainLoop() {
@@ -229,5 +231,33 @@ var core = core || {},
 
         mainLoop();
     };
+
+    function drawProgram(paper, program, grid) {
+        for (var x = 0; x < program.cols; ++x) {
+            for (var y = 0; y < program.rows; ++y) {
+                var c = program.getCell(x, y);
+
+                if (c.type != "Empty") {
+                    var imageUrl = null;
+
+                    if (c.type == "BranchBR") {
+                        imageUrl = "img/branch-br.svg";
+                    }
+
+                    if (c.type == "Conveyor") {
+                        imageUrl = "img/conveyor.svg";
+                    }
+
+                    if (imageUrl) {
+                        Snap.load(imageUrl, function(f) {
+                            var g = f.select("g");
+                            paper.append(g);
+                            //g.transform(grid.getCellMatrix(x,y).toTransformString());
+                        });
+                    }
+                }
+            }
+        }
+    }
 
 })(Snap, program, interpreter);
