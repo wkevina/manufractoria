@@ -171,19 +171,82 @@ var core = core || {};
 
         grid.drawGrid();
 
-        for (var i = 0; i < 10; ++i) {
-            var m = grid.getCellMatrix(i, i);
-            var c = paper.circle(0,0,2);
-            c.transform(m.toTransformString());
-            c.attr({fill: "#000"});
+
+        var interpreter = new MockInterpreter();
+        interpreter.gridWidth = grid.cols;
+        interpreter.gridHeight = grid.rows;
+
+        var token = paper.circle(0, 0, 10);
+        token.attr({fill: "#E0E"});
+
+        var curPos = interpreter.position;
+        token.transform(grid.getCellMatrix(curPos.x, curPos.y).toTransformString());
+
+        function mainLoop() {
+
+            interpreter.step();
+
+            curPos = interpreter.position;
+            var newTransform = grid.getCellMatrix(curPos.x, curPos.y).toTransformString();
+
+            token.animate(
+                {transform: newTransform},
+                500,
+                mina.easeinout,
+                function() {
+                    mainLoop();
+                }
+            );
         }
 
-        for (var i = 0; i < 10; ++i) {
-            var m = grid.getCellMatrix(i, i, true);
-            var c = paper.circle(0,0,2);
-            c.transform(m.toTransformString());
-            c.attr({fill: "#f00"});
-        }
+        mainLoop();
     };
+
+    /**
+     A Fake interpreter
+     */
+    function MockInterpreter() {
+        this.position = {x:0, y:0};
+        this.gridWidth = 0;
+        this.gridHeight = 0;
+    }
+
+    MockInterpreter.prototype.step = function step() {
+        function randomDir() {
+            var r = Math.floor(Math.random()*4);
+
+            switch(r) {
+            case 0:
+                return {x: 0, y: -1};
+            case 1:
+                return {x:0, y: 1};
+            case 2:
+                return {x:-1, y: 0};
+            case 3:
+                return {x: 1, y: 0};
+            default:
+                return {x: 0, y: -1};
+            }
+        }
+
+        while (true) {
+            var newDir = randomDir();
+            var newX = newDir.x + this.position.x;
+            var newY = newDir.y + this.position.y;
+
+            if (newX < 0 || newX >= this.gridWidth) {
+                continue;
+            }
+            if (newY < 0 || newY >= this.gridHeight) {
+                continue;
+            }
+
+            this.position = {x: newX, y: newY};
+            break;
+        }
+
+    };
+
+
 
 })(Snap);
