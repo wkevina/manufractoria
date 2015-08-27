@@ -71,7 +71,7 @@ var interpreter = interpreter || {};
         } else {
 
             // Evaluate cell
-            var result = this.evalCurrentCell();
+            var result = this.evalCell(cell, head);
 
             // Perform result
             if (result[0]) {
