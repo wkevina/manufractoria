@@ -11,15 +11,15 @@ var interpreter = interpreter || {};
 
         this.position = {x: 0, y: 0};
         this.facing = program.directions.UP;
-    }
+    };
 
     Interpreter.prototype.setProgram = function(program) {
         this.program = program;
-    }
+    };
 
     Interpreter.prototype.setTape = function(tape) {
         this.tape = tape;
-    }
+    };
 
     Interpreter.prototype.start = function() {
         this.accept = false;
@@ -31,13 +31,13 @@ var interpreter = interpreter || {};
                 if (this.program.cells[x][y].type == "Start") {
                     this.position.x = x;
                     this.position.y = y;
-                } 
+                }
             }
         }
 
         // Face +y;
         this.facing = program.directions.UP;
-    }
+    };
 
     // Returns tuple [pop tape head or not (bool), symbol to push (maybe null), new facing direction]
     Interpreter.prototype.evalCell = function(cell, tapeHead) {
@@ -45,10 +45,10 @@ var interpreter = interpreter || {};
         // Implement cell logic here
 
         return [false, null, program.directions.UP];
-    }
+    };
 
     Interpreter.prototype.step = function() {
-        
+
         if (!this.running) return;
 
         // Move 'facing' direction:
@@ -86,7 +86,7 @@ var interpreter = interpreter || {};
 
         }
 
-    }
+    };
 
     interpreter.Interpreter = Interpreter;
 
