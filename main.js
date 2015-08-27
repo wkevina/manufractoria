@@ -1,6 +1,8 @@
-var core = core || {};
+var core = core || {},
+    program = program || {},
+    interpreter = interpreter || {};
 
-(function (Snap) {
+(function (Snap, program, interpreter) {
 
     /* Symbols */
     core.EMPTY = {symbol: 'empty'};
@@ -178,19 +180,54 @@ var core = core || {};
 
         grid.drawGrid();
 
-        for (var i = 0; i < 10; ++i) {
-            var m = grid.getCellMatrix(i, i);
-            var c = paper.circle(0,0,2);
-            c.transform(m.toTransformString());
-            c.attr({fill: "#000"});
+        var p = new program.Program(10, 10);
+        p.setStart(5, 0);
+        p.setCell(5, 9, "End");
+
+        for (var i = 1; i < 9; ++i) {
+            p.setCell(5, i, "Conveyor");
         }
 
-        for (var i = 0; i < 10; ++i) {
-            var m = grid.getCellMatrix(i, i, true);
-            var c = paper.circle(0,0,2);
-            c.transform(m.toTransformString());
-            c.attr({fill: "#f00"});
+        p.setCell(5, 5, "BranchBR");
+        p.setCell(4, 5, "Conveyor");
+        p.setCell(6, 5, "Conveyor");
+
+        var myInterpreter = new interpreter.Interpreter();
+        myInterpreter.setProgram(p);
+        myInterpreter.setTape(t);
+
+        var token = paper.circle(0, 0, 10);
+        token.attr({fill: "#E0E"});
+
+        myInterpreter.start();
+
+        function mainLoop() {
+            field.drawTape(t);
+
+            var curPos = myInterpreter.position;
+            token.transform(grid.getCellMatrix(curPos.x, curPos.y).toTransformString());
+
+            myInterpreter.step();
+
+            curPos = myInterpreter.position;
+
+            var update = function() {
+                token.animate(
+                    {transform:
+                     grid.getCellMatrix(curPos.x, curPos.y).toTransformString()
+                    },
+                    500,
+                    mina.linear,
+                    function() {
+                        mainLoop();
+                    }
+                );
+            };
+
+            setTimeout(update, 100);
         }
+
+        mainLoop();
     };
 
-})(Snap);
+})(Snap, program, interpreter);
