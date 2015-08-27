@@ -1,6 +1,8 @@
-var interpreter = interpreter || {};
+var interpreter = interpreter || {},
+    program = program || {},
+    codeCell = codeCell || {};
 
-(function(core, program) {
+(function(core, program, cell) {
 
     var Interpreter = function() {
         this.tape = new core.Tape();
@@ -42,7 +44,13 @@ var interpreter = interpreter || {};
     // Returns tuple [pop tape head or not (bool), symbol to push (maybe null), new facing direction]
     Interpreter.prototype.evalCell = function(cell, tapeHead) {
 
-        // Implement cell logic here
+        var cellFunc = codeCell.codeCells[cell.type];
+
+        if (cellFunc) {
+            return cellFunc(tapeHead);
+        }
+
+        console.log("Invalid cell type.");
 
         return [false, null, program.directions.UP];
     };
@@ -90,4 +98,4 @@ var interpreter = interpreter || {};
 
     interpreter.Interpreter = Interpreter;
 
-})(core, program);
+})(core, program, codeCell);
