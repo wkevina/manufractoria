@@ -3,11 +3,11 @@ var program = program || {};
 
 (function(core) {
 
-    var dir = {
-        UP: "UP",
-        DN: "DOWN",
-        L: "LEFT",
-        R: "RIGHT"
+    var dir = {          // regardless of how graphics are handled, these mean:
+        UP:     "UP",    // +y
+        DOWN:   "DOWN",  // -y
+        LEFT:   "LEFT",  // -x
+        RIGHT:  "RIGHT"  // +x
     };
 
     program.directions = dir;
@@ -35,7 +35,6 @@ var program = program || {};
         this.cols = cols;
         this.rows = rows;
         this.cells = [];
-        this.tape = new core.Tape();
 
         for (var x = 0; x < cols; ++x) {
             this.cells.append([]);
@@ -62,6 +61,8 @@ var program = program || {};
     Program.prototype.setStart = function(x, y) {
         this.setCell(x, y, "Empty");
     };
+
+    program.Program = Program;
 
 
 })(core);
