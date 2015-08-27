@@ -1,5 +1,6 @@
 
-var program = program || {};
+var program = program || {},
+    core = core || {};
 
 (function(core) {
 

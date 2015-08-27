@@ -29,11 +29,11 @@ var core = core || {};
         } else {
             return core.EMPTY;
         }
-    }
+    };
 
     Tape.prototype.append = function append(s) {
         this.symbols.push(s);
-    }
+    };
 
     core.Tape = Tape;
 
@@ -44,11 +44,11 @@ var core = core || {};
         this.height = height;
         this.x = x;
         this.y = y;
-    }
+    };
 
     TapeView.prototype.drawTape = function drawTape(t) {
 
-        this.tapeView.clear()
+        this.tapeView.clear();
 
         var sw = 20;
 
@@ -80,8 +80,8 @@ var core = core || {};
         }
 
         this.tapeView.transform("");
-        this.tapeView.transform("t" + this.x + "," + this.y)
-    }
+        this.tapeView.transform("t" + this.x + "," + this.y);
+    };
 
     core.TapeView = TapeView;
 
@@ -94,7 +94,7 @@ var core = core || {};
         this.y = y;
         this.cols = cols;
         this.rows = rows;
-    }
+    };
 
     GridView.prototype.drawGrid = function drawGrid() {
         this.grid.clear();
@@ -116,7 +116,7 @@ var core = core || {};
 
         this.grid.transform("");
         this.grid.transform("t1,1t" + this.x + "," + this.y);
-    }
+    };
 
 
 
@@ -143,7 +143,7 @@ var core = core || {};
         globalMatrix.translate(sw * col, sy * row);
 
         return globalMatrix;
-    }
+    };
 
     core.GridView = GridView;
 
