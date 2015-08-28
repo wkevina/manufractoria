@@ -6,6 +6,8 @@ var core = core || {};
     core.EMPTY = {symbol: 'empty'};
     core.RED = {symbol: 'red'};
     core.BLUE = {symbol: 'blue'};
+    core.GREEN = {symbol: 'green'};
+    core.YELLOW = {symbol: 'yellow'};
 
 
     /* Tape
@@ -73,6 +75,14 @@ var core = core || {};
 
             if (curSym === core.BLUE) {
                 circle.attr({fill: "#01F"});
+            }
+
+            if (curSym === core.GREEN) {
+                circle.attr({fill: "#0F0"});
+            }
+
+            if (curSym === core.YELLOW) {
+                circle.attr({fill: "#FF0"});
             }
 
             this.tapeView.append(circle);
