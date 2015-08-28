@@ -91,7 +91,7 @@ var interpreter = interpreter || {},
             }
 
             // Convert cell's returned direction into global direction
-            result[2] = this.convertDirectionCellToGlobal(result[2]);
+            result[2] = this.convertDirectionCellToGlobal(result[2], cell);
             return result;
         }
 
