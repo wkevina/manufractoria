@@ -18,12 +18,7 @@ var program = program || {},
             this.type = typeID;
             this.dir = program.directions.UP;
             this.mirror = false;
-        },
-        Code: function(type) {
-            this.type = type;
-            this.dir = dir.UP;
-            this.mirror = false;
-        }
+        };
     }
 
     program.cellTypes = {
