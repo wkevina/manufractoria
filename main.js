@@ -112,6 +112,10 @@ var core = core || {},
     GridView.prototype.drawGrid = function drawGrid() {
         this.grid.clear();
 
+        var r = this.paper.rect(0,0, this.width, this.height);
+        r.attr({fill: "#FFF"});
+        this.grid.append(r);
+
         var sw = this.width / this.cols;
         var sy = this.height / this.rows;
 
@@ -198,7 +202,7 @@ var core = core || {},
             var field = new TapeView(paper, 0, 0, 400, 20);
             field.drawTape(t);
 
-            var grid = new GridView(paper, 0, 30, 400, 400, 10, 10);
+            var grid = new GridView(paper, 0, 30, 560, 560, 10, 10);
 
             grid.drawGrid();
 
@@ -209,7 +213,7 @@ var core = core || {},
             for (var x = 0; x < 10; ++x) {
                 for (var y = 1; y < 9; ++y) {
 
-                    var choice = Math.floor(Math.random()*3);
+                    var choice = Math.floor(Math.random()*4);
 
                     switch (choice) {
                     case 0:
@@ -227,8 +231,6 @@ var core = core || {},
                     default:
                         p.setCell(x, y, "BranchBR");
                     }
-
-
                 }
             }
 
@@ -297,10 +299,21 @@ var core = core || {},
 
                         var group = paper.g(image);
 
+                        console.log(group.getBBox());
+                        console.log(group.transform());
+
+                        var corner = grid.getCellMatrix(x, y, true)
+                                .toTransformString()
+                                .toUpperCase();
+
                         group.transform(
-                            "s0.8" +
-                                grid.getCellMatrix(x,y, true).toTransformString().toUpperCase()
+                            //"s0.6" +
+                                corner
                         );
+
+                        var marker = paper.circle(0, 0, 2);
+                        marker.attr({fill: "#0F0"});
+                        marker.transform(corner);
 
                     }
                 }
