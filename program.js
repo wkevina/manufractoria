@@ -13,22 +13,26 @@ var program = program || {},
 
     program.directions = dir;
 
-    program.cellTypes = {
-        Empty: function() {
-            this.type = "Empty";
-            this.dir = dir.UP;
-            this.mirror = false;
-        },
-        Start: function() {
-            this.type = "Start";
-            this.dir = dir.UP;
-            this.mirror = false;
-        },
-        End: function() {
-            this.type = "End";
-            this.dir = dir.UP;
+    var makeCellClass = function(typeID) {
+        return function() {
+            this.type = typeID;
+            this.dir = program.directions.UP;
             this.mirror = false;
         }
+    }
+
+    program.cellTypes = {
+        Empty: makeCellClass("Empty"),
+        Start: makeCellClass("Start"),
+        End: makeCellClass("End"),
+        Conveyor: makeCellClass("Conveyor"),
+        CrossConveyor: makeCellClass("CrossConveyor"),
+        BranchBR: makeCellClass("BranchBR"),
+        BranchGY: makeCellClass("BranchGY"),
+        WriteB: makeCellClass("WriteB"),
+        WriteR: makeCellClass("WriteR"),
+        WriteG: makeCellClass("WriteG"),
+        WriteY: makeCellClass("WriteY")
     };
 
 
