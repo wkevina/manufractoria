@@ -1,14 +1,14 @@
 
-var program = program || {};
-var core = core || {};
+var program = program || {},
+    core = core || {};
 
 (function(core) {
 
-    var dir = {
-        UP: "UP",
-        DN: "DOWN",
-        L: "LEFT",
-        R: "RIGHT"
+    var dir = {          // regardless of how graphics are handled, these mean:
+        UP:     "UP",    // +y
+        DOWN:   "DOWN",  // -y
+        LEFT:   "LEFT",  // -x
+        RIGHT:  "RIGHT"  // +x
     };
 
     program.directions = dir;
@@ -36,13 +36,11 @@ var core = core || {};
         }
     };
 
+
     var Program = function Program(cols, rows) {
         this.cols = cols;
         this.rows = rows;
         this.cells = [];
-        this.start = null;
-        this.end = null;
-        this.tape = new core.Tape();
 
         for (var x = 0; x < cols; ++x) {
             this.cells.push([]);
@@ -78,7 +76,6 @@ var core = core || {};
 
     Program.prototype.setStart = function(x, y) {
         this.setCell(x, y, "Start");
-        this.start = {x: x, y: y};
     };
 
     Program.prototype.setEnd = function(x, y) {

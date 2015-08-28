@@ -1,7 +1,6 @@
 var core = core || {};
-var program = program || {};
 
-(function (Snap, program) {
+(function (Snap) {
 
     /* Symbols */
     core.EMPTY = {symbol: 'empty'};
@@ -30,11 +29,11 @@ var program = program || {};
         } else {
             return core.EMPTY;
         }
-    }
+    };
 
     Tape.prototype.append = function append(s) {
         this.symbols.push(s);
-    }
+    };
 
     core.Tape = Tape;
 
@@ -45,11 +44,11 @@ var program = program || {};
         this.height = height;
         this.x = x;
         this.y = y;
-    }
+    };
 
     TapeView.prototype.drawTape = function drawTape(t) {
 
-        this.tapeView.clear()
+        this.tapeView.clear();
 
         var sw = 20;
 
@@ -81,8 +80,8 @@ var program = program || {};
         }
 
         this.tapeView.transform("");
-        this.tapeView.transform("t" + this.x + "," + this.y)
-    }
+        this.tapeView.transform("t" + this.x + "," + this.y);
+    };
 
     core.TapeView = TapeView;
 
@@ -116,7 +115,7 @@ var program = program || {};
         this.grid.attr({stroke: "#000", strokeWidth: 2});
 
         this.grid.transform("");
-        this.grid.transform("t" + this.x + "," + this.y);
+        this.grid.transform("t1,1t" + this.x + "," + this.y);
     };
 
     /**
@@ -142,7 +141,7 @@ var program = program || {};
         globalMatrix.translate(sw * col, sy * row);
 
         return globalMatrix;
-    }
+    };
 
     core.GridView = GridView;
 
@@ -162,19 +161,26 @@ var program = program || {};
         paper.appendTo(document.getElementById("main"));
 
 
-        var tape = new TapeView(paper, 0, 0, 400, 20);
-        tape.drawTape(t);
+        var field = new TapeView(paper, 0, 0, 400, 20);
+        field.drawTape(t);
 
-        var prog = new program.Program(11, 11);
+        var grid = new GridView(paper, 0, 30, 400, 400, 10, 10);
 
-        prog.setStart(5, 0);
-        prog.setEnd(5, 10);
+        grid.drawGrid();
 
-        prog.setCell(5, 1, "branch");
+        for (var i = 0; i < 10; ++i) {
+            var m = grid.getCellMatrix(i, i);
+            var c = paper.circle(0,0,2);
+            c.transform(m.toTransformString());
+            c.attr({fill: "#000"});
+        }
 
-        var programView = new program.ProgramView(paper, 1, 30, 330, 330, prog);
-        programView.drawProgram();
-
+        for (var i = 0; i < 10; ++i) {
+            var m = grid.getCellMatrix(i, i, true);
+            var c = paper.circle(0,0,2);
+            c.transform(m.toTransformString());
+            c.attr({fill: "#f00"});
+        }
     };
 
-})(Snap, program);
+})(Snap);
