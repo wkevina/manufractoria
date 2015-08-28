@@ -165,11 +165,30 @@ var core = core || {},
             var t = new Tape();
             core.t = t;
 
-            for (var i = 0; i < 10; ++i) {
-                t.append(core.RED);
-                t.append(core.BLUE);
-                t.append(core.RED);
-                t.append(core.EMPTY);
+            for (var i = 0; i < 100; ++i) {
+
+                var choice = Math.floor(Math.random()*4);
+
+                switch (choice) {
+                case 0:
+                    t.append(core.RED);
+                    break;
+                case 1:
+                    t.append(core.BLUE);
+                    break;
+                case 2:
+                    t.append(core.GREEN);
+                    break;
+                case 3:
+                    t.append(core.YELLOW);
+                default:
+                    t.append(core.RED);
+                }
+
+            }
+
+            if (t.head() == core.EMPTY) {
+                t.pop();
             }
 
             var paper = Snap(640, 640);
@@ -187,16 +206,38 @@ var core = core || {},
             p.setStart(5, 0);
             p.setCell(5, 9, "End");
 
-            for (var i = 1; i < 9; ++i) {
-                p.setCell(5, i, "Conveyor");
+            for (var x = 0; x < 10; ++x) {
+                for (var y = 1; y < 9; ++y) {
+
+                    var choice = Math.floor(Math.random()*3);
+
+                    switch (choice) {
+                    case 0:
+                        p.setCell(x, y, "BranchBR");
+                        break;
+                    case 1:
+                        p.setCell(x, y, "BranchBR");
+                        break;
+                    case 2:
+                        p.setCell(x,y, "BranchGY");
+                        break;
+                    case 3:
+                        p.setCell(x,y, "Conveyor");
+                        break;
+                    default:
+                        p.setCell(x, y, "BranchBR");
+                    }
+
+
+                }
             }
 
-            p.setCell(5, 5, "BranchBR");
-            p.setCell(4, 5, "BranchBR");
-            p.setCell(3, 5, "BranchBR");
-            p.setCell(2, 5, "BranchBR");
+            // p.setCell(5, 5, "BranchBR");
+            // p.setCell(4, 5, "BranchBR");
+            // p.setCell(3, 5, "BranchBR");
+            // p.setCell(2, 5, "BranchBR");
 
-            p.setCell(6, 5, "Conveyor");
+            // p.setCell(6, 5, "Conveyor");
 
             var myInterpreter = new interpreter.Interpreter();
             myInterpreter.setProgram(p);
