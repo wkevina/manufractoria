@@ -54,13 +54,7 @@ var program = program || {},
     };
 
     Program.prototype.setCell = function setCell(x, y, type, direction, mirrored) {
-        var s;
-
-        if (["Empty", "Start", "End"].indexOf(type) != -1) {
-            s = new program.cellTypes[type]();
-        } else {
-            s = new program.cellTypes["Code"](type);
-        }
+        var s = new program.cellTypes[type]();
 
         if (direction) {
             s.dir = direction;
