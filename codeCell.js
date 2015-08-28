@@ -57,7 +57,7 @@ var codeCell = codeCell || {},
          If head is YELLOW, pop tape and move RIGHT
          Otherwise, don't pop and move UP
          */
-        BranchBR: function BranchGY(head) {
+        BranchGY: function BranchGY(head) {
             if (head === core.GREEN) {
                 return [true, null, program.directions.LEFT];
             }
