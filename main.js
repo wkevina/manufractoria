@@ -1,8 +1,9 @@
 var core = core || {},
     program = program || {},
-    interpreter = interpreter || {};
+    interpreter = interpreter || {},
+    graphics = graphics || {};
 
-(function (Snap, program, interpreter) {
+(function (Snap, program, interpreter, graphics) {
 
     /* Symbols */
     core.EMPTY = {symbol: 'empty'};
@@ -13,8 +14,8 @@ var core = core || {},
 
 
     /* Tape
-       Represents an ordered queue of symbols
-    */
+     Represents an ordered queue of symbols
+     */
     var Tape = function Tape() {
         this.symbols = [];
     };
@@ -131,15 +132,15 @@ var core = core || {},
     };
 
     /**
-       GridView.getCellMatrix(col, row, corner) -> Matrix
+     GridView.getCellMatrix(col, row, corner) -> Matrix
 
-       Returns global matrix describing location of cell
+     Returns global matrix describing location of cell
 
-       If corner == true, uses top left corner of cell
+     If corner == true, uses top left corner of cell
 
-       Otherwise, uses center of cell
+     Otherwise, uses center of cell
 
-       */
+     */
     GridView.prototype.getCellMatrix = function getCellMatrix(col, row, corner) {
         var transform = this.grid.transform();
         var globalMatrix = transform.globalMatrix.clone();
@@ -159,78 +160,86 @@ var core = core || {},
 
     core.main = function() {
 
-        var t = new Tape();
-        core.t = t;
+        graphics.preload().then(function() {
 
-        for (var i = 0; i < 10; ++i) {
-            t.append(core.RED);
-            t.append(core.BLUE);
-            t.append(core.RED);
-            t.append(core.EMPTY);
-        }
+            var t = new Tape();
+            core.t = t;
 
-        var paper = Snap(640, 640);
-        paper.appendTo(document.getElementById("main"));
+            for (var i = 0; i < 10; ++i) {
+                t.append(core.RED);
+                t.append(core.BLUE);
+                t.append(core.RED);
+                t.append(core.EMPTY);
+            }
+
+            var paper = Snap(640, 640);
+            paper.appendTo(document.getElementById("main"));
 
 
-        var field = new TapeView(paper, 0, 0, 400, 20);
-        field.drawTape(t);
-
-        var grid = new GridView(paper, 0, 30, 400, 400, 10, 10);
-
-        grid.drawGrid();
-
-        var p = new program.Program(10, 10);
-        p.setStart(5, 0);
-        p.setCell(5, 9, "End");
-
-        for (var i = 1; i < 9; ++i) {
-            p.setCell(5, i, "Conveyor");
-        }
-
-        p.setCell(5, 5, "BranchBR");
-        p.setCell(4, 5, "Conveyor");
-        p.setCell(6, 5, "Conveyor");
-
-        var myInterpreter = new interpreter.Interpreter();
-        myInterpreter.setProgram(p);
-        myInterpreter.setTape(t);
-
-        var token = paper.circle(0, 0, 10);
-        token.attr({fill: "#E0E"});
-
-        drawProgram(paper, p, grid);
-
-        myInterpreter.start();
-
-        function mainLoop() {
+            var field = new TapeView(paper, 0, 0, 400, 20);
             field.drawTape(t);
 
-            var curPos = myInterpreter.position;
-            token.transform(grid.getCellMatrix(curPos.x, curPos.y).toTransformString());
+            var grid = new GridView(paper, 0, 30, 400, 400, 10, 10);
 
-            myInterpreter.step();
+            grid.drawGrid();
 
-            curPos = myInterpreter.position;
+            var p = new program.Program(10, 10);
+            p.setStart(5, 0);
+            p.setCell(5, 9, "End");
 
-            var update = function() {
-                token.animate(
-                    {transform:
-                     grid.getCellMatrix(curPos.x, curPos.y).toTransformString()
-                    },
-                    500,
-                    mina.linear,
-                    function() {
-                        mainLoop();
-                    }
-                );
-            };
+            for (var i = 1; i < 9; ++i) {
+                p.setCell(5, i, "Conveyor");
+            }
 
-            setTimeout(update, 100);
-        }
+            p.setCell(5, 5, "BranchBR");
+            p.setCell(4, 5, "BranchBR");
+            p.setCell(3, 5, "BranchBR");
+            p.setCell(2, 5, "BranchBR");
 
-        mainLoop();
+            p.setCell(6, 5, "Conveyor");
+
+            var myInterpreter = new interpreter.Interpreter();
+            myInterpreter.setProgram(p);
+            myInterpreter.setTape(t);
+
+            var token = paper.circle(0, 0, 10);
+            token.attr({fill: "#E0E"});
+
+            drawProgram(paper, p, grid);
+
+            myInterpreter.start();
+
+            function mainLoop() {
+                field.drawTape(t);
+
+                var curPos = myInterpreter.position;
+                token.transform(grid.getCellMatrix(curPos.x, curPos.y).toTransformString());
+
+                myInterpreter.step();
+
+                curPos = myInterpreter.position;
+
+                var update = function() {
+                    token.animate(
+                        {transform:
+                         grid.getCellMatrix(curPos.x, curPos.y).toTransformString()
+                        },
+                        500,
+                        mina.linear,
+                        function() {
+                            mainLoop();
+                        }
+                    );
+                };
+
+                setTimeout(update, 100);
+            }
+
+            mainLoop();
+        });
+
     };
+
 
     function drawProgram(paper, program, grid) {
         for (var x = 0; x < program.cols; ++x) {
@@ -238,26 +247,24 @@ var core = core || {},
                 var c = program.getCell(x, y);
 
                 if (c.type != "Empty") {
-                    var imageUrl = null;
 
-                    if (c.type == "BranchBR") {
-                        imageUrl = "img/branch-br.svg";
-                    }
+                    var image = graphics.getGraphic(c.type);
 
-                    if (c.type == "Conveyor") {
-                        imageUrl = "img/conveyor.svg";
-                    }
+                    if (image) {
 
-                    if (imageUrl) {
-                        Snap.load(imageUrl, function(f) {
-                            var g = f.select("g");
-                            paper.append(g);
-                            //g.transform(grid.getCellMatrix(x,y).toTransformString());
-                        });
+                        paper.append(image);
+
+                        var group = paper.g(image);
+
+                        group.transform(
+                            "s0.8" +
+                                grid.getCellMatrix(x,y, true).toTransformString().toUpperCase()
+                        );
+
                     }
                 }
             }
         }
     }
 
-})(Snap, program, interpreter);
+})(Snap, program, interpreter, graphics);
