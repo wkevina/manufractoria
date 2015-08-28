@@ -41,13 +41,58 @@ var interpreter = interpreter || {},
         this.facing = program.directions.UP;
     };
 
+    Interpreter.prototype._convertDirectionCore = function(d, cell, way) {
+
+        // Ask me to explain this function in person. There is no documentation that will allow you to understand
+        // unless you re-create this function yourself to see why it is the way it is. - Chase
+
+        var nativeMap = [program.directions.UP, program.directions.LEFT, program.directions.DOWN, program.directions.RIGHT];
+        var mirrorMap = [program.directions.UP, program.directions.RIGHT, program.directions.DOWN, program.directions.LEFT];
+        var actualMap = cell.mirror ? mirrorMap : nativeMap;
+
+        var refCell = _.indexOf(nativeMap, cell.dir);
+        var dInd = _.indexOf(actualMap, d);
+
+        var result = 0;
+        if (way == "GC") {
+            result = (dInd - refCell) % 4; // Global to Cell
+        } else if (way == "CG") {
+            result = (dInd + refCell) % 4; // Cell to Global
+        }
+
+        while (result < 0) result += 4; // Make '%' behave sanely :(
+
+        return actualMap[result];
+    }
+
+    Interpreter.prototype.convertDirectionGlobalToCell = function(d, cell) {
+        return this._convertDirectionCore(d, cell, "GC");
+    };
+
+    Interpreter.prototype.convertDirectionCellToGlobal = function(d, cell) {
+        return this._convertDirectionCore(d, cell, "CG");
+    };
+
     // Returns tuple [pop tape head or not (bool), symbol to push (maybe null), new facing direction]
     Interpreter.prototype.evalCell = function(cell, tapeHead) {
 
         var cellFunc = codeCell.codeCells[cell.type];
 
+        var result = null;
+
         if (cellFunc) {
-            return cellFunc(tapeHead);
+            if (cell.type == "CrossConveyor") {
+                // Special case. Convert this.facing into cell coordinates for CrossConveyor's function:
+                var cellFacing = this.convertDirectionGlobalToCell(this.facing, cell);
+                result = cellFunc(tapeHead, cellFacing);
+            } else {
+                // No knowledge of current facing needed
+                result = cellFunc(tapeHead);
+            }
+
+            // Convert cell's returned direction into global direction
+            result[2] = this.convertDirectionCellToGlobal(result[2]);
+            return result;
         }
 
         console.log("Invalid cell type.");
