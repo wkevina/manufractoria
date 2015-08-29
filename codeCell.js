@@ -24,10 +24,10 @@ var codeCell = codeCell || {},
          (This cell, like conveyor, will handle orientation implicitly by letting the default orientation be ^>)
          */
         CrossConveyor: function CrossConveyor(head, previousFacing) {
-            if (previousFacing == program.directions.UP || previousFacing == program.directions.DOWN) {
+            if (previousFacing.equals(program.directions.UP) || previousFacing.equals(program.directions.DOWN)) {
                 return [false, null, program.directions.UP];
-            } else if (previousFacing == program.directions.UP || previousFacing == program.directions.DOWN) {
-                return [false, null, program.directions.RIGHT]
+            } else if (previousFacing.equals(program.directions.UP) || previousFacing.equals(program.directions.DOWN)) {
+                return [false, null, program.directions.RIGHT];
             }
         },
 

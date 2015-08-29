@@ -1,14 +1,15 @@
 
 var program = program || {},
     core = core || {};
+    tmath = tmath || {};
 
-(function(core) {
+(function(core, tmath) {
 
-    var dir = {          // regardless of how graphics are handled, these mean:
-        UP:     "UP",    // +y
-        DOWN:   "DOWN",  // -y
-        LEFT:   "LEFT",  // -x
-        RIGHT:  "RIGHT"  // +x
+    var dir = {                     // regardless of how graphics are handled, these mean:
+        UP:     new tmath.Vec2(0, 1),     // +y
+        DOWN:   new tmath.Vec2(0, -1),    // -y
+        LEFT:   new tmath.Vec2(-1, 0),    // -x
+        RIGHT:  new tmath.Vec2(1, 0)      // +x
     };
 
     program.directions = dir;
@@ -16,8 +17,7 @@ var program = program || {},
     var makeCellClass = function(typeID) {
         return function() {
             this.type = typeID;
-            this.dir = program.directions.UP;
-            this.mirror = false;
+            this.orientation = tmath.Mat2x2.ID();
         };
     }
 
@@ -120,5 +120,85 @@ var program = program || {},
 
     program.ProgramView = ProgramView;
 
+    program.readLegacyProgramString = function(s) {
+        
+        // [lvlString]&[codeString]&[metaInfo]
 
-})(core);
+        var i = 0;
+
+        var attrStrings = s.split("&");
+        var attrs = {}
+
+        for (i = 0; i < attrStrings.length; i ++) {
+            if (attrStrings[i].startsWith("lvl=")) {
+                attrs.lvl = parseInt(attrStrings[i].slice(4));
+            }
+            if (attrStrings[i].startsWith("code=")) {
+                attrs.codeString = attrStrings[i].slice(5);
+            }
+            if (attrStrings[i].startsWith("ctm=")) {
+
+                // [name];[description];[test case string];[rows/cols count];[??? always 3];[??? 1 or 0 for binary or 'normal']
+
+                var ctmParts = attrStrings[i].slice(4).split(";");
+                attrs.name = ctmParts[0];
+                attrs.description = ctmParts[1];
+                attrs.testCaseString = ctmParts[2];
+                attrs.rows = ctmParts[3];
+                attrs.cols = ctmParts[3];
+            }
+        }
+
+        // Now parse the codeString part
+
+        var typeMap = {c: "Conveyor", b: "WriteB", r: "WriteR", g: "WriteG", y: "WriteY", p: "BranchBR", q: "BranchGY", i: "CrossConveyor"};
+        var dirMapNative = [program.directions.LEFT, program.directions.DOWN, program.directions.RIGHT, program.directions.UP];
+        var dirMapMirror = [program.directions.RIGHT, program.directions.DOWN, program.directions.LEFT, program.directions.UP];
+
+        var p = new program.Program(attrs.cols, attrs.rows);
+        var parts = attrs.codeString.split(";");
+
+        for (var i = 0; i < parts.length; i ++) {
+
+            // [type][column]:[row]f[orientation]
+
+            var partString = parts[i].trim();
+
+            if (partString.length == 0) continue;
+
+            var fInd = _.indexOf(partString, "f");
+            var cInd = _.indexOf(partString, ":");
+
+            var original = {type: partString[0], x: parseInt(partString.slice(1, cInd)), y: parseInt(partString.slice(cInd+1, fInd)), dir: parseInt(partString.slice(fInd+1))};
+
+            var cellProps = {};
+
+            cellProps.type = typeMap[original.type];
+            cellProps.x = original.x - 8;
+            cellProps.y = original.y - 3;
+
+            if (original.dir == 0) cellProps.dir = tmath.Mat2x2.ID();
+            if (original.dir == 1) cellProps.dir = tmath.Mat2x2.MROT1();
+            if (original.dir == 2) cellProps.dir = tmath.Mat2x2.MROT2();
+            if (original.dir == 3) cellProps.dir = tmath.Mat2x2.MROT3();
+            if (original.dir == 4) cellProps.dir = tmath.Mat2x2.ID();
+            if (original.dir == 5) cellProps.dir = tmath.Mat2x2.ROT1();
+            if (original.dir == 6) cellProps.dir = tmath.Mat2x2.ROT2();
+            if (original.dir == 7) cellProps.dir = tmath.Mat2x2.ROT3();
+
+            console.log(partString);
+            console.log(original);
+            console.log(cellProps);
+            p.setCell(cellProps.x, cellProps.y, cellProps.type, cellProps.dir, cellProps.mirror);
+
+        }
+
+        p.setStart(Math.floor(p.cols/2), 0);
+        p.setEnd(Math.floor(p.cols/2), p.rows - 1);
+
+        return p;
+
+    }
+
+
+})(core, tmath);

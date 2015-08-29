@@ -1,8 +1,9 @@
 var interpreter = interpreter || {},
     program = program || {},
-    codeCell = codeCell || {};
+    codeCell = codeCell || {},
+    tmath = tmath || {};
 
-(function(core, program, cell) {
+(function(core, program, cell, tmath) {
 
     var Interpreter = function() {
         this.tape = new core.Tape();
@@ -11,7 +12,7 @@ var interpreter = interpreter || {},
         this.accept = false;
         this.running = false;
 
-        this.position = {x: 0, y: 0};
+        this.position = new tmath.Vec2(0, 0);
         this.facing = program.directions.UP;
     };
 
@@ -41,36 +42,12 @@ var interpreter = interpreter || {},
         this.facing = program.directions.UP;
     };
 
-    Interpreter.prototype._convertDirectionCore = function(d, cell, way) {
-
-        // Ask me to explain this function in person. There is no documentation that will allow you to understand
-        // unless you re-create this function yourself to see why it is the way it is. - Chase
-
-        var nativeMap = [program.directions.UP, program.directions.LEFT, program.directions.DOWN, program.directions.RIGHT];
-        var mirrorMap = [program.directions.UP, program.directions.RIGHT, program.directions.DOWN, program.directions.LEFT];
-        var actualMap = cell.mirror ? mirrorMap : nativeMap;
-
-        var refCell = _.indexOf(nativeMap, cell.dir);
-        var dInd = _.indexOf(actualMap, d);
-
-        var result = 0;
-        if (way == "GC") {
-            result = (dInd - refCell) % 4; // Global to Cell
-        } else if (way == "CG") {
-            result = (dInd + refCell) % 4; // Cell to Global
-        }
-
-        while (result < 0) result += 4; // Make '%' behave sanely :(
-
-        return actualMap[result];
-    }
-
     Interpreter.prototype.convertDirectionGlobalToCell = function(d, cell) {
-        return this._convertDirectionCore(d, cell, "GC");
+        return cell.orientation.apply(d);
     };
 
     Interpreter.prototype.convertDirectionCellToGlobal = function(d, cell) {
-        return this._convertDirectionCore(d, cell, "CG");
+        return cell.orientation.invert().apply(d);
     };
 
     // Returns tuple [pop tape head or not (bool), symbol to push (maybe null), new facing direction]
@@ -91,7 +68,9 @@ var interpreter = interpreter || {},
             }
 
             // Convert cell's returned direction into global direction
+            console.log("(", result, ")");
             result[2] = this.convertDirectionCellToGlobal(result[2], cell);
+            console.log(result)
             return result;
         }
 
@@ -105,10 +84,7 @@ var interpreter = interpreter || {},
         if (!this.running) return;
 
         // Move 'facing' direction:
-        if (this.facing == program.directions.UP) this.position.y += 1;
-        if (this.facing == program.directions.DOWN) this.position.y -= 1;
-        if (this.facing == program.directions.LEFT) this.position.x -= 1;
-        if (this.facing == program.directions.RIGHT) this.position.x += 1;
+        this.position = this.position.add(this.facing);
 
         // Get state
         var cell = this.program.getCell(this.position.x, this.position.y);
@@ -143,4 +119,31 @@ var interpreter = interpreter || {},
 
     interpreter.Interpreter = Interpreter;
 
-})(core, program, codeCell);
+    interpreter.dtest = function() {
+        var intr = new interpreter.Interpreter();
+        console.log(i);
+        var a = new program.cellTypes["BranchBR"]();
+
+        var dirs = [program.directions.UP, program.directions.LEFT, program.directions.DOWN, program.directions.RIGHT];
+
+        for (var i = 0; i < dirs.length; i ++) {
+            a.dir = dirs[i];
+            console.log("Cell is ", a.dir);
+            for (var j = 0; j < dirs.length; j ++) {
+                console.log(dirs[j], " --> ", intr.convertDirectionCellToGlobal(dirs[j], a));
+            }
+        }
+
+        console.log("mirroring cell");
+        a.mirror = true;
+
+        for (var i = 0; i < dirs.length; i ++) {
+            a.dir = dirs[i];
+            console.log("Cell is ", a.dir);
+            for (var j = 0; j < dirs.length; j ++) {
+                console.log(dirs[j], " --> ", intr.convertDirectionCellToGlobal(dirs[j], a));
+            }
+        }
+    }
+
+})(core, program, codeCell, tmath);
