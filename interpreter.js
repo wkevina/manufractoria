@@ -68,9 +68,7 @@ var interpreter = interpreter || {},
             }
 
             // Convert cell's returned direction into global direction
-            console.log("(", result, ")");
             result[2] = this.convertDirectionCellToGlobal(result[2], cell);
-            console.log(result)
             return result;
         }
 
@@ -118,32 +116,5 @@ var interpreter = interpreter || {},
     };
 
     interpreter.Interpreter = Interpreter;
-
-    interpreter.dtest = function() {
-        var intr = new interpreter.Interpreter();
-        console.log(i);
-        var a = new program.cellTypes["BranchBR"]();
-
-        var dirs = [program.directions.UP, program.directions.LEFT, program.directions.DOWN, program.directions.RIGHT];
-
-        for (var i = 0; i < dirs.length; i ++) {
-            a.dir = dirs[i];
-            console.log("Cell is ", a.dir);
-            for (var j = 0; j < dirs.length; j ++) {
-                console.log(dirs[j], " --> ", intr.convertDirectionCellToGlobal(dirs[j], a));
-            }
-        }
-
-        console.log("mirroring cell");
-        a.mirror = true;
-
-        for (var i = 0; i < dirs.length; i ++) {
-            a.dir = dirs[i];
-            console.log("Cell is ", a.dir);
-            for (var j = 0; j < dirs.length; j ++) {
-                console.log(dirs[j], " --> ", intr.convertDirectionCellToGlobal(dirs[j], a));
-            }
-        }
-    }
 
 })(core, program, codeCell, tmath);
