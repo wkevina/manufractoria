@@ -24,21 +24,25 @@ var tmath = tmath || {};
         this.d = d;
     };
 
-    Mat2x2.ID =     function() { return new Mat2x2(1, 0, 0, 1); };
-    Mat2x2.ROT1 =   function() { return new Mat2x2(0, -1, 1, 0); };
-    Mat2x2.ROT2 =   function() { return new Mat2x2(-1, 0, 0, -1); };
-    Mat2x2.ROT3 =   function() { return new Mat2x2(0, 1, -1, 0); };
-    Mat2x2.MIR =    function() { return new Mat2x2(-1, 0, 0, 1); };
-    Mat2x2.MROT1 =  function() { return new Mat2x2(0, 1, 1, 0); };
-    Mat2x2.MROT2 =  function() { return new Mat2x2(1, 0, 0, -1); };
-    Mat2x2.MROT3 =  function() { return new Mat2x2(0, -1, -1, 0); };
+    Mat2x2.ID =     function() { return new Mat2x2(1, 0, 0, 1); };      Mat2x2.kID = Mat2x2.ID();
+    Mat2x2.ROT1 =   function() { return new Mat2x2(0, -1, 1, 0); };     Mat2x2.kROT1 = Mat2x2.ROT1();
+    Mat2x2.ROT2 =   function() { return new Mat2x2(-1, 0, 0, -1); };    Mat2x2.kROT2 = Mat2x2.ROT2();
+    Mat2x2.ROT3 =   function() { return new Mat2x2(0, 1, -1, 0); };     Mat2x2.kROT3 = Mat2x2.ROT3();
+    Mat2x2.MIR =    function() { return new Mat2x2(-1, 0, 0, 1); };     Mat2x2.kMIR = Mat2x2.MIR();
+    Mat2x2.MROT1 =  function() { return new Mat2x2(0, 1, 1, 0); };      Mat2x2.kMROT1 = Mat2x2.MROT1();
+    Mat2x2.MROT2 =  function() { return new Mat2x2(1, 0, 0, -1); };     Mat2x2.kMROT2 = Mat2x2.MROT2();
+    Mat2x2.MROT3 =  function() { return new Mat2x2(0, -1, -1, 0); };    Mat2x2.kMROT3 = Mat2x2.MROT3();
 
     Mat2x2.prototype.apply = function(v) {
         return new Vec2(this.a * v.x + this.b * v.y, this.c * v.x + this.d * v.y);
     };
 
+    Mat2x2.prototype.scale = function(s) {
+        return new Mat2x2(s*this.a, s*this.b, s*this.c, s*this.d);
+    }
+
     Mat2x2.prototype.invert = function() {
-        return new Mat2x2(this.d, -this.b, -this.c, this.a);
+        return new Mat2x2(this.d, -this.b, -this.c, this.a).scale((this.a*this.d - this.b*this.c));
     };
 
     Mat2x2.prototype.compose = function(m2) {
