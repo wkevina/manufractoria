@@ -53,15 +53,11 @@ var program = program || {},
         return this.cells[x][y];
     };
 
-    Program.prototype.setCell = function setCell(x, y, type, direction, mirrored) {
+    Program.prototype.setCell = function setCell(x, y, type, orientation) {
         var s = new program.cellTypes[type]();
 
-        if (direction) {
-            s.dir = direction;
-        }
-
-        if (mirrored) {
-            s.mirror = mirrored;
+        if (orientation) {
+            s.orientation = orientation;
         }
 
         this.cells[x][y] = s;
@@ -152,8 +148,6 @@ var program = program || {},
         // Now parse the codeString part
 
         var typeMap = {c: "Conveyor", b: "WriteB", r: "WriteR", g: "WriteG", y: "WriteY", p: "BranchBR", q: "BranchGY", i: "CrossConveyor"};
-        var dirMapNative = [program.directions.LEFT, program.directions.DOWN, program.directions.RIGHT, program.directions.UP];
-        var dirMapMirror = [program.directions.RIGHT, program.directions.DOWN, program.directions.LEFT, program.directions.UP];
 
         var p = new program.Program(attrs.cols, attrs.rows);
         var parts = attrs.codeString.split(";");
@@ -169,7 +163,7 @@ var program = program || {},
             var fInd = _.indexOf(partString, "f");
             var cInd = _.indexOf(partString, ":");
 
-            var original = {type: partString[0], x: parseInt(partString.slice(1, cInd)), y: parseInt(partString.slice(cInd+1, fInd)), dir: parseInt(partString.slice(fInd+1))};
+            var original = {type: partString[0], x: parseInt(partString.slice(1, cInd)), y: parseInt(partString.slice(cInd+1, fInd)), orientation: parseInt(partString.slice(fInd+1))};
 
             var cellProps = {};
 
@@ -177,19 +171,26 @@ var program = program || {},
             cellProps.x = original.x - 8;
             cellProps.y = original.y - 3;
 
-            if (original.dir == 0) cellProps.dir = tmath.Mat2x2.ID();
-            if (original.dir == 1) cellProps.dir = tmath.Mat2x2.MROT1();
-            if (original.dir == 2) cellProps.dir = tmath.Mat2x2.MROT2();
-            if (original.dir == 3) cellProps.dir = tmath.Mat2x2.MROT3();
-            if (original.dir == 4) cellProps.dir = tmath.Mat2x2.ID();
-            if (original.dir == 5) cellProps.dir = tmath.Mat2x2.ROT1();
-            if (original.dir == 6) cellProps.dir = tmath.Mat2x2.ROT2();
-            if (original.dir == 7) cellProps.dir = tmath.Mat2x2.ROT3();
+            console.log(cellProps.type, original.orientation);
+            if (cellProps.type.startsWith("Branch")) {
+                if (original.orientation == 0) cellProps.orientation = tmath.Mat2x2.MROT3();
+                if (original.orientation == 1) cellProps.orientation = tmath.Mat2x2.MROT2();
+                if (original.orientation == 2) cellProps.orientation = tmath.Mat2x2.MROT1();
+                if (original.orientation == 3) cellProps.orientation = tmath.Mat2x2.MIR();
+                if (original.orientation == 4) cellProps.orientation = tmath.Mat2x2.ROT3();
+                if (original.orientation == 5) cellProps.orientation = tmath.Mat2x2.ROT2();
+                if (original.orientation == 6) cellProps.orientation = tmath.Mat2x2.ROT1();
+                if (original.orientation == 7) cellProps.orientation = tmath.Mat2x2.ID();
+            } else {
+                if (original.orientation == 0 || original.orientation == 4) cellProps.orientation = tmath.Mat2x2.ROT3();
+                if (original.orientation == 1 || original.orientation == 5) cellProps.orientation = tmath.Mat2x2.ROT2();
+                if (original.orientation == 2 || original.orientation == 6) cellProps.orientation = tmath.Mat2x2.ROT1();
+                if (original.orientation == 3 || original.orientation == 7) cellProps.orientation = tmath.Mat2x2.ID();
+            }
 
-            console.log(partString);
-            console.log(original);
-            console.log(cellProps);
-            p.setCell(cellProps.x, cellProps.y, cellProps.type, cellProps.dir, cellProps.mirror);
+            console.log(partString, cellProps);
+
+            p.setCell(cellProps.x, cellProps.y, cellProps.type, cellProps.orientation);
 
         }
 
