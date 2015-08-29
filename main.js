@@ -1,9 +1,10 @@
 var core = core || {},
     program = program || {},
     interpreter = interpreter || {},
-    graphics = graphics || {};
+    graphics = graphics || {},
+    tmath = tmath || {};
 
-(function (Snap, program, interpreter, graphics) {
+(function (Snap, program, interpreter, graphics, tmath) {
 
     /* Symbols */
     core.EMPTY = {symbol: 'empty'};
@@ -231,6 +232,8 @@ var core = core || {},
                     default:
                         p.setCell(x, y, "BranchBR");
                     }
+
+                    p.getCell(x, y).orientation = tmath.Mat2x2.MROT1();
                 }
             }
 
@@ -251,15 +254,14 @@ var core = core || {},
             drawProgram(paper, p, grid);
 
             myInterpreter.start();
+            field.drawTape(t);
 
             function mainLoop() {
-                field.drawTape(t);
 
                 var curPos = myInterpreter.position;
                 token.transform(grid.getCellMatrix(curPos.x, curPos.y).toTransformString());
 
                 myInterpreter.step();
-
                 curPos = myInterpreter.position;
 
                 var update = function() {
@@ -270,6 +272,7 @@ var core = core || {},
                         500,
                         mina.linear,
                         function() {
+                            field.drawTape(t);
                             mainLoop();
                         }
                     );
@@ -302,13 +305,20 @@ var core = core || {},
                         console.log(group.getBBox());
                         console.log(group.transform());
 
+                        
                         var corner = grid.getCellMatrix(x, y, true)
                                 .toTransformString()
                                 .toUpperCase();
 
+                        var o = c.orientation;
+                        
+                        var transform = Snap.matrix(o.a, o.b, o.c, o.d, 28, 28);
+                        transform.add(Snap.matrix().translate(-28, -28));
+
+                        console.log(transform.toTransformString());
                         group.transform(
-                            //"s0.6" +
-                                corner
+                            transform.toTransformString() + 
+                            corner
                         );
 
                         var marker = paper.circle(0, 0, 2);
@@ -321,4 +331,4 @@ var core = core || {},
         }
     }
 
-})(Snap, program, interpreter, graphics);
+})(Snap, program, interpreter, graphics, tmath);
