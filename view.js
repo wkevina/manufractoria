@@ -61,9 +61,9 @@ var view = view || {},
     core.TapeView = TapeView;
 
     /**
-       GridView
+     GridView
 
-       Draws a grid on the canvas
+     Draws a grid on the canvas
      */
     function GridView(paper, x, y, width, height, rows, cols) {
         this.paper = paper;
@@ -103,15 +103,15 @@ var view = view || {},
     };
 
     /**
-       GridView.getCellMatrix(col, row, corner) -> Matrix
+     GridView.getCellMatrix(col, row, corner) -> Matrix
 
-       Returns global matrix describing location of cell
+     Returns global matrix describing location of cell
 
-       If corner == true, uses top left corner of cell
+     If corner == true, uses top left corner of cell
 
-       Otherwise, uses center of cell
+     Otherwise, uses center of cell
 
-    */
+     */
     GridView.prototype.getCellMatrix = function getCellMatrix(col, row, corner) {
         var transform = this.grid.transform();
         var globalMatrix = transform.globalMatrix.clone();
@@ -208,8 +208,8 @@ var view = view || {},
     view.ProgramView = ProgramView;
 
     /**
-       Utility function that converts a Snap.Matrix to a Snap transform string
-    */
+     Utility function that converts a Snap.Matrix to a Snap transform string
+     */
     view.toTransformString = function (matrix) {
         var E = "";
         var s = matrix.split();
@@ -217,7 +217,7 @@ var view = view || {},
             s.scalex = +s.scalex.toFixed(4);
             s.scaley = +s.scaley.toFixed(4);
             s.rotate = +s.rotate.toFixed(4);
-            return  (s.dx || s.dy ? "t" + [+s.dx.toFixed(4), +s.dy.toFixed(4)] : E) + 
+            return  (s.dx || s.dy ? "t" + [+s.dx.toFixed(4), +s.dy.toFixed(4)] : E) +
                 (s.scalex != 1 || s.scaley != 1 ? "s" + [s.scalex, s.scaley] : E) +
                 (s.rotate ? "r" + [s.scalex*s.scaley < 0 ? 360 - s.rotate.toFixed(4) : +s.rotate.toFixed(4)] : E);
 
@@ -225,15 +225,15 @@ var view = view || {},
             //
             // 1. No ",0,0" is appended to the rotate and scale strings, so they will now default to the center of the element
             //
-            // 2. The complicated one: If we have been mirrored in either x or y but not both (i.e., either scalex or scaley is 
-            //    negative, but not both (just test if their product is negative)), our interpretation of "rotate" changes. 
+            // 2. The complicated one: If we have been mirrored in either x or y but not both (i.e., either scalex or scaley is
+            //    negative, but not both (just test if their product is negative)), our interpretation of "rotate" changes.
             //    in particular, in the mirrored case, rotate needs to be interpreted as going "backward" or "clockwise". So,
             //    to get the actual correct rotation in this case, we subtract it from 360. Whether or not the original behavior is
-            //    actually incorrect on the part of Snap needs more study. 
+            //    actually incorrect on the part of Snap needs more study.
 
         } else {
             return "m" + [matrix.get(0), matrix.get(1), matrix.get(2), matrix.get(3), matrix.get(4), matrix.get(5)];
         }
     };
-    
+
 })(core, graphics);

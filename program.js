@@ -129,7 +129,7 @@ var program = program || {},
             cellProps.x = original.x - 8;
             cellProps.y = original.y - 3;
 
-            console.log(cellProps.type, original.orientation);
+            //console.log(cellProps.type, original.orientation);
             if (cellProps.type.startsWith("Branch")) {
                 if (original.orientation == 0) cellProps.orientation = tmath.Mat2x2.MROT3();
                 if (original.orientation == 1) cellProps.orientation = tmath.Mat2x2.MROT2();
@@ -146,7 +146,7 @@ var program = program || {},
                 if (original.orientation == 3 || original.orientation == 7) cellProps.orientation = tmath.Mat2x2.ID();
             }
 
-            console.log(partString, cellProps);
+            //console.log(partString, cellProps);
 
             p.setCell(cellProps.x, cellProps.y, cellProps.type, cellProps.orientation);
 
