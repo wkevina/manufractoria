@@ -9,7 +9,7 @@ var graphics = graphics || {};
     };
 
     var allImagePromises =
-            _(_.keys(imageMap)).map(function(key) {
+            _.keys(imageMap).map(function(key) {
                 var url = imageMap[key];
 
                 var p = getSVG(url);
