@@ -94,7 +94,7 @@ var main = function() {
                     500,
                     mina.linear,
                     function() {
-                        field.drawTape();
+                        //field.drawTape();
                         mainLoop();
                     }
                 );

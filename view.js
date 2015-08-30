@@ -13,15 +13,22 @@ var view = view || {},
         this.x = x;
         this.y = y;
 		this.tape = tape;
+
+		this._sw = 20; // Parameterize this later
+		this._MAX = Math.floor((this.width - this._sw) / this._sw);
+
+		// Register for tape's changed signal
+		this.tape.changed.add(_.bind(this.animate, this));
     };
 
+	/**
+	 Performs a clean draw of the tape with no animation
+	 */
     TapeView.prototype.drawTape = function drawTape() {
+		var MAX = this._MAX,
+			sw = this._sw;
 
         this.tapeView.clear();
-
-        var sw = 20;
-
-        var MAX = Math.floor((this.width - sw) / sw);
 
         for (var i = 0; i < this.tape.symbols.length && i < MAX; ++i) {
             var circle = this.paper.circle(sw*i + sw/2, sw/2, sw/2 - 2);
@@ -34,23 +41,11 @@ var view = view || {},
                     strokeWidth: 2,
                     fill: "#FFF"
                 });
-            }
-
-            if (curSym === core.RED) {
-                circle.attr({fill: "#E10"});
-            }
-
-            if (curSym === core.BLUE) {
-                circle.attr({fill: "#01F"});
-            }
-
-            if (curSym === core.GREEN) {
-                circle.attr({fill: "#0F0"});
-            }
-
-            if (curSym === core.YELLOW) {
-                circle.attr({fill: "#FF0"});
-            }
+            } else {
+				circle.attr({
+					fill: colorForSymbol(curSym)
+				});
+			}
 
             this.tapeView.append(circle);
         }
@@ -58,6 +53,87 @@ var view = view || {},
         this.tapeView.transform("");
         this.tapeView.transform("t" + this.x + "," + this.y);
     };
+
+	TapeView.prototype._appendSymbol = function(symbol) {
+		var sw = this._sw,
+			length = this.tapeView.selectAll("*").length;
+
+		var circle = this.tapeView.circle(sw*length + sw/2, sw/2, sw/2 - 2);
+
+		if (symbol === core.EMPTY) {
+			circle.attr({
+				stroke: "#111",
+				strokeWidth: 2,
+				fill: "#FFF"
+			});
+		} else {
+			circle.attr({
+				fill: colorForSymbol(symbol)
+			});
+		}
+	};
+
+	TapeView.prototype.animate = function animate(action) {
+
+		var pop = function(head, callback) {
+			head.animate(
+				{opacity: 0},
+				100,
+				mina.linear,
+				function() {
+					head.remove();
+					if (callback)
+						callback();
+				}
+			);
+		};
+
+		var slide = _.bind(function() {
+			var sw = this._sw,
+				length = this.tapeView.selectAll("*").length;
+
+			// Append symbol if necessary
+			if (length < this._MAX && this.tape.symbols.length > length) {
+				this._appendSymbol(this.tape.symbols[length - 1]);
+			}
+
+			// Slide left
+			var left = Snap.matrix().translate(-sw, 0).toTransformString();
+
+			this.tapeView.selectAll("*").forEach(function(el) {
+				el.animate(
+					{
+						transform: el.transform().string + left
+					},
+					200,
+					mina.easeinout
+				);
+			}, this);
+
+
+		}, this);
+
+		if (action == "pop") {
+			// Dissolve first element, then slide left
+			var head = this.tapeView.selectAll("*")[0];
+			pop(head, slide);
+
+		}
+	};
+
+	function colorForSymbol(symbol) {
+		if (symbol === core.RED) {
+            return "#E10";
+        } else if (symbol === core.BLUE) {
+            return "#01F";
+        } else if (symbol === core.GREEN) {
+            return "#0F0";
+        } else if (symbol === core.YELLOW) {
+            return "#FF0";
+        } else {
+			return "FA3";
+		}
+	}
 
     core.TapeView = TapeView;
 

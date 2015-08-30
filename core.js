@@ -1,6 +1,6 @@
 var core = core || {};
 
-(function() {
+(function(signals) {
     /* Symbols */
     core.EMPTY = {symbol: 'empty'};
     core.RED = {symbol: 'red'};
@@ -9,13 +9,14 @@ var core = core || {};
     core.YELLOW = {symbol: 'yellow'};
 
     /* Tape
-       Represents an ordered queue of symbols
-    */
+     Represents an ordered queue of symbols
+     */
     function Tape() {
         this.symbols = [];
+		this.changed = new signals.Signal();
     };
 
-    Tape.prototype.head = function head() {
+	Tape.prototype.head = function head() {
         if (this.symbols.length > 0) {
             return this.symbols[0];
         } else {
@@ -25,7 +26,9 @@ var core = core || {};
 
     Tape.prototype.pop = function pop() {
         if (this.symbols.length > 0) {
-            return this.symbols.shift();
+			var popped = this.symbols.shift();
+			this.changed.dispatch("pop");
+            return popped;
         } else {
             return core.EMPTY;
         }
@@ -33,7 +36,8 @@ var core = core || {};
 
     Tape.prototype.append = function append(s) {
         this.symbols.push(s);
+		this.changed.dispatch("append");
     };
 
     core.Tape = Tape;
-})();
+})(signals);
