@@ -5,16 +5,17 @@ var view = view || {},
 
 (function (core, graphics) {
 
-    function TapeView(paper, x, y, width, height) {
+    function TapeView(paper, x, y, width, height, tape) {
         this.paper = paper;
         this.tapeView = paper.g();
         this.width = width;
         this.height = height;
         this.x = x;
         this.y = y;
+		this.tape = tape;
     };
 
-    TapeView.prototype.drawTape = function drawTape(t) {
+    TapeView.prototype.drawTape = function drawTape() {
 
         this.tapeView.clear();
 
@@ -22,10 +23,10 @@ var view = view || {},
 
         var MAX = Math.floor((this.width - sw) / sw);
 
-        for (var i = 0; i < t.symbols.length && i < MAX; ++i) {
+        for (var i = 0; i < this.tape.symbols.length && i < MAX; ++i) {
             var circle = this.paper.circle(sw*i + sw/2, sw/2, sw/2 - 2);
 
-            var curSym = t.symbols[i];
+            var curSym = this.tape.symbols[i];
 
             if (curSym === core.EMPTY) {
                 circle.attr({

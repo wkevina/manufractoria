@@ -43,8 +43,8 @@ var main = function() {
         paper.appendTo(document.getElementById("main"));
 
 
-        var field = new core.TapeView(paper, 0, 0, 400, 20);
-        field.drawTape(t);
+        var field = new core.TapeView(paper, 0, 0, 400, 20, t);
+        field.drawTape();
 
 
         //var p = program.readLegacyProgramString("lvl=32&code=c12:4f3;c12:5f3;p12:6f0;c11:6f3;c11:7f3;c11:8f3;c11:9f3;c11:10f3;c11:11f2;&ctm=N1;N2;bbr:x|rrb:x;9;3;1;");
@@ -71,7 +71,7 @@ var main = function() {
 		pView.drawProgram();
 
         myInterpreter.start();
-        field.drawTape(t);
+        field.drawTape();
 
         function mainLoop() {
 
@@ -94,7 +94,7 @@ var main = function() {
                     500,
                     mina.linear,
                     function() {
-                        field.drawTape(t);
+                        field.drawTape();
                         mainLoop();
                     }
                 );
