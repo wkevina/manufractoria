@@ -143,7 +143,42 @@ var view = view || {},
     }
 
     ProgramView.prototype.drawProgram = function drawProgram() {
+		var paper = this.paper,
+			grid = this.gridView,
+			program = this.program;
+
         this.cells.clear();
+
+		for (var x = 0; x < program.cols; ++x) {
+			for (var y = 0; y < program.rows; ++y) {
+				var c = program.getCell(x, y);
+
+				if (c.type != "Empty") {
+
+					var image = graphics.getGraphic(c.type);
+
+					if (image) {
+
+						paper.append(image);
+
+						var group = paper.g(image);
+
+						var corner = grid.getCellMatrix(x, y, true)
+								.toTransformString()
+								.toUpperCase();
+
+						var o = c.orientation;
+
+						var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
+						var tstring = view.toTransformString(transform);
+
+						group.transform(
+							tstring + corner
+						);
+					}
+				}
+			}
+		}
 
         for (var x = 0; x < this.program.cols; ++x) {
             for (var y = 0; y < this.program.rows; ++y) {
