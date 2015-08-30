@@ -18,7 +18,7 @@ var view = view || {},
 		this._MAX = Math.floor((this.width - this._sw) / this._sw);
 
 		// Register for tape's changed signal
-		this.tape.changed.add(_.bind(this.animate, this));
+		this.tape.changed.add(this.animate.bind(this));
     };
 
 	/**
@@ -83,7 +83,7 @@ var view = view || {},
 			);
 		};
 
-		var slide = _.bind(function() {
+		var slide = (function() {
 			var sw = this._sw,
 				length = this.tapeView.selectAll("*").length;
 
@@ -103,7 +103,7 @@ var view = view || {},
 				mina.easeinout
 			);
 
-		}, this);
+		}).bind(this);
 
 		if (action == "pop") {
 			// Dissolve first element, then slide left
