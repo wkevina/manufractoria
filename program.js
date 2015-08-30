@@ -1,6 +1,6 @@
 
 var program = program || {},
-    core = core || {};
+    core = core || {},
     tmath = tmath || {};
 
 (function(core, tmath) {
@@ -19,7 +19,7 @@ var program = program || {},
             this.type = typeID;
             this.orientation = tmath.Mat2x2.ID();
         };
-    }
+    };
 
     program.cellTypes = {
         Empty: makeCellClass("Empty"),
@@ -74,56 +74,14 @@ var program = program || {},
 
     program.Program = Program;
 
-    var ProgramView = function ProgramView(paper, x, y, width, height, program) {
-        this.paper = paper;
-        this.program = program;
-        this.width = width;
-        this.height = height;
-        this.cells = paper.g();
-        this.gridView = new core.GridView(paper, x, y, width, height,
-                                          program.rows, program.cols);
-
-        this.gridView.drawGrid();
-    };
-
-    ProgramView.prototype.drawProgram = function drawProgram() {
-        this.cells.clear();
-
-        for (var x = 0; x < this.program.cols; ++x) {
-            for (var y = 0; y < this.program.rows; ++y) {
-                var programCell = this.program.getCell(x, y);
-
-                if (programCell.type != "Empty") {
-                    var cellGraphic = this.paper.circle(0, 0, 10);
-
-                    cellGraphic.transform(
-                        this.gridView.getCellMatrix(x, y).toTransformString()
-                    );
-
-                    if (programCell.type == "Start") {
-                        cellGraphic.attr({fill: "#0f0"});
-                    } else if (programCell.type == "End") {
-                        cellGraphic.attr({fill: "#F00"});
-                    } else {
-                        cellGraphic.attr({fill: "#00F"});
-                    }
-
-                    this.cells.append(cellGraphic);
-                }
-            }
-        }
-    };
-
-    program.ProgramView = ProgramView;
-
     program.readLegacyProgramString = function(s) {
-        
+
         // [lvlString]&[codeString]&[metaInfo]
 
         var i = 0;
 
         var attrStrings = s.split("&");
-        var attrs = {}
+        var attrs = {};
 
         for (i = 0; i < attrStrings.length; i ++) {
             if (attrStrings[i].startsWith("lvl=")) {
@@ -199,7 +157,6 @@ var program = program || {},
 
         return p;
 
-    }
-
+    };
 
 })(core, tmath);
