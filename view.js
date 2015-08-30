@@ -31,34 +31,21 @@ var view = view || {},
         this.tapeView.clear();
 
         for (var i = 0; i < this.tape.symbols.length && i < MAX; ++i) {
-            var circle = this.paper.circle(sw*i + sw/2, sw/2, sw/2 - 2);
-
             var curSym = this.tape.symbols[i];
-
-            if (curSym === core.EMPTY) {
-                circle.attr({
-                    stroke: "#111",
-                    strokeWidth: 2,
-                    fill: "#FFF"
-                });
-            } else {
-				circle.attr({
-					fill: colorForSymbol(curSym)
-				});
-			}
-
-            this.tapeView.append(circle);
+            this._appendSymbol(curSym);
         }
 
         this.tapeView.transform("");
         this.tapeView.transform("t" + this.x + "," + this.y);
     };
 
-	TapeView.prototype._appendSymbol = function(symbol) {
+	TapeView.prototype._appendSymbol = function(symbol, offset, color) {
+		offset = offset || 0;
+
 		var sw = this._sw,
 			length = this.tapeView.selectAll("*").length;
 
-		var circle = this.tapeView.circle(sw*length + sw/2, sw/2, sw/2 - 2);
+		var circle = this.tapeView.circle(sw*(length + offset) + sw/2, sw/2, sw/2 - 2);
 
 		if (symbol === core.EMPTY) {
 			circle.attr({
@@ -67,10 +54,18 @@ var view = view || {},
 				fill: "#FFF"
 			});
 		} else {
-			circle.attr({
-				fill: colorForSymbol(symbol)
-			});
+			if (color) {
+				circle.attr({
+					fill: "#FFF"
+				});
+			} else {
+				circle.attr({
+					fill: colorForSymbol(symbol)
+				});
+			}
 		}
+
+		return circle;
 	};
 
 	TapeView.prototype.animate = function animate(action) {
@@ -94,22 +89,19 @@ var view = view || {},
 
 			// Append symbol if necessary
 			if (length < this._MAX && this.tape.symbols.length > length) {
-				this._appendSymbol(this.tape.symbols[length - 1]);
+				var c = this._appendSymbol(this.tape.symbols[length - 1], 1);
+				c.attr({opacity: 0});
 			}
 
 			// Slide left
-			var left = Snap.matrix().translate(-sw, 0).toTransformString();
-
-			this.tapeView.selectAll("*").forEach(function(el) {
-				el.animate(
-					{
-						transform: el.transform().string + left
-					},
-					200,
-					mina.easeinout
-				);
-			}, this);
-
+			this.tapeView.selectAll("*").animate(
+				{
+					cx: "-=" + sw,
+					opacity: 1
+				},
+				200,
+				mina.easeinout
+			);
 
 		}, this);
 
