@@ -100,7 +100,7 @@ var main = function() {
                 );
             };
 
-            setTimeout(update, 100);
+            setTimeout(update, 0);
         }
 
         mainLoop();
