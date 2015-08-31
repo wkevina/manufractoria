@@ -6,7 +6,7 @@ var core = core || {},
     view = view || {},
     tmath = tmath || {};
 
-var main = function() {
+var startEditor = function() {
 
     graphics.preload().then(function() {
 
