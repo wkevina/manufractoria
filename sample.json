@@ -8,6 +8,4 @@
         start: {x:5, y:4, orientation:"ID"},
         end: {x:5, y:4, orientation:"ID"}
     }
-
-
 }
