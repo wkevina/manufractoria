@@ -66,7 +66,8 @@
 */
 
 var loader = loader || {},
-    codeCell = codeCell || {};
+    codeCell = codeCell || {},
+    tmath = tmath || {};
 
 (function() {
     function isTape(t) {
@@ -190,5 +191,94 @@ var loader = loader || {},
     }
 
     loader.isValid = isValid;
+
+    function orientationToJson(o) {
+        var mat = tmath.Mat2x2;
+
+        if (_.isEqual(o, mat.kID))
+            return "ID";
+        else if (_.isEqual(o, mat.kROT1))
+            return "ROT1";
+        else if (_.isEqual(o, mat.kROT2))
+            return "ROT2";
+        else if (_.isEqual(o, mat.kROT3))
+            return "ROT3";
+        else if (_.isEqual(o, mat.kMIR))
+            return "MIR";
+        else if (_.isEqual(o, mat.kMROT1))
+            return "MROT1";
+        else if (_.isEqual(o, mat.kMROT2))
+            return "MROT2";
+        else if (_.isEqual(o, mat.kMROT3))
+            return "MROT3";
+        else
+            return "INVALID";
+    }
+
+    loader.orientationToJson = orientationToJson;
+
+    function programToJson(p) {
+        var json = {
+            cols: p.cols,
+            rows: p.rows,
+            cells: [],
+            start: null,
+            end: null
+        };
+
+        p.cells.forEach(function(column, x) {
+            column.forEach(function(cell, y){
+                if (cell.type != "Empty") {
+                    var ob = {x:x, y:y, orientation: orientationToJson(cell.orientation)};
+                    if (cell.type == "Start")
+                        json.start = ob;
+                    else if (cell.type == "End")
+                        json.end = ob;
+                    else {
+                        ob.type = cell.type;
+                        json.cells.push(ob);
+                    }
+                }
+            });
+        });
+
+        return json;
+
+    }
+
+    loader.programToJson = programToJson;
+
+    function tapeToJson(t) {
+        return t.symbols.reduce(
+            function(prev, cur) {
+                var end = "";
+                if (cur == core.RED)
+                    end = "R";
+                if (cur == core.BLUE)
+                    end = "B";
+                if (cur == core.GREEN)
+                    end = "G";
+                if (cur == core.YELLOW)
+                    end = "Y";
+                return prev + end;
+            },
+            ""
+        );
+
+    }
+
+    loader.tapeToJson = tapeToJson;
+
+    function levelToJson(title, tapes, prog) {
+        var json = {
+            title: title,
+            tape: (_.isArray(tapes) ? tapes : [tapes]).map(tapeToJson),
+            program: programToJson(prog)
+        };
+
+        return json;
+    }
+
+    loader.levelToJson = levelToJson;
 
 })();
