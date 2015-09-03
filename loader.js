@@ -66,8 +66,10 @@
 */
 
 var loader = loader || {},
+    core = core || {},
     codeCell = codeCell || {},
-    tmath = tmath || {};
+    tmath = tmath || {},
+    program = program || {};
 
 (function() {
     function isTape(t) {
@@ -217,6 +219,35 @@ var loader = loader || {},
 
     loader.orientationToJson = orientationToJson;
 
+
+    function jsonToOrientation(json) {
+        var mat = tmath.Mat2x2;
+
+        switch (json) {
+            case "ID":
+                return mat.kID;
+            case "ROT1":
+                return mat.kROT1;
+            case "ROT2":
+                return mat.kROT2;
+            case "ROT3":
+                return mat.kROT3;
+
+            case "MIR":
+                return mat.kMIR;
+            case "MROT1":
+                return mat.kROT1;
+            case "MROT2":
+                return mat.kROT2;
+            case "MROT3":
+                return mat.kROT3;
+            default:
+                return null;
+        }
+    }
+
+    loader.jsonToOrientation = jsonToOrientation;
+
     function programToJson(p) {
         var json = {
             cols: p.cols,
@@ -247,6 +278,31 @@ var loader = loader || {},
     }
 
     loader.programToJson = programToJson;
+
+    function jsonToProgram(json) {
+        var p = new program.Program(json.cols, json.rows);
+
+        json.cells.forEach(function(cell) {
+            p.setCell(cell.x, cell.y, cell.type, jsonToOrientation(cell.orientation));
+        });
+
+        p.setStart(
+            json.start.x,
+            json.start.y,
+            jsonToOrientation(json.end.orientation)
+        );
+
+        p.setEnd(
+            json.end.x,
+            json.end.y,
+            jsonToOrientation(json.end.orientation)
+        );
+
+        return p;
+
+    }
+
+    loader.jsonToProgram = jsonToProgram;
 
     function tapeToJson(t) {
         return t.symbols.reduce(
