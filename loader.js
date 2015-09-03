@@ -142,6 +142,14 @@ var loader = loader || {},
 
     loader.isEndpoint = isEndpoint;
 
+    function isWithinBounds(max_x, max_y) {
+        return function(cell) {
+            return (cell.x >= 0 && cell.x <= max_x && cell.y >= 0 && cell.y <= max_y);
+        };
+    }
+
+    loader.isWithinBounds = isWithinBounds;
+
     function allTrue(l) {
         return l.every(function(p) {
             return Boolean(p);
@@ -155,13 +163,17 @@ var loader = loader || {},
             return false;
         }
 
-        return allTrue([
+        var basic = allTrue([
             isCoordinate(p.cols),
             isCoordinate(p.rows),
             p.cells.every(isCellDesc),
             isEndpoint(p.start),
             isEndpoint(p.end)
         ]);
+
+        var bounds = isWithinBounds(p.cols - 1, p.rows - 1);
+
+        return basic && p.cells.every(bounds) && bounds(p.start) && bounds(p.end);
     }
 
     loader.isProgram = isProgram;
@@ -180,21 +192,3 @@ var loader = loader || {},
     loader.isValid = isValid;
 
 })();
-
-// program-description:
-
-//  {
-//  	cols: Number,
-//  	rows: Number,
-// 	cells: [ cell-description1, cell-description2 ],
-//  	start: {
-//  		x: Number,
-// 		y: Number,
-//  		orientation: orientation-description
-// 	},
-// 	end: {
-// 		x: Number,
-// 		y: Number,
-//  		orientation: orientation-description
-// 	}
-//  }
