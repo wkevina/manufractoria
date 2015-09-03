@@ -280,7 +280,7 @@ var loader = loader || {},
     loader.programToJson = programToJson;
 
     function jsonToProgram(json) {
-        var p = new program.Program(json.cols, json.rows);
+        var p = new program.Program(parseInt(json.cols), parseInt(json.rows));
 
         json.cells.forEach(function(cell) {
             p.setCell(cell.x, cell.y, cell.type, jsonToOrientation(cell.orientation));
@@ -348,5 +348,29 @@ var loader = loader || {},
     }
 
     loader.levelToJson = levelToJson;
+
+    function jsonToLevel(json) {
+        var level = {
+            title: json.title,
+            tape: json.tape.map(jsonToTape),
+            program: jsonToProgram(json.program)
+        };
+
+        return level;
+    }
+
+    loader.jsonToLevel = jsonToLevel;
+
+    loader.fromJson = function(jsonString) {
+        var dejsoned = JSON.parse(jsonString);
+        if (!isValid(dejsoned))
+            return null;
+
+        return jsonToLevel(dejsoned);
+    };
+
+    loader.toJson = function(title, tapes, prog) {
+        return JSON.stringify(levelToJson(title, tapes, prog));
+    };
 
 })();
