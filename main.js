@@ -15,6 +15,21 @@ function App() {
     form.find("button").click(this.generateLink.bind(this));
     form.find("input").val("");
 
+    var controls = $("#controls");
+
+    controls.find("[data-action=run]").click(() => {
+        if (!this.isRunning) {
+            this.isRunning = true;
+            this.isPaused = false;
+            this.run();
+        }
+    });
+
+    controls.find("[data-action=pause]").click(() => {
+        this.isPaused = !!!this.isPaused;
+    });
+
+
     var hash = window.location.hash;
 
     if (hash) {
@@ -73,7 +88,7 @@ App.prototype.main = function() {
 
 App.prototype.run = function() {
     var paper = this.paper,
-        pView = this.pView;
+        pView = this.programView;
 
     var myInterpreter = new interpreter.Interpreter();
     myInterpreter.setProgram(this.program);
@@ -86,7 +101,7 @@ App.prototype.run = function() {
 
     myInterpreter.start();
 
-    function mainLoop() {
+    var mainLoop = (function () {
 
         var curPos = myInterpreter.position;
         token.transform(
@@ -94,8 +109,11 @@ App.prototype.run = function() {
 		.toTransformString()
 	);
 
-        myInterpreter.step();
-        curPos = myInterpreter.position;
+        if (!this.isPaused) {
+            myInterpreter.step();
+
+            curPos = myInterpreter.position;
+        }
 
         var update = function() {
             token.animate(
@@ -114,7 +132,7 @@ App.prototype.run = function() {
         };
 
         setTimeout(update, 0);
-    }
+    }).bind(this);
 
     mainLoop();
 };
