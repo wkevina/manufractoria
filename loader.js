@@ -47,7 +47,7 @@
 
  orientation-description:
 
- One of the strings ID, ROT1, ROT2, ROT3, MID, MROT1, MROT2, MROT3
+ One of the strings ID, ROT1, ROT2, ROT3, MIR, MROT1, MROT2, MROT3
 
 
  type-description:
@@ -80,7 +80,7 @@ var loader = loader || {},
     loader.isTape = isTape;
 
     function isOrientation(o) {
-        var index = ["ID", "ROT1", "ROT2", "ROT3", "MID", "MROT1", "MROT2", "MROT3"].indexOf(o);
+        var index = ["ID", "ROT1", "ROT2", "ROT3", "MIR", "MROT1", "MROT2", "MROT3"].indexOf(o);
         if (index == -1)
             return false;
         return true;
