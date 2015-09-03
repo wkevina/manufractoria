@@ -325,6 +325,18 @@ var loader = loader || {},
 
     loader.tapeToJson = tapeToJson;
 
+    function jsonToTape(json) {
+        var t = new core.Tape();
+
+        Array.prototype.forEach.call(json, function(letter) {
+            t.append(core.symbols[letter]);
+        });
+
+        return t;
+    }
+
+    loader.jsonToTape = jsonToTape;
+
     function levelToJson(title, tapes, prog) {
         var json = {
             title: title,

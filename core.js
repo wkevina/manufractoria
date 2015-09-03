@@ -8,6 +8,13 @@ var core = core || {};
     core.GREEN = {symbol: 'green'};
     core.YELLOW = {symbol: 'yellow'};
 
+    core.symbols = {
+        R: core.RED,
+        B: core.BLUE,
+        G: core.GREEN,
+        Y: core.YELLOW
+    };
+
     /* Tape
      Represents an ordered queue of symbols
      */
