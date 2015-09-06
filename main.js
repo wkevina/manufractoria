@@ -35,11 +35,19 @@ function App() {
     if (hash) {
         hash = decodeURI(hash.replace('#', ''));
 
-        var level = loader.fromJson(hash);
-        if (level) {
-            this.program = level.program;
-            this.tape = level.tape[0];
-        }
+		if (hash.startsWith("lvl")) {
+			this.program = program.readLegacyProgramString(hash);
+		} else {
+			var level = loader.fromJson(hash);
+			if (level) {
+				this.program = level.program;
+				this.tape = level.tape[0];
+			} else {
+				// Error case
+				console.log("Unable to load program string");
+			}
+
+		}
     }
 
 }
@@ -69,14 +77,14 @@ App.prototype.main = function() {
             this.program = new program.Program(10, 10);
         }
 
-	var pView = new view.ProgramView(
-	    paper,
-	    0, 				// x
-	    40, 			// y
-	    56 * this.program.cols, 	// width
-	    56 * this.program.rows, 	// height
-	    this.program
-	);
+		var pView = new view.ProgramView(
+			paper,
+			0, 				// x
+			40, 			// y
+			56 * this.program.cols, 	// width
+			56 * this.program.rows, 	// height
+			this.program
+		);
 
         pView.drawProgram();
 
@@ -105,9 +113,9 @@ App.prototype.run = function() {
 
         var curPos = myInterpreter.position;
         token.transform(
-	    pView.gridView.getCellMatrix(curPos.x, curPos.y)
-		.toTransformString()
-	);
+			pView.gridView.getCellMatrix(curPos.x, curPos.y)
+				.toTransformString()
+		);
 
         if (!this.isPaused) {
             myInterpreter.step();
@@ -118,9 +126,9 @@ App.prototype.run = function() {
         var update = function() {
             token.animate(
                 {
-		    transform:
-		    pView.gridView.getCellMatrix(curPos.x, curPos.y)
-			.toTransformString()
+					transform:
+					pView.gridView.getCellMatrix(curPos.x, curPos.y)
+						.toTransformString()
                 },
                 500,
                 mina.linear,
@@ -139,6 +147,6 @@ App.prototype.run = function() {
 
 
 /*
-Example hash level:
-#{"title":"Sample","tape":["BYRGGYRYRGRRGBYRGYRYRGYRGBRYRRBRBGBBYRBYRBGBRBYRRYRYRGBGGBGRYRRGRRYRYRRYRBRRBYRGGRBYRBRBYRRYRGRRGGRRRGYRBYRRRRRRBYRBBGBBRG"],"program":{"cols":9,"rows":9,"cells":[{"x":2,"y":1,"orientation":"ROT3","type":"Conveyor"},{"x":2,"y":2,"orientation":"ROT3","type":"BranchBR"},{"x":2,"y":3,"orientation":"ROT3","type":"BranchBR"},{"x":2,"y":4,"orientation":"ROT3","type":"BranchGY"},{"x":2,"y":5,"orientation":"ROT3","type":"BranchGY"},{"x":3,"y":1,"orientation":"ROT2","type":"Conveyor"},{"x":3,"y":2,"orientation":"ROT2","type":"BranchBR"},{"x":3,"y":3,"orientation":"ROT2","type":"BranchBR"},{"x":3,"y":4,"orientation":"ROT2","type":"BranchGY"},{"x":3,"y":5,"orientation":"ROT2","type":"BranchGY"},{"x":4,"y":1,"orientation":"ROT1","type":"Conveyor"},{"x":4,"y":2,"orientation":"ROT1","type":"BranchBR"},{"x":4,"y":3,"orientation":"ROT1","type":"BranchBR"},{"x":4,"y":4,"orientation":"ROT1","type":"BranchGY"},{"x":4,"y":5,"orientation":"ROT1","type":"BranchGY"},{"x":5,"y":1,"orientation":"ID","type":"Conveyor"},{"x":5,"y":2,"orientation":"MIR","type":"BranchBR"},{"x":5,"y":3,"orientation":"ID","type":"BranchBR"},{"x":5,"y":4,"orientation":"MIR","type":"BranchGY"},{"x":5,"y":5,"orientation":"ID","type":"BranchGY"}],"start":{"x":4,"y":0,"orientation":"ID"},"end":{"x":4,"y":8,"orientation":"ID"}}}
-*/
+ Example hash level:
+ #{"title":"Sample","tape":["BYRGGYRYRGRRGBYRGYRYRGYRGBRYRRBRBGBBYRBYRBGBRBYRRYRYRGBGGBGRYRRGRRYRYRRYRBRRBYRGGRBYRBRBYRRYRGRRGGRRRGYRBYRRRRRRBYRBBGBBRG"],"program":{"cols":9,"rows":9,"cells":[{"x":2,"y":1,"orientation":"ROT3","type":"Conveyor"},{"x":2,"y":2,"orientation":"ROT3","type":"BranchBR"},{"x":2,"y":3,"orientation":"ROT3","type":"BranchBR"},{"x":2,"y":4,"orientation":"ROT3","type":"BranchGY"},{"x":2,"y":5,"orientation":"ROT3","type":"BranchGY"},{"x":3,"y":1,"orientation":"ROT2","type":"Conveyor"},{"x":3,"y":2,"orientation":"ROT2","type":"BranchBR"},{"x":3,"y":3,"orientation":"ROT2","type":"BranchBR"},{"x":3,"y":4,"orientation":"ROT2","type":"BranchGY"},{"x":3,"y":5,"orientation":"ROT2","type":"BranchGY"},{"x":4,"y":1,"orientation":"ROT1","type":"Conveyor"},{"x":4,"y":2,"orientation":"ROT1","type":"BranchBR"},{"x":4,"y":3,"orientation":"ROT1","type":"BranchBR"},{"x":4,"y":4,"orientation":"ROT1","type":"BranchGY"},{"x":4,"y":5,"orientation":"ROT1","type":"BranchGY"},{"x":5,"y":1,"orientation":"ID","type":"Conveyor"},{"x":5,"y":2,"orientation":"MIR","type":"BranchBR"},{"x":5,"y":3,"orientation":"ID","type":"BranchBR"},{"x":5,"y":4,"orientation":"MIR","type":"BranchGY"},{"x":5,"y":5,"orientation":"ID","type":"BranchGY"}],"start":{"x":4,"y":0,"orientation":"ID"},"end":{"x":4,"y":8,"orientation":"ID"}}}
+ */
