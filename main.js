@@ -4,106 +4,141 @@ var core = core || {},
     interpreter = interpreter || {},
     graphics = graphics || {},
     view = view || {},
-    tmath = tmath || {};
+    tmath = tmath || {},
+    loader = loader || {};
 
-var main = function() {
+function App() {
+    this.program = null;
+    this.tape = new core.Tape();
 
+    var form = $("#link-form");
+    form.find("button").click(this.generateLink.bind(this));
+    form.find("input").val("");
+
+    var controls = $("#controls");
+
+    controls.find("[data-action=run]").click(() => {
+        if (!this.isRunning) {
+            this.isRunning = true;
+            this.isPaused = false;
+            this.run();
+        }
+    });
+
+    controls.find("[data-action=pause]").click(() => {
+        this.isPaused = !!!this.isPaused;
+    });
+
+
+    var hash = window.location.hash;
+
+    if (hash) {
+        hash = decodeURI(hash.replace('#', ''));
+
+        var level = loader.fromJson(hash);
+        if (level) {
+            this.program = level.program;
+            this.tape = level.tape[0];
+        }
+    }
+
+}
+
+App.prototype.generateLink = function() {
+    if (this.program != null && this.tape != null) {
+        var link = window.location.href.split("#")[0] + "#";
+        link += loader.toJson("Sample", this.tape, this.program);
+        $("#link-form").find("input").val(decodeURI(link));
+    }
+};
+
+App.prototype.main = function() {
+
+    // Set up UI elements
     graphics.preload().then(function() {
 
-        var t = new core.Tape();
-        core.t = t;
-
-        for (var i = 0; i < 100; ++i) {
-
-            var choice = Math.floor(Math.random()*4);
-
-            switch (choice) {
-            case 0:
-                t.append(core.RED);
-                break;
-            case 1:
-                t.append(core.BLUE);
-                break;
-            case 2:
-                t.append(core.GREEN);
-                break;
-            case 3:
-                t.append(core.YELLOW);
-            default:
-                t.append(core.RED);
-            }
-
-        }
-
-        if (t.head() == core.EMPTY) {
-            t.pop();
-        }
-
         var paper = Snap(640, 640);
+        this.paper = paper;
         paper.appendTo(document.getElementById("main"));
 
 
-        var field = new core.TapeView(paper, 0, 0, 400, 20, t);
+        var field = new core.TapeView(paper, 0, 0, 400, 20, this.tape);
         field.drawTape();
 
-
-        //var p = program.readLegacyProgramString("lvl=32&code=c12:4f3;c12:5f3;p12:6f0;c11:6f3;c11:7f3;c11:8f3;c11:9f3;c11:10f3;c11:11f2;&ctm=N1;N2;bbr:x|rrb:x;9;3;1;");
-        var p = program.readLegacyProgramString("lvl=32&code=c10:4f0;c11:4f1;c12:4f2;c13:4f3;p10:5f0;p11:5f1;p12:5f2;p13:5f3;p10:6f4;p11:6f5;p12:6f6;p13:6f7;q10:7f0;q11:7f1;q12:7f2;q13:7f3;q10:8f4;q11:8f5;q12:8f6;q13:8f7;&ctm=N1;N2;bbr:x|rrb:x;9;3;0;");
-
-
-		var pView = new view.ProgramView(
-			paper,
-			0, 				// x
-			40, 			// y
-			56 * p.cols, 	// width
-			56 * p.rows, 	// height
-			p
-		);
-
-
-        var myInterpreter = new interpreter.Interpreter();
-        myInterpreter.setProgram(p);
-        myInterpreter.setTape(t);
-
-        var token = paper.circle(0, 0, 10);
-        token.attr({fill: "#E0E"});
-
-		pView.drawProgram();
-
-        myInterpreter.start();
-        field.drawTape();
-
-        function mainLoop() {
-
-            var curPos = myInterpreter.position;
-            token.transform(
-				pView.gridView.getCellMatrix(curPos.x, curPos.y)
-					.toTransformString()
-			);
-
-            myInterpreter.step();
-            curPos = myInterpreter.position;
-
-            var update = function() {
-                token.animate(
-                    {
-						transform:
-						pView.gridView.getCellMatrix(curPos.x, curPos.y)
-							.toTransformString()
-                    },
-                    500,
-                    mina.linear,
-                    function() {
-                        //field.drawTape();
-                        mainLoop();
-                    }
-                );
-            };
-
-            setTimeout(update, 0);
+        if (this.program == null) {
+            this.program = new program.Program(10, 10);
         }
 
-        mainLoop();
-    });
+	var pView = new view.ProgramView(
+	    paper,
+	    0, 				// x
+	    40, 			// y
+	    56 * this.program.cols, 	// width
+	    56 * this.program.rows, 	// height
+	    this.program
+	);
+
+        pView.drawProgram();
+
+        this.programView = pView;
+
+    }.bind(this));
 
 };
+
+App.prototype.run = function() {
+    var paper = this.paper,
+        pView = this.programView;
+
+    var myInterpreter = new interpreter.Interpreter();
+    myInterpreter.setProgram(this.program);
+    myInterpreter.setTape(this.tape);
+
+    var token = paper.circle(0, 0, 10);
+    token.attr({fill: "#E0E"});
+
+    pView.drawProgram();
+
+    myInterpreter.start();
+
+    var mainLoop = (function () {
+
+        var curPos = myInterpreter.position;
+        token.transform(
+	    pView.gridView.getCellMatrix(curPos.x, curPos.y)
+		.toTransformString()
+	);
+
+        if (!this.isPaused) {
+            myInterpreter.step();
+
+            curPos = myInterpreter.position;
+        }
+
+        var update = function() {
+            token.animate(
+                {
+		    transform:
+		    pView.gridView.getCellMatrix(curPos.x, curPos.y)
+			.toTransformString()
+                },
+                500,
+                mina.linear,
+                function() {
+                    //field.drawTape();
+                    mainLoop();
+                }
+            );
+        };
+
+        setTimeout(update, 0);
+    }).bind(this);
+
+    mainLoop();
+};
+
+
+/*
+Example hash level:
+#{"title":"Sample","tape":["BYRGGYRYRGRRGBYRGYRYRGYRGBRYRRBRBGBBYRBYRBGBRBYRRYRYRGBGGBGRYRRGRRYRYRRYRBRRBYRGGRBYRBRBYRRYRGRRGGRRRGYRBYRRRRRRBYRBBGBBRG"],"program":{"cols":9,"rows":9,"cells":[{"x":2,"y":1,"orientation":"ROT3","type":"Conveyor"},{"x":2,"y":2,"orientation":"ROT3","type":"BranchBR"},{"x":2,"y":3,"orientation":"ROT3","type":"BranchBR"},{"x":2,"y":4,"orientation":"ROT3","type":"BranchGY"},{"x":2,"y":5,"orientation":"ROT3","type":"BranchGY"},{"x":3,"y":1,"orientation":"ROT2","type":"Conveyor"},{"x":3,"y":2,"orientation":"ROT2","type":"BranchBR"},{"x":3,"y":3,"orientation":"ROT2","type":"BranchBR"},{"x":3,"y":4,"orientation":"ROT2","type":"BranchGY"},{"x":3,"y":5,"orientation":"ROT2","type":"BranchGY"},{"x":4,"y":1,"orientation":"ROT1","type":"Conveyor"},{"x":4,"y":2,"orientation":"ROT1","type":"BranchBR"},{"x":4,"y":3,"orientation":"ROT1","type":"BranchBR"},{"x":4,"y":4,"orientation":"ROT1","type":"BranchGY"},{"x":4,"y":5,"orientation":"ROT1","type":"BranchGY"},{"x":5,"y":1,"orientation":"ID","type":"Conveyor"},{"x":5,"y":2,"orientation":"MIR","type":"BranchBR"},{"x":5,"y":3,"orientation":"ID","type":"BranchBR"},{"x":5,"y":4,"orientation":"MIR","type":"BranchGY"},{"x":5,"y":5,"orientation":"ID","type":"BranchGY"}],"start":{"x":4,"y":0,"orientation":"ID"},"end":{"x":4,"y":8,"orientation":"ID"}}}
+*/
