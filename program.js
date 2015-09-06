@@ -139,14 +139,18 @@ var program = program || {},
                 if (original.orientation == 5) cellProps.orientation = tmath.Mat2x2.ROT2();
                 if (original.orientation == 6) cellProps.orientation = tmath.Mat2x2.ROT1();
                 if (original.orientation == 7) cellProps.orientation = tmath.Mat2x2.ID();
-            } else {
+            } else if (!(cellProps.type == "CrossConveyor")) {
                 if (original.orientation == 0 || original.orientation == 4) cellProps.orientation = tmath.Mat2x2.ROT3();
                 if (original.orientation == 1 || original.orientation == 5) cellProps.orientation = tmath.Mat2x2.ROT2();
                 if (original.orientation == 2 || original.orientation == 6) cellProps.orientation = tmath.Mat2x2.ROT1();
                 if (original.orientation == 3 || original.orientation == 7) cellProps.orientation = tmath.Mat2x2.ID();
+            } else {
+                // CrossConveyer is weird
+                if (original.orientation == 5 || original.orientation == 7) cellProps.orientation = tmath.Mat2x2.ID();
+                if (original.orientation == 1 || original.orientation == 6) cellProps.orientation = tmath.Mat2x2.ROT1();
+                if (original.orientation == 0 || original.orientation == 2) cellProps.orientation = tmath.Mat2x2.ROT2();
+                if (original.orientation == 3 || original.orientation == 4) cellProps.orientation = tmath.Mat2x2.ROT3();
             }
-
-            //console.log(partString, cellProps);
 
             p.setCell(cellProps.x, cellProps.y, cellProps.type, cellProps.orientation);
 

@@ -26,7 +26,7 @@ var codeCell = codeCell || {},
         CrossConveyor: function CrossConveyor(head, previousFacing) {
             if (previousFacing.equals(program.directions.UP) || previousFacing.equals(program.directions.DOWN)) {
                 return [false, null, program.directions.UP];
-            } else if (previousFacing.equals(program.directions.UP) || previousFacing.equals(program.directions.DOWN)) {
+            } else if (previousFacing.equals(program.directions.LEFT) || previousFacing.equals(program.directions.RIGHT)) {
                 return [false, null, program.directions.RIGHT];
             }
         },
