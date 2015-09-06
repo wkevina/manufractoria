@@ -4,6 +4,7 @@ var graphics = graphics || {};
 
     var imageMap = {
         Conveyor: "img/conveyor.svg",
+		CrossConveyor: "img/cross-conveyor.svg",
         BranchBR: "img/branch-br.svg",
         BranchGY: "img/branch-gy.svg"
     };
