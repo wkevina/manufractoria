@@ -145,6 +145,10 @@ var view = view || {},
         this.rows = rows;
     };
 
+	GridView.prototype.remove = function remove() {
+		this.grid.remove();
+	};
+
     GridView.prototype.drawGrid = function drawGrid() {
         this.grid.clear();
 
@@ -199,17 +203,31 @@ var view = view || {},
     core.GridView = GridView;
 
 
-    function ProgramView(paper, x, y, width, height, program) {
+    function ProgramView(paper, x, y, tileSize, program) {
         this.paper = paper;
         this.program = program;
-        this.width = width;
-        this.height = height;
+		this.tileSize = tileSize;
         this.cells = paper.g();
-        this.gridView = new core.GridView(paper, x, y, width, height,
+		this.x = x;
+		this.y = y;
+        this.gridView = new core.GridView(paper, x, y,
+										  program.cols*tileSize,
+										  program.rows*tileSize,
                                           program.rows, program.cols);
 
         this.gridView.drawGrid();
     }
+
+	ProgramView.prototype.setProgram = function setProgram(p) {
+		this.program = p;
+		this.gridView.remove();
+		this.gridView = new core.GridView(this.paper, this.x, this.y,
+										  p.cols*this.tileSize,
+										  p.rows*this.tileSize,
+                                          p.rows, p.cols);
+		this.gridView.drawGrid();
+		this.cells.clear();
+	};
 
     ProgramView.prototype.drawProgram = function drawProgram() {
 		var paper = this.paper,

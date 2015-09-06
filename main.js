@@ -64,6 +64,7 @@ App.prototype.loadLevel = function() {
         var newProgram = program.readLegacyProgramString(levelString);
         this.program = newProgram;
         this.programView.setProgram(newProgram);
+		this.programView.drawProgram();
     }
 };
 
@@ -96,8 +97,7 @@ App.prototype.main = function() {
 			paper,
 			0, 				// x
 			40, 			// y
-			56 * this.program.cols, 	// width
-			56 * this.program.rows, 	// height
+			56,
 			this.program
 		);
 
