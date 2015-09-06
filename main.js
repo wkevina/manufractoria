@@ -9,11 +9,15 @@ var core = core || {},
 
 function App() {
     this.program = null;
+	this.programView = null;
     this.tape = new core.Tape();
 
-    var form = $("#link-form");
-    form.find("button").click(this.generateLink.bind(this));
-    form.find("input").val("");
+    var linkForm = $("#link-form");
+    linkForm.find("button").click(this.generateLink.bind(this));
+    linkForm.find("input").val("");
+
+	var loadForm = $("#load-form");
+	loadForm.find("button").click(this.loadLevel.bind(this));
 
     var controls = $("#controls");
 
@@ -51,6 +55,17 @@ function App() {
     }
 
 }
+
+App.prototype.loadLevel = function() {
+    var loadForm = $("#load-form"),
+        levelString = loadForm.find("input").val();
+
+    if (levelString.startsWith("lvl")) {
+        var newProgram = program.readLegacyProgramString(levelString);
+        this.program = newProgram;
+        this.programView.setProgram(newProgram);
+    }
+};
 
 App.prototype.generateLink = function() {
     if (this.program != null && this.tape != null) {
