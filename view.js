@@ -169,7 +169,7 @@ var view = view || {},
             this.grid.append(l);
         }
 
-        this.grid.attr({stroke: "#000", strokeWidth: 2});
+        this.grid.attr({stroke: "#888", strokeWidth: 1});
 
         this.grid.transform("");
         this.grid.transform("t1,1t" + this.x + "," + this.y);
