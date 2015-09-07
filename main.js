@@ -117,10 +117,10 @@ App.prototype.run = function() {
     myInterpreter.setProgram(this.program);
     myInterpreter.setTape(this.tape);
 
+    pView.drawProgram();
+
     var token = paper.circle(0, 0, 10);
     token.attr({fill: "#E0E"});
-
-    pView.drawProgram();
 
     myInterpreter.start();
 
