@@ -126,8 +126,9 @@ var program = program || {},
             var cellProps = {};
 
             cellProps.type = typeMap[original.type];
-            cellProps.x = original.x - 8;
-            cellProps.y = original.y - 3;
+            cellProps.x = original.x - Math.round(-0.5*(p.cols - 9) + 8);
+            cellProps.y = original.y - Math.round(-0.5*(p.cols - 9) + 3); // Lol this coordinate system
+            console.log(cellProps);
 
             //console.log(cellProps.type, original.orientation);
             if (cellProps.type.startsWith("Branch")) {
