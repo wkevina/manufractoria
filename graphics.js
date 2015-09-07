@@ -10,7 +10,9 @@ var graphics = graphics || {};
         WriteB: "img/write-blue.svg",
         WriteR: "img/write-red.svg",
         WriteY: "img/write-yellow.svg",
-        WriteG: "img/write-green.svg"
+        WriteG: "img/write-green.svg",
+        Start: "img/start.svg",
+        End: "img/end.svg"
     };
 
     var allImagePromises =
