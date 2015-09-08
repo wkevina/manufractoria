@@ -37,7 +37,7 @@ function App() {
     var hash = window.location.hash;
 
     if (hash) {
-        hash = decodeURI(hash.replace('#', ''));
+        hash = decodeURI(hash.replace('#', '')).trim();
 
 		if (hash.startsWith("lvl")) {
 			this.program = program.readLegacyProgramString(hash);
@@ -58,14 +58,27 @@ function App() {
 
 App.prototype.loadLevel = function() {
     var loadForm = $("#load-form"),
-        levelString = loadForm.find("input").val();
+        levelString = loadForm.find("input").val().trim(),
+		newProgram = null;
 
     if (levelString.startsWith("lvl")) {
-        var newProgram = program.readLegacyProgramString(levelString);
-        this.program = newProgram;
-        this.programView.setProgram(newProgram);
+        newProgram = program.readLegacyProgramString(levelString);
+
+    } else {
+		var level = loader.fromJson(levelString);
+		if (level) {
+			newProgram = level.program;
+			this.tape = level.tape[0];
+		} else {
+			// Error case
+			console.log("Unable to load program string");
+		}
+	}
+	if (newProgram) {
+		this.program = newProgram;
+		this.programView.setProgram(newProgram);
 		this.programView.drawProgram();
-    }
+	}
 };
 
 App.prototype.generateLink = function() {
