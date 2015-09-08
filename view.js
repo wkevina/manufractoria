@@ -353,33 +353,35 @@ var view = view || {},
                 right:{cell: null, position: null}
             };
 
-
+        function safeGetCell(prog, pos) {
+            try {
+                var cell = prog.getCell(pos.x, pos.y);
+                if (cell)
+                    return cell;
+                else
+                    return {type: "Empty"};
+            } catch (e) {
+                return {type: "Empty"};
+            }
+        }
         // Now we have vectors that point to our down, left, and right neighbors
-        try {
-            var downNeighbor = prog.getCell(down.x, down.y);
-            if (downNeighbor.type == "Conveyor") {
-                neighbors.down.cell = downNeighbor;
-                neighbors.down.position = down;
-            }
-        } catch (e) {
+
+        var downNeighbor = safeGetCell(prog, down);
+        if (downNeighbor.type != "Empty") {
+            neighbors.down.cell = downNeighbor;
+            neighbors.down.position = down;
         }
 
-        try {
-            var leftNeighbor = prog.getCell(left.x, left.y);
-            if (leftNeighbor.type == "Conveyor") {
-                neighbors.left.cell = leftNeighbor;
-                neighbors.left.position = left;
-            }
-        } catch (e) {
+        var leftNeighbor = safeGetCell(prog, left);
+        if (leftNeighbor.type != "Empty") {
+            neighbors.left.cell = leftNeighbor;
+            neighbors.left.position = left;
         }
 
-        try {
-            var rightNeighbor = prog.getCell(right.x, right.y);
-            if (rightNeighbor.type == "Conveyor") {
-                neighbors.right.cell = rightNeighbor;
-                neighbors.right.position = right;
-            }
-        } catch (e) {
+        var rightNeighbor = safeGetCell(prog, right);
+        if (rightNeighbor.type != "Empty") {
+            neighbors.right.cell = rightNeighbor;
+            neighbors.right.position = right;
         }
 
         return neighbors;
@@ -388,9 +390,22 @@ var view = view || {},
     function isPointingTo(source, target) {
         var direction = cellToGlobal(program.directions.UP, source.cell.orientation),
             pointedTo = source.position.add(direction),
+            same = pointedTo.equals(target.position),
+            isBranch = source.cell.type.indexOf("Branch") != -1;
+
+        if (!same && (source.cell.type == "CrossConveyor" ||
+                      isBranch)  ) {
+            // Additional test for crossconveyor
+            direction = cellToGlobal(program.directions.RIGHT, source.cell.orientation);
+            pointedTo = source.position.add(direction);
             same = pointedTo.equals(target.position);
 
-
+            if (!same && isBranch) {
+                direction = cellToGlobal(program.directions.LEFT, source.cell.orientation);
+                pointedTo = source.position.add(direction);
+                same = pointedTo.equals(target.position);
+            }
+        }
 
         return same;
 
