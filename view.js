@@ -235,6 +235,7 @@ var view = view || {},
 	    program = this.program;
 
         this.cells.clear();
+        this.cells.appendTo(this.paper);
 
 	for (var x = 0; x < program.cols; ++x) {
 	    for (var y = 0; y < program.rows; ++y) {
@@ -242,32 +243,162 @@ var view = view || {},
 
 		if (c.type != "Empty") {
 
-		    var image = graphics.getGraphic(c.type);
+                    if (c.type == "Conveyor") {
+                        this.drawConveyor(c, x, y);
+                    } else {
 
-		    if (image) {
+		        var image = graphics.getGraphic(c.type);
 
-			paper.append(image);
+		        if (image) {
 
-			var group = paper.g(image);
+			    paper.append(image);
 
-			var corner = grid.getCellMatrix(x, y, true)
-				.toTransformString()
-				.toUpperCase();
+			    var group = paper.g(image);
+                            this.cells.append(group);
 
-			var o = c.orientation;
+			    var corner = grid.getCellMatrix(x, y, true)
+				    .toTransformString()
+				    .toUpperCase();
 
-			var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
-			var tstring = view.toTransformString(transform);
+			    var o = c.orientation;
 
-			group.transform(
-			    tstring + corner
-			);
-		    }
+			    var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
+			    var tstring = view.toTransformString(transform);
+
+			    group.transform(
+			        tstring + corner
+			    );
+		        }
+                    }
 		}
 	    }
 	}
 
     };
+
+    ProgramView.prototype.drawConveyor = function drawConveyor(cell, x, y) {
+        var neighbors = getNeighbors(this.program, cell, x, y),
+
+            target = {cell: cell, position: new tmath.Vec2(x, y)},
+
+            hasLeft = neighbors.left.cell != null ? isPointingTo(neighbors.left, target) : false,
+
+            hasRight = neighbors.right.cell != null ? isPointingTo(neighbors.right, target) : false,
+
+            hasDown = neighbors.down.cell != null ? isPointingTo(neighbors.down, target) : false,
+
+            image = null,
+
+            mirror = false;
+
+        if (!hasLeft && !hasRight) {
+
+            image = "Conveyor";
+
+        } else if (!hasLeft && hasRight ||
+                   hasLeft && !hasRight) {
+
+            image = hasDown ? "ConveyorTeeTwo" : "ConveyorElbow";
+
+            mirror = hasLeft;
+
+        } else if (!hasDown && hasLeft && hasRight) {
+
+            image = "ConveyorTee";
+
+        } else {
+
+            image = "ConveyorEx";
+
+        }
+
+        image = graphics.getGraphic(image);
+
+	if (image) {
+
+	    this.paper.append(image);
+
+	    var group = this.paper.g(image);
+            this.cells.append(group);
+
+	    var corner = this.gridView.getCellMatrix(x, y, true)
+		    .toTransformString()
+		    .toUpperCase();
+
+	    var o = cell.orientation;
+
+            if (mirror) {
+                o = tmath.Mat2x2.kMIR.compose(o);
+            }
+
+	    var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
+	    var tstring = view.toTransformString(transform);
+
+	    group.transform(
+		tstring + corner
+	    );
+	}
+
+    };
+
+    function getNeighbors(prog, cell, x, y) {
+        var o = cell.orientation,
+            position = new tmath.Vec2(x, y),
+            down = cellToGlobal(program.directions.DOWN, o).add(position),
+            left = cellToGlobal(program.directions.LEFT, o).add(position),
+            right = cellToGlobal(program.directions.RIGHT, o).add(position),
+            neighbors = {
+                down: {cell: null, position: null},
+                left: {cell: null, position: null},
+                right:{cell: null, position: null}
+            };
+
+
+        // Now we have vectors that point to our down, left, and right neighbors
+        try {
+            var downNeighbor = prog.getCell(down.x, down.y);
+            if (downNeighbor.type == "Conveyor") {
+                neighbors.down.cell = downNeighbor;
+                neighbors.down.position = down;
+            }
+        } catch (e) {
+        }
+
+        try {
+            var leftNeighbor = prog.getCell(left.x, left.y);
+            if (leftNeighbor.type == "Conveyor") {
+                neighbors.left.cell = leftNeighbor;
+                neighbors.left.position = left;
+            }
+        } catch (e) {
+        }
+
+        try {
+            var rightNeighbor = prog.getCell(right.x, right.y);
+            if (rightNeighbor.type == "Conveyor") {
+                neighbors.right.cell = rightNeighbor;
+                neighbors.right.position = right;
+            }
+        } catch (e) {
+        }
+
+        return neighbors;
+    }
+
+    function isPointingTo(source, target) {
+        var direction = cellToGlobal(program.directions.UP, source.cell.orientation),
+            pointedTo = source.position.add(direction),
+            same = pointedTo.equals(target.position);
+
+
+
+        return same;
+
+    }
+
+    function cellToGlobal(d, orientation) {
+        return orientation.invert().apply(d);
+    }
 
     view.ProgramView = ProgramView;
 
