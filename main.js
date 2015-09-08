@@ -9,15 +9,15 @@ var core = core || {},
 
 function App() {
     this.program = null;
-	this.programView = null;
+    this.programView = null;
     this.tape = new core.Tape();
 
     var linkForm = $("#link-form");
     linkForm.find("button").click(this.generateLink.bind(this));
     linkForm.find("input").val("");
 
-	var loadForm = $("#load-form");
-	loadForm.find("button").click(this.loadLevel.bind(this));
+    var loadForm = $("#load-form");
+    loadForm.find("button").click(this.loadLevel.bind(this));
 
     var controls = $("#controls");
 
@@ -39,19 +39,19 @@ function App() {
     if (hash) {
         hash = decodeURI(hash.replace('#', '')).trim();
 
-		if (hash.startsWith("lvl")) {
-			this.program = program.readLegacyProgramString(hash);
-		} else {
-			var level = loader.fromJson(hash);
-			if (level) {
-				this.program = level.program;
-				this.tape = level.tape[0];
-			} else {
-				// Error case
-				console.log("Unable to load program string");
-			}
+	if (hash.startsWith("lvl")) {
+	    this.program = program.readLegacyProgramString(hash);
+	} else {
+	    var level = loader.fromJson(hash);
+	    if (level) {
+		this.program = level.program;
+		this.tape = level.tape[0];
+	    } else {
+		// Error case
+		console.log("Unable to load program string");
+	    }
 
-		}
+	}
     }
 
 }
@@ -59,26 +59,26 @@ function App() {
 App.prototype.loadLevel = function() {
     var loadForm = $("#load-form"),
         levelString = loadForm.find("input").val().trim(),
-		newProgram = null;
+	newProgram = null;
 
     if (levelString.startsWith("lvl")) {
         newProgram = program.readLegacyProgramString(levelString);
 
     } else {
-		var level = loader.fromJson(levelString);
-		if (level) {
-			newProgram = level.program;
-			this.tape = level.tape[0];
-		} else {
-			// Error case
-			console.log("Unable to load program string");
-		}
+	var level = loader.fromJson(levelString);
+	if (level) {
+	    newProgram = level.program;
+	    this.tape = level.tape[0];
+	} else {
+	    // Error case
+	    console.log("Unable to load program string");
 	}
-	if (newProgram) {
-		this.program = newProgram;
-		this.programView.setProgram(newProgram);
-		this.programView.drawProgram();
-	}
+    }
+    if (newProgram) {
+	this.program = newProgram;
+	this.programView.setProgram(newProgram);
+	this.programView.drawProgram();
+    }
 };
 
 App.prototype.generateLink = function() {
@@ -106,13 +106,13 @@ App.prototype.main = function() {
             this.program = new program.Program(10, 10);
         }
 
-		var pView = new view.ProgramView(
-			paper,
-			0, 				// x
-			40, 			// y
-			56,
-			this.program
-		);
+	var pView = new view.ProgramView(
+	    paper,
+	    0, 				// x
+	    40, 			// y
+	    56,
+	    this.program
+	);
 
         pView.drawProgram();
 
@@ -132,7 +132,7 @@ App.prototype.run = function() {
 
     pView.drawProgram();
 
-	var token = paper.circle(0, 0, 10);
+    var token = paper.circle(0, 0, 10);
     token.attr({fill: "#E0E"});
 
     myInterpreter.start();
@@ -141,9 +141,9 @@ App.prototype.run = function() {
 
         var curPos = myInterpreter.position;
         token.transform(
-			pView.gridView.getCellMatrix(curPos.x, curPos.y)
-				.toTransformString()
-		);
+	    pView.gridView.getCellMatrix(curPos.x, curPos.y)
+		.toTransformString()
+	);
 
         if (!this.isPaused) {
             myInterpreter.step();
@@ -154,9 +154,9 @@ App.prototype.run = function() {
         var update = function() {
             token.animate(
                 {
-					transform:
-					pView.gridView.getCellMatrix(curPos.x, curPos.y)
-						.toTransformString()
+		    transform:
+		    pView.gridView.getCellMatrix(curPos.x, curPos.y)
+			.toTransformString()
                 },
                 500,
                 mina.linear,
