@@ -72,6 +72,19 @@ var program = program || {},
         this.start = {x: x, y: y};
     };
 
+	Program.prototype.hasCell = function(x, y) {
+		// Support using vector object
+		if (typeof(x) == "object") {
+			y = x.y;
+			x = x.x;
+		}
+		if (x < 0 || x >= this.cols || y < 0 || y >= this.rows)
+			return false;
+		else {
+			return this.getCell(x, y).type != "Empty";
+		}
+	};
+
     program.Program = Program;
 
     program.readLegacyProgramString = function(s) {

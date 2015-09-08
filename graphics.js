@@ -12,7 +12,8 @@ var graphics = graphics || {};
         WriteY: "img/write-yellow.svg",
         WriteG: "img/write-green.svg",
         Start: "img/start.svg",
-        End: "img/end.svg"
+        End: "img/end.svg",
+		Endcap: "img/endcap.svg"
     };
 
     var allImagePromises =

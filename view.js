@@ -136,6 +136,7 @@ var view = view || {},
      */
     function GridView(paper, x, y, width, height, rows, cols) {
         this.paper = paper;
+		this.background = paper.g();
         this.grid = paper.g();
         this.width = width;
         this.height = height;
@@ -154,7 +155,7 @@ var view = view || {},
 
         var r = this.paper.rect(0,0, this.width, this.height);
         r.attr({fill: "#FFF"});
-        this.grid.append(r);
+        this.background.append(r);
 
         var sw = this.width / this.cols;
         var sy = this.height / this.rows;
@@ -173,6 +174,9 @@ var view = view || {},
 
         this.grid.transform("");
         this.grid.transform("t1,1t" + this.x + "," + this.y);
+
+		this.background.transform("");
+        this.background.transform("t1,1t" + this.x + "," + this.y);
     };
 
     /**
@@ -208,6 +212,7 @@ var view = view || {},
         this.program = program;
 		this.tileSize = tileSize;
         this.cells = paper.g();
+		this.cells.addClass("programView");
 		this.x = x;
 		this.y = y;
         this.gridView = new core.GridView(paper, x, y,
@@ -232,13 +237,13 @@ var view = view || {},
     ProgramView.prototype.drawProgram = function drawProgram() {
 		var paper = this.paper,
 			grid = this.gridView,
-			program = this.program;
+			prog = this.program;
 
         this.cells.clear();
 
-		for (var x = 0; x < program.cols; ++x) {
-			for (var y = 0; y < program.rows; ++y) {
-				var c = program.getCell(x, y);
+		for (var x = 0; x < prog.cols; ++x) {
+			for (var y = 0; y < prog.rows; ++y) {
+				var c = prog.getCell(x, y);
 
 				if (c.type != "Empty") {
 
@@ -249,6 +254,7 @@ var view = view || {},
 						paper.append(image);
 
 						var group = paper.g(image);
+						this.cells.append(group);
 
 						var corner = grid.getCellMatrix(x, y, true)
 								.toTransformString()
@@ -259,6 +265,42 @@ var view = view || {},
 						var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
 						var tstring = view.toTransformString(transform);
 
+						if (c.type == "Conveyor") {
+							// add endcap
+							var pointingUp = o.invert().apply(program.directions.UP),
+								nextUp = new tmath.Vec2(x,y).add(pointingUp),
+								hasNeighborUp = prog.hasCell(nextUp),
+								pointingDown = o.invert().apply(program.directions.DOWN),
+								nextDown = new tmath.Vec2(x,y).add(pointingDown),
+								hasNeighborDown = prog.hasCell(nextDown),
+								endcap = null;
+
+							if (!hasNeighborUp) {
+								endcap = graphics.getGraphic("Endcap");
+								endcap.addClass("endcap");
+								paper.append(endcap);
+								group.append(endcap);
+							}
+
+							if (!hasNeighborDown) {
+								endcap = graphics.getGraphic("Endcap");
+								endcap.addClass("endcap");
+								paper.append(endcap);
+								group.append(endcap);
+
+								var downMat = tmath.Mat2x2.ROT2(),
+									downTransform = view.toTransformString(
+										Snap.matrix(downMat.a, downMat.b,
+													downMat.c, downMat.d,
+													0, 0)
+									);
+
+								endcap.transform(downTransform);
+
+							}
+
+						}
+
 						group.transform(
 							tstring + corner
 						);
@@ -267,29 +309,8 @@ var view = view || {},
 			}
 		}
 
-        for (var x = 0; x < this.program.cols; ++x) {
-            for (var y = 0; y < this.program.rows; ++y) {
-                var programCell = this.program.getCell(x, y);
+		this.cells.insertBefore(grid.grid);
 
-                if (programCell.type != "Empty") {
-                    var cellGraphic = this.paper.circle(0, 0, 10);
-
-                    cellGraphic.transform(
-                        this.gridView.getCellMatrix(x, y).toTransformString()
-                    );
-
-                    if (programCell.type == "Start") {
-                        cellGraphic.attr({fill: "#0f0"});
-                    } else if (programCell.type == "End") {
-                        cellGraphic.attr({fill: "#F00"});
-                    } else {
-                        cellGraphic.attr({fill: "#00F"});
-                    }
-
-                    this.cells.append(cellGraphic);
-                }
-            }
-        }
     };
 
     view.ProgramView = ProgramView;
