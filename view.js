@@ -12,21 +12,21 @@ var view = view || {},
         this.height = height;
         this.x = x;
         this.y = y;
-		this.tape = tape;
+	this.tape = tape;
 
-		this._sw = 20; // Parameterize this later
-		this._MAX = Math.floor((this.width - this._sw) / this._sw);
+	this._sw = 20; // Parameterize this later
+	this._MAX = Math.floor((this.width - this._sw) / this._sw);
 
-		// Register for tape's changed signal
-		this.tape.changed.add(this.animate.bind(this));
+	// Register for tape's changed signal
+	this.tape.changed.add(this.animate.bind(this));
     };
 
-	/**
-	 Performs a clean draw of the tape with no animation
-	 */
+    /**
+     Performs a clean draw of the tape with no animation
+     */
     TapeView.prototype.drawTape = function drawTape() {
-		var MAX = this._MAX,
-			sw = this._sw;
+	var MAX = this._MAX,
+	    sw = this._sw;
 
         this.tapeView.clear();
 
@@ -39,82 +39,82 @@ var view = view || {},
         this.tapeView.transform("t" + this.x + "," + this.y);
     };
 
-	TapeView.prototype._appendSymbol = function(symbol, offset, color) {
-		offset = offset || 0;
+    TapeView.prototype._appendSymbol = function(symbol, offset, color) {
+	offset = offset || 0;
 
-		var sw = this._sw,
-			length = this.tapeView.selectAll("*").length;
+	var sw = this._sw,
+	    length = this.tapeView.selectAll("*").length;
 
-		var circle = this.tapeView.circle(sw*(length + offset) + sw/2, sw/2, sw/2 - 2);
+	var circle = this.tapeView.circle(sw*(length + offset) + sw/2, sw/2, sw/2 - 2);
 
-		if (symbol === core.EMPTY) {
-			circle.attr({
-				stroke: "#111",
-				strokeWidth: 2,
-				fill: "#FFF"
-			});
-		} else {
-			if (color) {
-				circle.attr({
-					fill: "#FFF"
-				});
-			} else {
-				circle.attr({
-					fill: colorForSymbol(symbol)
-				});
-			}
+	if (symbol === core.EMPTY) {
+	    circle.attr({
+		stroke: "#111",
+		strokeWidth: 2,
+		fill: "#FFF"
+	    });
+	} else {
+	    if (color) {
+		circle.attr({
+		    fill: "#FFF"
+		});
+	    } else {
+		circle.attr({
+		    fill: colorForSymbol(symbol)
+		});
+	    }
+	}
+
+	return circle;
+    };
+
+    TapeView.prototype.animate = function animate(action) {
+
+	var pop = function(head, callback) {
+	    head.animate(
+		{opacity: 0},
+		100,
+		mina.linear,
+		function() {
+		    head.remove();
+		    if (callback)
+			callback();
 		}
-
-		return circle;
+	    );
 	};
 
-	TapeView.prototype.animate = function animate(action) {
+	var slide = (function() {
+	    var sw = this._sw,
+		length = this.tapeView.selectAll("*").length;
 
-		var pop = function(head, callback) {
-			head.animate(
-				{opacity: 0},
-				100,
-				mina.linear,
-				function() {
-					head.remove();
-					if (callback)
-						callback();
-				}
-			);
-		};
+	    // Append symbol if necessary
+	    if (length < this._MAX && this.tape.symbols.length > length) {
+		var c = this._appendSymbol(this.tape.symbols[length - 1], 1);
+		c.attr({opacity: 0});
+	    }
 
-		var slide = (function() {
-			var sw = this._sw,
-				length = this.tapeView.selectAll("*").length;
+	    // Slide left
+	    this.tapeView.selectAll("*").animate(
+		{
+		    cx: "-=" + sw,
+		    opacity: 1
+		},
+		200,
+		mina.easeinout
+	    );
 
-			// Append symbol if necessary
-			if (length < this._MAX && this.tape.symbols.length > length) {
-				var c = this._appendSymbol(this.tape.symbols[length - 1], 1);
-				c.attr({opacity: 0});
-			}
+	}).bind(this);
 
-			// Slide left
-			this.tapeView.selectAll("*").animate(
-				{
-					cx: "-=" + sw,
-					opacity: 1
-				},
-				200,
-				mina.easeinout
-			);
+	if (action == "pop") {
+	    // Dissolve first element, then slide left
+	    var head = this.tapeView.selectAll("*")[0];
+	    pop(head, slide);
 
-		}).bind(this);
+	}
+    };
 
-		if (action == "pop") {
-			// Dissolve first element, then slide left
-			var head = this.tapeView.selectAll("*")[0];
-			pop(head, slide);
-
-		}
-	};
-
-	function colorForSymbol(symbol) {
-		if (symbol === core.RED) {
+    function colorForSymbol(symbol) {
+	if (symbol === core.RED) {
             return "#E10";
         } else if (symbol === core.BLUE) {
             return "#01F";
@@ -123,9 +123,9 @@ var view = view || {},
         } else if (symbol === core.YELLOW) {
             return "#FF0";
         } else {
-			return "FA3";
-		}
+	    return "FA3";
 	}
+    }
 
     core.TapeView = TapeView;
 
@@ -145,9 +145,9 @@ var view = view || {},
         this.rows = rows;
     };
 
-	GridView.prototype.remove = function remove() {
-		this.grid.remove();
-	};
+    GridView.prototype.remove = function remove() {
+	this.grid.remove();
+    };
 
     GridView.prototype.drawGrid = function drawGrid() {
         this.grid.clear();
@@ -206,66 +206,66 @@ var view = view || {},
     function ProgramView(paper, x, y, tileSize, program) {
         this.paper = paper;
         this.program = program;
-		this.tileSize = tileSize;
+	this.tileSize = tileSize;
         this.cells = paper.g();
-		this.x = x;
-		this.y = y;
+	this.x = x;
+	this.y = y;
         this.gridView = new core.GridView(paper, x, y,
-										  program.cols*tileSize,
-										  program.rows*tileSize,
+					  program.cols*tileSize,
+					  program.rows*tileSize,
                                           program.rows, program.cols);
 
         this.gridView.drawGrid();
     }
 
-	ProgramView.prototype.setProgram = function setProgram(p) {
-		this.program = p;
-		this.gridView.remove();
-		this.gridView = new core.GridView(this.paper, this.x, this.y,
-										  p.cols*this.tileSize,
-										  p.rows*this.tileSize,
+    ProgramView.prototype.setProgram = function setProgram(p) {
+	this.program = p;
+	this.gridView.remove();
+	this.gridView = new core.GridView(this.paper, this.x, this.y,
+					  p.cols*this.tileSize,
+					  p.rows*this.tileSize,
                                           p.rows, p.cols);
-		this.gridView.drawGrid();
-		this.cells.clear();
-	};
+	this.gridView.drawGrid();
+	this.cells.clear();
+    };
 
     ProgramView.prototype.drawProgram = function drawProgram() {
-		var paper = this.paper,
-			grid = this.gridView,
-			program = this.program;
+	var paper = this.paper,
+	    grid = this.gridView,
+	    program = this.program;
 
         this.cells.clear();
 
-		for (var x = 0; x < program.cols; ++x) {
-			for (var y = 0; y < program.rows; ++y) {
-				var c = program.getCell(x, y);
+	for (var x = 0; x < program.cols; ++x) {
+	    for (var y = 0; y < program.rows; ++y) {
+		var c = program.getCell(x, y);
 
-				if (c.type != "Empty") {
+		if (c.type != "Empty") {
 
-					var image = graphics.getGraphic(c.type);
+		    var image = graphics.getGraphic(c.type);
 
-					if (image) {
+		    if (image) {
 
-						paper.append(image);
+			paper.append(image);
 
-						var group = paper.g(image);
+			var group = paper.g(image);
 
-						var corner = grid.getCellMatrix(x, y, true)
-								.toTransformString()
-								.toUpperCase();
+			var corner = grid.getCellMatrix(x, y, true)
+				.toTransformString()
+				.toUpperCase();
 
-						var o = c.orientation;
+			var o = c.orientation;
 
-						var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
-						var tstring = view.toTransformString(transform);
+			var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
+			var tstring = view.toTransformString(transform);
 
-						group.transform(
-							tstring + corner
-						);
-					}
-				}
-			}
+			group.transform(
+			    tstring + corner
+			);
+		    }
 		}
+	    }
+	}
 
         for (var x = 0; x < this.program.cols; ++x) {
             for (var y = 0; y < this.program.rows; ++y) {
