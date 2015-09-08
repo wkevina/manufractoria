@@ -267,29 +267,6 @@ var view = view || {},
 	    }
 	}
 
-        for (var x = 0; x < this.program.cols; ++x) {
-            for (var y = 0; y < this.program.rows; ++y) {
-                var programCell = this.program.getCell(x, y);
-
-                if (programCell.type != "Empty") {
-                    var cellGraphic = this.paper.circle(0, 0, 10);
-
-                    cellGraphic.transform(
-                        this.gridView.getCellMatrix(x, y).toTransformString()
-                    );
-
-                    if (programCell.type == "Start") {
-                        cellGraphic.attr({fill: "#0f0"});
-                    } else if (programCell.type == "End") {
-                        cellGraphic.attr({fill: "#F00"});
-                    } else {
-                        cellGraphic.attr({fill: "#00F"});
-                    }
-
-                    this.cells.append(cellGraphic);
-                }
-            }
-        }
     };
 
     view.ProgramView = ProgramView;
