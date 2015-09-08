@@ -6,7 +6,13 @@ var graphics = graphics || {};
         Conveyor: "img/conveyor.svg",
 		CrossConveyor: "img/cross-conveyor.svg",
         BranchBR: "img/branch-br.svg",
-        BranchGY: "img/branch-gy.svg"
+        BranchGY: "img/branch-gy.svg",
+        WriteB: "img/write-blue.svg",
+        WriteR: "img/write-red.svg",
+        WriteY: "img/write-yellow.svg",
+        WriteG: "img/write-green.svg",
+        Start: "img/start.svg",
+        End: "img/end.svg"
     };
 
     var allImagePromises =
