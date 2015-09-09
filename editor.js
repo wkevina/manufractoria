@@ -47,7 +47,18 @@ Palette.prototype.drawPalette = function drawPalette() {
             y_index = Math.floor(index / this.columns),
 	    transform = Snap.matrix().translate(x_index * width, y_index * height);
 
-        group.click(() => editor.trigger(editor.events.tileSelected, {tile: image.name}));
+        group.click(
+            (evt, x, y) => {
+                editor.trigger(
+                    editor.events.tileSelected,
+                    {
+                        tile: image.name,
+                        event: evt,
+                        x: x,
+                        y: y
+                    }
+                );
+            });
 
         group.transform(transform.toTransformString());
 
@@ -86,12 +97,14 @@ var startEditor = function() {
 	paper.appendTo(document.getElementById("main"));
 	var palette = new Palette(paper, 10, 30, 2);
 
-        var controller = new Editor();
+        var controller = new Editor(paper);
     });
 
 };
 
-function Editor() {
+function Editor(paper) {
+    this.paper = paper;
+    this.tileCursor = null;
 
     var events = {
         tileSelected: (data) => this.onTileSelected(data)
@@ -101,7 +114,31 @@ function Editor() {
 }
 
 Editor.prototype.onTileSelected = function(data) {
-    console.log(data.tile + " Clicked");
+    if (this.tileCursor != null)
+        this.tileCursor.remove();
+
+    var tileGraphic = this.paper.g(graphics.getGraphic(data.tile)),
+        mousePoint = screenPointToLocal(data.x, data.y, this.paper);
+
+    tileGraphic.transform("t" + (mousePoint.x - 56/2) + "," + (mousePoint.y - 56/2));
+
+    var move = (evt, x, y) => {
+        var mousePoint = screenPointToLocal(x, y, this.paper);
+        tileGraphic.transform("t" + (mousePoint.x - 56/2) + "," + (mousePoint.y - 56/2));
+    };
+
+    this.paper.mousemove(
+        move
+    );
+
+    this.paper.mousedown(
+        () => {
+            this.paper.unmousemove(move);
+            tileGraphic.remove();
+        }
+    );
+
+    this.tileCursor = tileGraphic;
 };
 
 
@@ -119,3 +156,14 @@ function registerEvents(evts) {
 editor.trigger = function(event, args) {
     radio(event).broadcast(args);
 };
+
+
+function screenPointToLocal(x, y, element) {
+    var svg = element.node.ownerSVGElement || element.node,
+        spt = svg.createSVGPoint(),
+        mat = element.node.getScreenCTM();
+
+    spt.x = x; spt.y = y;
+
+    return spt.matrixTransform(mat.inverse());
+}
