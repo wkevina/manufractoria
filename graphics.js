@@ -48,6 +48,16 @@ var graphics = graphics || {};
         return null;
     };
 
+    graphics.screenPointToLocal = function screenPointToLocal(x, y, element) {
+        var svg = element.node.ownerSVGElement || element.node,
+            spt = svg.createSVGPoint(),
+            mat = element.node.getScreenCTM();
+
+        spt.x = x; spt.y = y;
+
+        return spt.matrixTransform(mat.inverse());
+    };
+
     function getSVG(url) {
         if (!getSVG.cache) {
             getSVG.cache = {};

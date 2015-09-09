@@ -8,6 +8,30 @@ var editor = editor || {},
     tmath = tmath || {},
     codeCell = codeCell || {};
 
+editor.events = {
+    tileSelected: "tile-selected"
+};
+
+editor.trigger = function(event, args) {
+    radio(event).broadcast(args);
+};
+
+function screenPointToLocal(x, y, element) {
+    var svg = element.node.ownerSVGElement || element.node,
+        spt = svg.createSVGPoint(),
+        mat = element.node.getScreenCTM();
+
+    spt.x = x; spt.y = y;
+
+    return spt.matrixTransform(mat.inverse());
+}
+
+function registerEvents(evts) {
+    Object.keys(evts).forEach(function(key) {
+        radio(editor.events[key]).subscribe(evts[key]);
+    });
+}
+
 function Palette(paper, x, y, columns) {
     this.paper = paper;
     this.x = x;
@@ -140,30 +164,3 @@ Editor.prototype.onTileSelected = function(data) {
 
     this.tileCursor = tileGraphic;
 };
-
-
-editor.events = {
-    tileSelected: "tile-selected"
-};
-
-
-function registerEvents(evts) {
-    Object.keys(evts).forEach(function(key) {
-        radio(editor.events[key]).subscribe(evts[key]);
-    });
-}
-
-editor.trigger = function(event, args) {
-    radio(event).broadcast(args);
-};
-
-
-function screenPointToLocal(x, y, element) {
-    var svg = element.node.ownerSVGElement || element.node,
-        spt = svg.createSVGPoint(),
-        mat = element.node.getScreenCTM();
-
-    spt.x = x; spt.y = y;
-
-    return spt.matrixTransform(mat.inverse());
-}
