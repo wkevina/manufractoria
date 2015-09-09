@@ -4,8 +4,19 @@ var graphics = graphics || {};
 
     var imageMap = {
         Conveyor: "img/conveyor.svg",
+        ConveyorElbow: "img/conveyor-elbow.svg",
+        ConveyorTee: "img/conveyor-tee.svg",
+        ConveyorTeeTwo: "img/conveyor-tee-2.svg",
+        ConveyorEx: "img/conveyor-ex.svg",
+	CrossConveyor: "img/cross-conveyor.svg",
         BranchBR: "img/branch-br.svg",
-        BranchGY: "img/branch-gy.svg"
+        BranchGY: "img/branch-gy.svg",
+        WriteB: "img/write-blue.svg",
+        WriteR: "img/write-red.svg",
+        WriteY: "img/write-yellow.svg",
+        WriteG: "img/write-green.svg",
+        Start: "img/start.svg",
+        End: "img/end.svg"
     };
 
     var allImagePromises =
