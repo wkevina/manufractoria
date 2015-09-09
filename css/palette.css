@@ -1,0 +1,17 @@
+.label-text {
+  fill: #eee;
+}
+
+.palette-tile-bg {
+  fill: #16e;
+  stroke: unset;
+  opacity: 1
+}
+
+.palette-tile {
+  opacity: 0.6;
+}
+
+.palette-tile:hover {
+  opacity: 1;
+}

@@ -50,8 +50,13 @@ Palette.prototype.drawPalette = function drawPalette() {
         group.transform(transform.toTransformString());
 
 	var r = group.rect(-1, -1, 58, 58);
-	r.attr({stroke: "#111", fill: "#fff", strokeWidth: 2});
+	r.attr({
+            stroke: "#111",
+            fill: "#fff",
+            strokeWidth: 2
+        }).addClass("palette-tile-bg");
 
+        image.image.addClass("palette-tile");
         group.append(image.image);
 
         // CrossConveyor is too long to fit in box
@@ -64,7 +69,7 @@ Palette.prototype.drawPalette = function drawPalette() {
             fontFamily: "monospace",
             fontSize: 10,
             textAnchor: "middle"
-        });
+        }).addClass("label-text");
 
 	var title = Snap.parse('<title>'+image.name+'</title>');
 	group.append(title);
