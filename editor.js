@@ -1,59 +1,82 @@
 
 var editor = editor || {},
-	core = core || {},
+    core = core || {},
     program = program || {},
     interpreter = interpreter || {},
     graphics = graphics || {},
     view = view || {},
     tmath = tmath || {},
-	codeCell = codeCell || {};
+    codeCell = codeCell || {};
 
-function Palette(paper, x, y) {
-	this.paper = paper;
-	this.x = x;
-	this.y = y;
-	this.tiles = paper.g();
+function Palette(paper, x, y, columns) {
+    this.paper = paper;
+    this.x = x;
+    this.y = y;
+    this.columns = columns > 0 ? columns : 1; // negative columns?
+    this.width = 56;
+    this.tiles = paper.g();
 
-	// Get names of all types to draw
-	this.typesToDraw = Object.keys(codeCell.codeCells);
+    // Get names of all types to draw
+    this.typesToDraw = Object.keys(codeCell.codeCells);
 
-	this.tiles.transform(Snap.matrix().translate(x, y));
-	this.drawPalette();
+     // calculate scaling required
+    var scale_x = this.width / 56;
+
+    this.tiles.transform(Snap.matrix().translate(x, y).scale(scale_x, scale_x));
+    this.drawPalette();
 }
 
 Palette.prototype.drawPalette = function drawPalette() {
-	this.tiles.clear();
+    this.tiles.clear();
 
-	var cellImages = this.typesToDraw.map(function(name) {
-		var image = graphics.getGraphic(name);
-		if (image != null) return {name:name, image:image};
-		else return undefined;
+    var scale_x = this.width / 56;
 
-	}).filter(_.negate(_.isUndefined));
+    var height = 56 + 20; // 56 pixel tile + 10 pixel text + 10 pixel padding
+    var width = 56 + 20;
+    var cellImages = this.typesToDraw.map(function(name) {
+	var image = this.paper.g(graphics.getGraphic(name));
+	if (image != null) return {name:name, image:image};
+	else return undefined;
 
-	cellImages.map(function(image, index){
-		this.paper.append(image.image);
-		var group = this.tiles.g();
-		var transform = Snap.matrix().translate(0, index*(56));
-		group.transform(transform.toTransformString());
+    }.bind(this)).filter(_.negate(_.isUndefined));
 
-		var r = group.rect(0, 0, 56, 56);
-		r.attr({stroke: "#333", fill: "#fff"});
+    cellImages.map(function(image, index){
 
-		group.append(image.image);
-//		group.attr();
+	var group = this.tiles.g(),
+            x_index = index % this.columns,
+            y_index = Math.floor(index / this.columns),
+	    transform = Snap.matrix().translate(x_index * width, y_index * height);
 
-		var title = Snap.parse('<title>'+image.name+'</title>');
-		group.append(title);
-	}, this);
+        group.transform(transform.toTransformString());
+
+	var r = group.rect(-1, -1, 58, 58);
+	r.attr({stroke: "#111", fill: "#fff", strokeWidth: 2});
+
+        group.append(image.image);
+
+        // CrossConveyor is too long to fit in box
+        if (image.name == "CrossConveyor") {
+            image.name = "Crossover";
+        }
+
+        var label = group.text(56/2, height - 8, image.name);
+        label.attr({
+            fontFamily: "monospace",
+            fontSize: 10,
+            textAnchor: "middle"
+        });
+
+	var title = Snap.parse('<title>'+image.name+'</title>');
+	group.append(title);
+    }, this);
 };
 
 var startEditor = function() {
 
     graphics.preload().then(function() {
-		var paper = Snap(640, 640);
-		paper.appendTo(document.getElementById("main"));
-		var palette = new Palette(paper, 10, 30);
+	var paper = Snap(640, 640);
+	paper.appendTo(document.getElementById("main"));
+	var palette = new Palette(paper, 10, 30, 2);
     });
 
 };
