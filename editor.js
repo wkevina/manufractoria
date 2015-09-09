@@ -47,6 +47,8 @@ Palette.prototype.drawPalette = function drawPalette() {
             y_index = Math.floor(index / this.columns),
 	    transform = Snap.matrix().translate(x_index * width, y_index * height);
 
+        group.click(() => editor.trigger(editor.events.tileSelected, {tile: image.name}));
+
         group.transform(transform.toTransformString());
 
 	var r = group.rect(-1, -1, 58, 58);
@@ -59,20 +61,21 @@ Palette.prototype.drawPalette = function drawPalette() {
         image.image.addClass("palette-tile");
         group.append(image.image);
 
-        // CrossConveyor is too long to fit in box
-        if (image.name == "CrossConveyor") {
-            image.name = "Crossover";
-        }
+
 
         var label = group.text(56/2, height - 8, image.name);
         label.attr({
             fontFamily: "monospace",
             fontSize: 10,
-            textAnchor: "middle"
+            textAnchor: "middle",
+            text: image.name == "CrossConveyor" ? "Crossover" : image.name
         }).addClass("label-text");
 
 	var title = Snap.parse('<title>'+image.name+'</title>');
+
 	group.append(title);
+
+
     }, this);
 };
 
@@ -82,6 +85,37 @@ var startEditor = function() {
 	var paper = Snap(640, 640);
 	paper.appendTo(document.getElementById("main"));
 	var palette = new Palette(paper, 10, 30, 2);
+
+        var controller = new Editor();
     });
 
+};
+
+function Editor() {
+
+    var events = {
+        tileSelected: (data) => this.onTileSelected(data)
+    };
+
+    registerEvents(events);
+}
+
+Editor.prototype.onTileSelected = function(data) {
+    console.log(data.tile + " Clicked");
+};
+
+
+editor.events = {
+    tileSelected: "tile-selected"
+};
+
+
+function registerEvents(evts) {
+    Object.keys(evts).forEach(function(key) {
+        radio(editor.events[key]).subscribe(evts[key]);
+    });
+}
+
+editor.trigger = function(event, args) {
+    radio(event).broadcast(args);
 };
