@@ -148,14 +148,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="8"
-     inkscape:cx="-1.6069575"
+     inkscape:cx="55.268043"
      inkscape:cy="25.883463"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
      units="px"
-     inkscape:window-width="1920"
-     inkscape:window-height="1022"
+     inkscape:window-width="1440"
+     inkscape:window-height="851"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -205,7 +205,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -222,13 +222,13 @@
     <path
        transform="translate(0,-996.3622)"
        id="path5529"
-       style="display:inline;opacity:1;fill:none;fill-rule:evenodd;stroke:#333333;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:none;fill-rule:evenodd;stroke:#333333;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 44,1024.3622 c 0,8.8366 -7.163444,16 -16,16 -8.836556,0 -16,-7.1634 -16,-16 0,-8.8366 7.163444,-16 16,-16 8.836556,0 16,7.1634 16,16 z m -32.5,-28 0,11.5 -11.5,0 m 56,0 -11.5,0 0,-11.5 m -16.5,49.75 c 5.372123,0 10.224788,-2.0223 14.019531,-5.25 l 0.151864,0 13.828605,0 m -28,5.25 c -5.372123,0 -10.224788,-2.0223 -14.019531,-5.25 l -0.0228,0 -13.957669,0"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ssssscccccccccccccc" />
     <rect
        transform="translate(0,-996.3622)"
-       style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#333333;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#333333;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4329"
        width="13.5"
        height="12.875"

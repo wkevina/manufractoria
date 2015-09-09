@@ -146,15 +146,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.5"
-     inkscape:cx="10.271752"
-     inkscape:cy="33.684618"
+     inkscape:zoom="8.131728"
+     inkscape:cx="0.7291425"
+     inkscape:cy="30.564441"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      units="px"
-     inkscape:window-width="1920"
-     inkscape:window-height="1022"
+     inkscape:window-width="1440"
+     inkscape:window-height="851"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -229,29 +229,10 @@
        y="0"
        transform="translate(0,996.3622)" />
     <path
-       style="fill:none;stroke:#333333;stroke-width:1.50000003;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="m 56,44.464077 -11.513,-4.72e-4 0,11.536377"
-       id="path5975"
-       inkscape:connector-curvature="0"
-       transform="translate(0,996.3622)" />
-    <path
-       style="fill:none;stroke:#333333;stroke-width:1.50000003;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="m 11.559659,55.999982 0,-11.436683 -11.514719,-0.0997"
-       id="path5977"
-       inkscape:connector-curvature="0"
-       transform="translate(0,996.3622)" />
-    <path
-       style="fill:none;stroke:#333333;stroke-width:1.50000003;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="m 0.04494,11.5363 11.514719,0 0,-11.5363"
-       id="path5969"
-       inkscape:connector-curvature="0"
-       transform="translate(0,996.3622)" />
-    <path
-       style="fill:none;stroke:#333333;stroke-width:1.50000003;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="m 44.487,0 0,11.536264 11.513,0"
        id="path5971"
-       inkscape:connector-curvature="0"
-       transform="translate(0,996.3622)" />
+       transform="translate(0,996.3622)"
+       style="fill:none;stroke:#333333;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 44.487,0 0,11.536264 11.513,0 m -55.95506,3.6e-5 11.514719,0 0,-11.5363 m 0,55.999982 0,-11.436683 -11.514719,-0.0997 M 56,44.464077 l -11.513,-4.72e-4 0,11.536377" />
     <path
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.00000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m 25.714844,1013.202 0,8.8766 -8.876563,0 0,4.75 8.876563,0 0,5.9375 -2.879688,0 5.254688,6.4125 5.254687,-6.4125 -2.879687,0 0,-5.9375 5.878125,0 0,2.8797 6.4125,-5.2547 -6.4125,-5.2547 0,2.8797 -5.878125,0 0,-8.8766 -4.75,0 z"
