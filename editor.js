@@ -16,15 +16,7 @@ editor.trigger = function(event, args) {
     radio(event).broadcast(args);
 };
 
-function screenPointToLocal(x, y, element) {
-    var svg = element.node.ownerSVGElement || element.node,
-        spt = svg.createSVGPoint(),
-        mat = element.node.getScreenCTM();
 
-    spt.x = x; spt.y = y;
-
-    return spt.matrixTransform(mat.inverse());
-}
 
 function registerEvents(evts) {
     Object.keys(evts).forEach(function(key) {
@@ -122,6 +114,14 @@ var startEditor = function() {
 	var palette = new Palette(paper, 10, 30, 2);
 
         var controller = new Editor(paper);
+
+        var gv = new view.GridView(paper, 150, 30, 400, 400, 10, 10);
+
+        gv.drawGrid();
+
+        paper.mousedown((evt, x, y) => {
+            gv.screenPointToCell(x, y);
+        });
     });
 
 };
@@ -142,12 +142,12 @@ Editor.prototype.onTileSelected = function(data) {
         this.tileCursor.remove();
 
     var tileGraphic = this.paper.g(graphics.getGraphic(data.tile)),
-        mousePoint = screenPointToLocal(data.x, data.y, this.paper);
+        mousePoint = graphics.screenPointToLocal(data.x, data.y, this.paper);
 
     tileGraphic.transform("t" + (mousePoint.x - 56/2) + "," + (mousePoint.y - 56/2));
 
     var move = (evt, x, y) => {
-        var mousePoint = screenPointToLocal(x, y, this.paper);
+        var mousePoint = graphics.screenPointToLocal(x, y, this.paper);
         tileGraphic.transform("t" + (mousePoint.x - 56/2) + "," + (mousePoint.y - 56/2));
     };
 

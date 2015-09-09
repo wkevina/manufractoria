@@ -200,7 +200,17 @@ var view = view || {},
         return globalMatrix;
     };
 
-    core.GridView = GridView;
+    GridView.prototype.screenPointToCell = function screenPointToCell(x, y) {
+        var localPoint = graphics.screenPointToLocal(x, y, this.grid),
+            sw = this.width / this.cols,
+            sy = this.height / this.rows,
+            index_x = Math.floor(localPoint.x / sw),
+            index_y = Math.floor(localPoint.y / sy);
+
+        console.log("I think you want " + index_x + ", " + index_y);
+    };
+
+    view.GridView = GridView;
 
 
     function ProgramView(paper, x, y, tileSize, program) {
