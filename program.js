@@ -40,6 +40,7 @@ var program = program || {},
         this.cols = cols;
         this.rows = rows;
         this.cells = [];
+        this.changed = new signals.Signal();
 
         for (var x = 0; x < cols; ++x) {
             this.cells.push([]);
@@ -61,6 +62,14 @@ var program = program || {},
         }
 
         this.cells[x][y] = s;
+
+        this.changed.dispatch({
+            event: "set",
+            x: x,
+            y: y,
+            type: type,
+            orientation: orientation
+        });
     };
 
     Program.prototype.setStart = function(x, y) {

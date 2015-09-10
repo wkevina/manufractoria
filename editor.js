@@ -9,14 +9,13 @@ var editor = editor || {},
     codeCell = codeCell || {};
 
 editor.events = {
-    tileSelected: "tile-selected"
+    tileSelected: "tile-selected",
+    cellSelected: "cell-selected"
 };
 
 editor.trigger = function(event, args) {
     radio(event).broadcast(args);
 };
-
-
 
 function registerEvents(evts) {
     Object.keys(evts).forEach(function(key) {
@@ -31,6 +30,7 @@ function Palette(paper, x, y, columns) {
     this.columns = columns > 0 ? columns : 1; // negative columns?
     this.width = 56;
     this.tiles = paper.g();
+    this.drawWidth = columns * (56 + 20);
 
     // Get names of all types to draw
     this.typesToDraw = Object.keys(codeCell.codeCells);
@@ -109,41 +109,57 @@ Palette.prototype.drawPalette = function drawPalette() {
 var startEditor = function() {
 
     graphics.preload().then(function() {
-        var paper = Snap(640, 640);
+        var paper = Snap(900, 640);
         paper.appendTo(document.getElementById("main"));
-        var palette = new Palette(paper, 10, 30, 2);
 
-        var controller = new Editor(paper);
+        var palette = new Palette(paper, 10, 30, 2),
 
-        var gv = new view.GridView(paper, 150, 30, 400, 400, 10, 10);
+            currentProgram = new program.Program(10, 10),
 
-        gv.drawGrid();
+            controller = new Editor(paper, currentProgram),
 
-        paper.mousedown((evt, x, y) => {
-            gv.screenPointToCell(x, y);
-        });
+            programView = new view.ProgramView(
+                paper,
+                10 + palette.drawWidth,
+                30,
+                56,
+                currentProgram
+            );
+
+        programView.drawProgram();
     });
 
 };
 
-function Editor(paper) {
+var IDLE = Symbol("IDLE"),
+    PLACING = Symbol("PLACING");
+
+
+function Editor(paper, prog) {
     this.paper = paper;
+    this.program = prog;
     this.tileCursor = null;
+    this.state = IDLE;
+    this.currentTile = null;
 
     var events = {
-        tileSelected: (data) => this.onTileSelected(data)
+        tileSelected: (data) => this.onTileSelected(data),
+        cellSelected: (data) => this.onCellSelected(data)
     };
 
     registerEvents(events);
 }
 
-Editor.prototype.onTileSelected = function(data) {
+Editor.prototype.onTileSelected = function (data) {
+    this.state = PLACING;
+    this.currentTile = data.tile;
     if (this.tileCursor != null)
         this.tileCursor.remove();
 
     var tileGraphic = this.paper.g(graphics.getGraphic(data.tile)),
         mousePoint = graphics.screenPointToLocal(data.x, data.y, this.paper);
 
+    tileGraphic.node.style.pointerEvents = "none"; // disable click events
     tileGraphic.transform("t" + (mousePoint.x - 56/2) + "," + (mousePoint.y - 56/2));
 
     var move = (evt, x, y) => {
@@ -155,12 +171,16 @@ Editor.prototype.onTileSelected = function(data) {
         move
     );
 
-    this.paper.mousedown(
-        () => {
-            this.paper.unmousemove(move);
-            tileGraphic.remove();
-        }
-    );
-
     this.tileCursor = tileGraphic;
+};
+
+Editor.prototype.onCellSelected = function (data) {
+    if (this.state == PLACING && this.currentTile) {
+        // We can now place the tile
+        this.program.setCell(data.cell.x, data.cell.y, this.currentTile);
+        this.state = IDLE;
+        this.tileCursor.remove();
+        this.tileCursor = null;
+        this.currentTile = null;
+    }
 };

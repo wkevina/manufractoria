@@ -143,6 +143,17 @@ var view = view || {},
         this.y = y;
         this.cols = cols;
         this.rows = rows;
+
+        this.grid.click(this.onClick.bind(this));
+    };
+
+    GridView.prototype.onClick = function onClick(evt, x, y) {
+        var cell = this.screenPointToCell(x, y);
+
+        if (cell.x >= 0 && cell.x < this.cols &&
+            cell.y >= 0 && cell.y < this.rows) {
+            editor.trigger(editor.events.cellSelected, {cell: cell});
+        }
     };
 
     GridView.prototype.remove = function remove() {
@@ -209,6 +220,8 @@ var view = view || {},
             index_y = Math.floor(localPoint.y / sy);
 
         console.log("I think you want " + index_x + ", " + index_y);
+
+        return {x: index_x, y: index_y};
     };
 
     view.GridView = GridView;
@@ -221,18 +234,24 @@ var view = view || {},
         this.cells = paper.g();
         this.x = x;
         this.y = y;
-        this.gridView = new core.GridView(paper, x, y,
+        this.gridView = new GridView(paper, x, y,
                                           program.cols*tileSize,
                                           program.rows*tileSize,
                                           program.rows, program.cols);
 
         this.gridView.drawGrid();
+
+        var binding = this.program.changed.add(this.drawProgram);
+        binding.context = this;
     }
 
     ProgramView.prototype.setProgram = function setProgram(p) {
+        if (this.program)
+            this.program.changed.remove(this.drawProgram);
+
         this.program = p;
         this.gridView.remove();
-        this.gridView = new core.GridView(this.paper, this.x, this.y,
+        this.gridView = new GridView(this.paper, this.x, this.y,
                                           p.cols*this.tileSize,
                                           p.rows*this.tileSize,
                                           p.rows, p.cols);
