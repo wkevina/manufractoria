@@ -29,9 +29,11 @@ function registerEvents(evts) {
 
 var startEditor = function() {
 
-    graphics.preload().then(function() {
-        var paper = Snap(900, 640),
-            programLayer = paper.g().addClass("program-layer");
+    var paper = Snap(900, 640);
+
+    graphics.preload(paper).then(function() {
+
+        var programLayer = paper.g().addClass("program-layer");
 
         paper.appendTo(document.getElementById("main"));
 

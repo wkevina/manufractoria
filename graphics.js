@@ -19,6 +19,8 @@ var graphics = graphics || {};
         End: "img/end.svg"
     };
 
+    var globalCanvas = null;
+
     var allImagePromises =
             Object.keys(imageMap).map(function(key) {
                 var url = imageMap[key];
@@ -27,6 +29,7 @@ var graphics = graphics || {};
 
                 p.then(function(svg) {
                     imageMap[key] = svg;
+                    globalCanvas.append(svg);
                 });
 
                 return p;
@@ -34,7 +37,8 @@ var graphics = graphics || {};
 
     var preloadPromise = Promise.all(allImagePromises);
 
-    graphics.preload = function preload() {
+    graphics.preload = function preload(paper) {
+        globalCanvas = paper.g().attr({visibility: "hidden"});
         return preloadPromise;
     };
 
@@ -42,7 +46,7 @@ var graphics = graphics || {};
         var original = imageMap[name];
 
         if (original) {
-            return original.clone();
+            return globalCanvas.use(original).attr({visibility: "visible"});
         }
 
         return null;
