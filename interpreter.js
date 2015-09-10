@@ -15,7 +15,7 @@ var interpreter = interpreter || {},
         this.position = new tmath.Vec2(0, 0);
         this.facing = program.directions.UP;
 
-		this.cycles = 0;
+        this.cycles = 0;
     };
 
     Interpreter.prototype.setProgram = function(program) {
@@ -29,7 +29,7 @@ var interpreter = interpreter || {},
     Interpreter.prototype.start = function() {
         this.accept = false;
         this.running = true;
-		this.cycles = 0;
+        this.cycles = 0;
 
         // Go to the start
         for (var x = 0; x < this.program.cols; x ++) {
@@ -113,9 +113,9 @@ var interpreter = interpreter || {},
 
             this.facing = result[2];
 
-			// Move 'facing' direction:
-			this.position = this.position.add(this.facing);
-			this.cycles += 1;
+            // Move 'facing' direction:
+            this.position = this.position.add(this.facing);
+            this.cycles += 1;
         }
 
     };

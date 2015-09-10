@@ -8,7 +8,7 @@ var graphics = graphics || {};
         ConveyorTee: "img/conveyor-tee.svg",
         ConveyorTeeTwo: "img/conveyor-tee-2.svg",
         ConveyorEx: "img/conveyor-ex.svg",
-	CrossConveyor: "img/cross-conveyor.svg",
+        CrossConveyor: "img/cross-conveyor.svg",
         BranchBR: "img/branch-br.svg",
         BranchGY: "img/branch-gy.svg",
         WriteB: "img/write-blue.svg",

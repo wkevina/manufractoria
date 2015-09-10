@@ -35,7 +35,7 @@ function Palette(paper, x, y, columns) {
     // Get names of all types to draw
     this.typesToDraw = Object.keys(codeCell.codeCells);
 
-     // calculate scaling required
+    // calculate scaling required
     var scale_x = this.width / 56;
 
     this.tiles.transform(Snap.matrix().translate(x, y).scale(scale_x, scale_x));
@@ -50,18 +50,18 @@ Palette.prototype.drawPalette = function drawPalette() {
     var height = 56 + 20; // 56 pixel tile + 10 pixel text + 10 pixel padding
     var width = 56 + 20;
     var cellImages = this.typesToDraw.map(function(name) {
-	var image = this.paper.g(graphics.getGraphic(name));
-	if (image != null) return {name:name, image:image};
-	else return undefined;
+        var image = this.paper.g(graphics.getGraphic(name));
+        if (image != null) return {name:name, image:image};
+        else return undefined;
 
     }.bind(this)).filter(_.negate(_.isUndefined));
 
     cellImages.map(function(image, index){
 
-	var group = this.tiles.g(),
+        var group = this.tiles.g(),
             x_index = index % this.columns,
             y_index = Math.floor(index / this.columns),
-	    transform = Snap.matrix().translate(x_index * width, y_index * height);
+            transform = Snap.matrix().translate(x_index * width, y_index * height);
 
         group.click(
             (evt, x, y) => {
@@ -78,8 +78,8 @@ Palette.prototype.drawPalette = function drawPalette() {
 
         group.transform(transform.toTransformString());
 
-	var r = group.rect(-1, -1, 58, 58);
-	r.attr({
+        var r = group.rect(-1, -1, 58, 58);
+        r.attr({
             stroke: "#111",
             fill: "#fff",
             strokeWidth: 2
@@ -98,9 +98,9 @@ Palette.prototype.drawPalette = function drawPalette() {
             text: image.name == "CrossConveyor" ? "Crossover" : image.name
         }).addClass("label-text");
 
-	var title = Snap.parse('<title>'+image.name+'</title>');
+        var title = Snap.parse('<title>'+image.name+'</title>');
 
-	group.append(title);
+        group.append(title);
 
 
     }, this);
@@ -109,9 +109,9 @@ Palette.prototype.drawPalette = function drawPalette() {
 var startEditor = function() {
 
     graphics.preload().then(function() {
-	var paper = Snap(640, 640);
-	paper.appendTo(document.getElementById("main"));
-	var palette = new Palette(paper, 10, 30, 2);
+        var paper = Snap(640, 640);
+        paper.appendTo(document.getElementById("main"));
+        var palette = new Palette(paper, 10, 30, 2);
 
         var controller = new Editor(paper);
 

@@ -20,7 +20,7 @@ var core = core || {};
      */
     function Tape() {
         this.symbols = [];
-	this.changed = new signals.Signal();
+        this.changed = new signals.Signal();
     };
 
     Tape.prototype.head = function head() {
@@ -33,8 +33,8 @@ var core = core || {};
 
     Tape.prototype.pop = function pop() {
         if (this.symbols.length > 0) {
-	    var popped = this.symbols.shift();
-	    this.changed.dispatch("pop");
+            var popped = this.symbols.shift();
+            this.changed.dispatch("pop");
             return popped;
         } else {
             return core.EMPTY;
@@ -43,7 +43,7 @@ var core = core || {};
 
     Tape.prototype.append = function append(s) {
         this.symbols.push(s);
-	this.changed.dispatch("append");
+        this.changed.dispatch("append");
     };
 
     core.Tape = Tape;
