@@ -213,19 +213,22 @@ var editor = editor || {},
     Editor.prototype.onCellSelected = function (data) {
         if (this.state == PLACING && this.currentTile) {
             // We can now place the tile
-            this.programView.program.setCell(data.cell.x,
-                                             data.cell.y,
-                                             this.currentTile,
-                                             orientationByName(
-                                                 this.currentOrientation,
-                                                 this.mirror)
-                                            );
 
-            // this.state = IDLE;
-            // this.tileCursor.remove();
-            // this.tileCursor.unmousemove(this.move);
-            // this.tileCursor = null;
-            // this.currentTile = null;
+            var curCell = this.programView.program.getCell(
+                data.cell.x,
+                data.cell.y
+            );
+
+            if (curCell.type != "Start" || curCell.type != "End") {
+
+                this.programView.program.setCell(data.cell.x,
+                                                 data.cell.y,
+                                                 this.currentTile,
+                                                 orientationByName(
+                                                     this.currentOrientation,
+                                                     this.mirror)
+                                                );
+            }
         }
     };
 
