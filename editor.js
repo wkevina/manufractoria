@@ -237,15 +237,30 @@ Editor.prototype.onRotateCell = function (data) {
 };
 
 Editor.prototype.onSetDirection = function (data) {
+    var dir = data.dir;
     if (this.state == PLACING) {
-        var dir = data.dir,
-            mir = this.mirror,
+        var mir = this.mirror,
             m = tmath.Mat2x2,
             o = orientationByName(dir, mir);
 
         if (o && o !== this.currentOrientation) {
             this.currentOrientation = dir;
             this.move(data, data.x, data.y);
+        }
+    } else if (this.state == IDLE) {
+        // see if we are hovering over the programview
+        var el = Snap.getElementByPoint(data.x, data.y);
+        var info = el.data("tileInfo");
+
+        if (el && info) {
+            // Now have reference to cell
+            var type = info.cell.type,
+                x = info.x,
+                y = info.y,
+                o = info.cell.orientation,
+                mirrored = isMirrored(o);
+
+            this.programView.program.setCell(x, y, type, orientationByName(dir, mirrored));
         }
     }
 };
@@ -288,4 +303,13 @@ function orientationByName(dir, mirror) {
         };
 
     return mirror ? mirrored[dir] : regular[dir];
+}
+
+function isMirrored(orientation) {
+    var m = tmath.Mat2x2,
+        l = [m.kMIR, m.kMROT1, m.kMROT2, m.kMROT3];
+
+    return l.some(
+        (mat) => _.isEqual(mat, orientation)
+    );
 }
