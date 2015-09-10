@@ -56,26 +56,35 @@ var startEditor = function() {
 
 function dispatchKeyEvents(evt) {
     console.log(evt);
-    var mouse = _.clone(mousePosition);
+    var data = _.clone(mousePosition),
+        what = null;
+
     switch (evt.key) {
         case "r":
-            editor.trigger(editor.events.rotate, mouse);
+            what = editor.events.rotate;
             break;
         case "m":
-            editor.trigger(editor.events.mirror, mouse);
+            what = (editor.events.mirror);
+            break;
         case "s":
-            editor.trigger(editor.events.setDirection, _.extend(mouse, {dir: "UP"}));
+            what = editor.events.setDirection;
+            data.dir = "UP";
             break;
         case "d":
-            editor.trigger(editor.events.setDirection, _.extend(mouse, {dir: "RIGHT"}));
+            what = editor.events.setDirection;
+            data.dir = "RIGHT";
             break;
         case "w":
-            editor.trigger(editor.events.setDirection, _.extend(mouse, {dir: "DOWN"}));
+            what = editor.events.setDirection;
+            data.dir = "DOWN";
             break;
         case "a":
-            editor.trigger(editor.events.setDirection, _.extend(mouse, {dir: "LEFT"}));
+            what = editor.events.setDirection;
+            data.dir = "LEFT";
             break;
     }
+
+    editor.trigger(what, data);
 }
 
 
@@ -146,22 +155,22 @@ Editor.prototype.move = function move(evt, x, y) {
                 .translate(mousePoint.x - 56/2, mousePoint.y - 56/2)
                 .toTransformString().toUpperCase();
 
-        if (move.lastOrientation && move.lastOrientation != o) {
-            move.animating = true;
-            this.tileCursor.animate(
-                {
-                    transform: rotate + translate
-                },
-                50,
-                mina.linear,
-                () => move.animating = false);
-        }
+        // if (move.lastOrientation && move.lastOrientation != o) {
+        //     move.animating = true;
+        //     this.tileCursor.animate(
+        //         {
+        //             transform: rotate + translate
+        //         },
+        //         50,
+        //         mina.linear,
+        //         () => move.animating = false);
+        // }
 
-        if (!move.animating) {
+        // if (!move.animating) {
             this.tileCursor.transform(rotate + translate);
-        }
+        // }
 
-        move.lastOrientation = o;
+        // move.lastOrientation = o;
     }
 };
 
@@ -192,7 +201,10 @@ Editor.prototype.onCellSelected = function (data) {
         this.program.setCell(data.cell.x,
                              data.cell.y,
                              this.currentTile,
-                             this.currentOrientation);
+                             orientationByName(
+                                 this.currentOrientation,
+                                 this.mirror)
+                            );
 
         this.state = IDLE;
         this.tileCursor.remove();
