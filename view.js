@@ -154,6 +154,7 @@ var view = view || {},
 
         var r = this.paper.rect(0,0, this.width, this.height);
         r.attr({fill: "#FFF"});
+		r.addClass("grid-bg");
         this.grid.append(r);
 
         var sw = this.width / this.cols;
