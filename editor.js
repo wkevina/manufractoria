@@ -10,7 +10,9 @@ var editor = editor || {},
 
 editor.events = {
     tileSelected: "tile-selected",
-    cellSelected: "cell-selected"
+    cellSelected: "cell-selected",
+    mirror: "mirror",
+    rotate: "rotate"
 };
 
 editor.trigger = function(event, args) {
@@ -106,6 +108,11 @@ Palette.prototype.drawPalette = function drawPalette() {
     }, this);
 };
 
+var mousePosition = {
+    x: 0,
+    y: 0
+};
+
 var startEditor = function() {
 
     graphics.preload().then(function() {
@@ -127,13 +134,51 @@ var startEditor = function() {
             );
 
         programView.drawProgram();
+
+        document.body.addEventListener("keydown", dispatchKeyEvents);
+        document.body.addEventListener("mousemove", trackMouse);
     });
 
 };
 
+function dispatchKeyEvents(evt) {
+    console.log(evt);
+
+    switch (evt.key) {
+        case "r":
+            editor.trigger(editor.events.rotate);
+    }
+}
+
+function trackMouse(evt) {
+    mousePosition.x = evt.clientX;
+    mousePosition.y = evt.clientY;
+}
+
 var IDLE = Symbol("IDLE"),
     PLACING = Symbol("PLACING");
 
+var cycleOrientation = (function() {
+    var cur = 0,
+        os =  [tmath.Mat2x2.kID,
+               tmath.Mat2x2.kROT1,
+               tmath.Mat2x2.kROT2,
+               tmath.Mat2x2.kROT3],
+        mos = [tmath.Mat2x2.kMIR,
+               tmath.Mat2x2.kMROT1,
+               tmath.Mat2x2.kMROT2,
+               tmath.Mat2x2.kMROT3];
+    return function(mirror, reset) {
+        if (reset)
+            cur = 0;
+
+        var currentOrientation = !mirror ? os[cur] : mos[cur];
+
+        cur = (cur + 1) % os.length;
+
+        return currentOrientation;
+    };
+})();
 
 function Editor(paper, prog) {
     this.paper = paper;
@@ -141,18 +186,52 @@ function Editor(paper, prog) {
     this.tileCursor = null;
     this.state = IDLE;
     this.currentTile = null;
+    this.currentOrientation = null;
 
     var events = {
         tileSelected: (data) => this.onTileSelected(data),
-        cellSelected: (data) => this.onCellSelected(data)
+        cellSelected: (data) => this.onCellSelected(data),
+        rotate: (data) => this.onRotateCell(data)
     };
 
     registerEvents(events);
 }
 
+Editor.prototype.move = function move(evt, x, y) {
+    if (this.state == PLACING && this.tileCursor) {
+        var mousePoint = graphics.screenPointToLocal(x, y, this.paper),
+            o = this.currentOrientation;
+
+        var rotate = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
+        rotate = view.toTransformString(rotate);
+        var translate = Snap.matrix()
+                .translate(mousePoint.x - 56/2, mousePoint.y - 56/2)
+                .toTransformString().toUpperCase();
+
+        if (move.lastOrientation && move.lastOrientation != o) {
+            move.animating = true;
+            this.tileCursor.animate(
+                {
+                    transform: rotate + translate
+                },
+                50,
+                mina.linear,
+                () => move.animating = false);
+        }
+
+        if (!move.animating) {
+            this.tileCursor.transform(rotate + translate);
+        }
+
+        move.lastOrientation = o;
+    }
+};
+
 Editor.prototype.onTileSelected = function (data) {
     this.state = PLACING;
     this.currentTile = data.tile;
+    this.currentOrientation = cycleOrientation(false, true);
+
     if (this.tileCursor != null)
         this.tileCursor.remove();
 
@@ -162,13 +241,8 @@ Editor.prototype.onTileSelected = function (data) {
     tileGraphic.node.style.pointerEvents = "none"; // disable click events
     tileGraphic.transform("t" + (mousePoint.x - 56/2) + "," + (mousePoint.y - 56/2));
 
-    var move = (evt, x, y) => {
-        var mousePoint = graphics.screenPointToLocal(x, y, this.paper);
-        tileGraphic.transform("t" + (mousePoint.x - 56/2) + "," + (mousePoint.y - 56/2));
-    };
-
     this.paper.mousemove(
-        move
+        this.move.bind(this)
     );
 
     this.tileCursor = tileGraphic;
@@ -177,10 +251,22 @@ Editor.prototype.onTileSelected = function (data) {
 Editor.prototype.onCellSelected = function (data) {
     if (this.state == PLACING && this.currentTile) {
         // We can now place the tile
-        this.program.setCell(data.cell.x, data.cell.y, this.currentTile);
+        this.program.setCell(data.cell.x,
+                             data.cell.y,
+                             this.currentTile,
+                             this.currentOrientation);
+
         this.state = IDLE;
         this.tileCursor.remove();
+        this.tileCursor.unmousemove(this.move);
         this.tileCursor = null;
         this.currentTile = null;
+    }
+};
+
+Editor.prototype.onRotateCell = function (data) {
+    if (this.state == PLACING) {
+        this.currentOrientation = cycleOrientation();
+        this.move(data, mousePosition.x, mousePosition.y);
     }
 };
