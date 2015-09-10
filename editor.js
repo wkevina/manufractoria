@@ -30,7 +30,9 @@ function registerEvents(evts) {
 var startEditor = function() {
 
     graphics.preload().then(function() {
-        var paper = Snap(900, 640);
+        var paper = Snap(900, 640),
+            programLayer = paper.g().addClass("program-layer");
+
         paper.appendTo(document.getElementById("main"));
 
         var palette = new view.Palette(paper, 10, 30, 2),
@@ -38,7 +40,7 @@ var startEditor = function() {
             currentProgram = new program.Program(10, 10),
 
             programView = new view.ProgramView(
-                paper,
+                programLayer,
                 10 + palette.drawWidth,
                 30,
                 56,
@@ -211,11 +213,11 @@ Editor.prototype.onCellSelected = function (data) {
                                              this.mirror)
                                         );
 
-        this.state = IDLE;
-        this.tileCursor.remove();
-        this.tileCursor.unmousemove(this.move);
-        this.tileCursor = null;
-        this.currentTile = null;
+        // this.state = IDLE;
+        // this.tileCursor.remove();
+        // this.tileCursor.unmousemove(this.move);
+        // this.tileCursor = null;
+        // this.currentTile = null;
     }
 };
 

@@ -190,7 +190,7 @@ var view = view || {},
     /**
      GridView.getCellMatrix(col, row, corner) -> Matrix
 
-     Returns global matrix describing location of cell
+     Returns local matrix describing location of cell
 
      If corner == true, uses top left corner of cell
 
@@ -198,18 +198,16 @@ var view = view || {},
 
      */
     GridView.prototype.getCellMatrix = function getCellMatrix(col, row, corner) {
-        var transform = this.grid.transform();
-        var globalMatrix = transform.globalMatrix.clone();
-
-        var sw = this.width / this.cols;
-        var sy = this.height / this.rows;
+        var mat = Snap.matrix(),
+            sw = this.width / this.cols,
+            sy = this.height / this.rows;
 
         if (!corner) {
-            globalMatrix.translate(sw / 2, sy / 2);
+            mat.translate(sw / 2, sy / 2);
         }
-        globalMatrix.translate(sw * col, sy * row);
+        mat.translate(sw * col, sy * row);
 
-        return globalMatrix;
+        return mat;
     };
 
     GridView.prototype.screenPointToCell = function screenPointToCell(x, y) {
@@ -231,7 +229,7 @@ var view = view || {},
         this.paper = paper;
         this.program = program;
         this.tileSize = tileSize;
-        this.cells = paper.g();
+        this.cells = paper.g().addClass("cells");
         this.x = x;
         this.y = y;
         this.gridView = new GridView(paper, x, y,
@@ -265,7 +263,7 @@ var view = view || {},
             program = this.program;
 
         this.cells.clear();
-        this.cells.appendTo(this.paper);
+        this.cells.appendTo(this.gridView.grid);
 
         for (var x = 0; x < program.cols; ++x) {
             for (var y = 0; y < program.rows; ++y) {
@@ -304,15 +302,17 @@ var view = view || {},
                             container = group;
                         }
                     }
+                    if (container) {
+                        container.selectAll("*").forEach((el) => {
+                            el.data("tileInfo", {
+                                cell: c,
+                                x: x,
+                                y: y,
+                                program: this.program
+                            }).addClass("tile-part");
+                        });
 
-                    container.selectAll("*").forEach((el) => {
-                        el.data("tileInfo", {
-                            cell: c,
-                            x: x,
-                            y: y,
-                            program: this.program
-                        }).addClass("tile-part");
-                    });
+                    }
                 }
             }
         }
