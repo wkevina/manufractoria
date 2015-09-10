@@ -141,7 +141,7 @@ App.prototype.run = function() {
 
         var curPos = myInterpreter.position;
         token.transform(
-            pView.gridView.getCellMatrix(curPos.x, curPos.y)
+            pView.gridView.getGlobalCellMatrix(curPos.x, curPos.y)
                 .toTransformString()
         );
 
@@ -155,7 +155,7 @@ App.prototype.run = function() {
             token.animate(
                 {
                     transform:
-                    pView.gridView.getCellMatrix(curPos.x, curPos.y)
+                    pView.gridView.getGlobalCellMatrix(curPos.x, curPos.y)
                         .toTransformString()
                 },
                 500,

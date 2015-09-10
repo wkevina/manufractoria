@@ -210,6 +210,34 @@ var view = view || {},
         return mat;
     };
 
+    /**
+     GridView.getGlobalCellMatrix(col, row, corner) -> Matrix
+
+     Returns global matrix describing location of cell
+
+     If corner == true, uses top left corner of cell
+
+     Otherwise, uses center of cell
+
+     */
+    GridView.prototype.getGlobalCellMatrix = function getGlobalCellMatrix(col, row, corner) {
+
+        var transform = this.grid.transform();
+        var globalMatrix = transform.globalMatrix.clone();
+
+        var sw = this.width / this.cols;
+        var sy = this.height / this.rows;
+
+        if (!corner) {
+            globalMatrix.translate(sw / 2, sy / 2);
+        }
+
+        globalMatrix.translate(sw * col, sy * row);
+
+        return globalMatrix;
+    };
+
+
     GridView.prototype.screenPointToCell = function screenPointToCell(x, y) {
         var localPoint = graphics.screenPointToLocal(x, y, this.grid),
             sw = this.width / this.cols,
