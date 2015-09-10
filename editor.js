@@ -36,15 +36,15 @@ var startEditor = function() {
 
             currentProgram = new program.Program(10, 10),
 
-            controller = new Editor(paper, currentProgram),
-
             programView = new view.ProgramView(
                 paper,
                 10 + palette.drawWidth,
                 30,
                 56,
                 currentProgram
-            );
+            ),
+
+            controller = new Editor(paper, programView);
 
         programView.drawProgram();
 
@@ -118,9 +118,9 @@ var cycleOrientation = (function() {
     };
 })();
 
-function Editor(paper, prog) {
+function Editor(paper, programView) {
     this.paper = paper;
-    this.program = prog;
+    this.programView = programView;
     this.tileCursor = null;
     this.state = IDLE;
     this.currentTile = null;
@@ -198,13 +198,13 @@ Editor.prototype.onTileSelected = function (data) {
 Editor.prototype.onCellSelected = function (data) {
     if (this.state == PLACING && this.currentTile) {
         // We can now place the tile
-        this.program.setCell(data.cell.x,
-                             data.cell.y,
-                             this.currentTile,
-                             orientationByName(
-                                 this.currentOrientation,
-                                 this.mirror)
-                            );
+        this.programView.program.setCell(data.cell.x,
+                                         data.cell.y,
+                                         this.currentTile,
+                                         orientationByName(
+                                             this.currentOrientation,
+                                             this.mirror)
+                                        );
 
         this.state = IDLE;
         this.tileCursor.remove();
@@ -218,6 +218,21 @@ Editor.prototype.onRotateCell = function (data) {
     if (this.state == PLACING) {
         this.currentOrientation = cycleOrientation(this.currentOrientation);
         this.move(data, data.x, data.y);
+    } else if (this.state == IDLE) {
+        // see if we are hovering over the programview
+        var el = Snap.getElementByPoint(data.x, data.y);
+        var info = el.data("tileInfo");
+
+        if (el && info) {
+            // Now have reference to cell
+            var o = info.cell.orientation,
+                type = info.cell.type,
+                x = info.x,
+                y = info.y;
+            o = o.compose(tmath.Mat2x2.kROT1);
+
+            this.programView.program.setCell(x, y, type, o);
+        }
     }
 };
 
@@ -239,6 +254,21 @@ Editor.prototype.onMirror = function (data) {
     if (this.state == PLACING) {
         this.mirror = !this.mirror;
         this.move(data, data.x, data.y);
+    } else if (this.state == IDLE) {
+        // see if we are hovering over the programview
+        var el = Snap.getElementByPoint(data.x, data.y);
+        var info = el.data("tileInfo");
+
+        if (el && info) {
+            // Now have reference to cell
+            var o = info.cell.orientation,
+                type = info.cell.type,
+                x = info.x,
+                y = info.y;
+            o = tmath.Mat2x2.kMIR.compose(o);
+
+            this.programView.program.setCell(x, y, type, o);
+        }
     }
 };
 

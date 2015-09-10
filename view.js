@@ -272,9 +272,9 @@ var view = view || {},
                 var c = program.getCell(x, y);
 
                 if (c.type != "Empty") {
-
+                    var container;
                     if (c.type == "Conveyor") {
-                        this.drawConveyor(c, x, y);
+                        container = this.drawConveyor(c, x, y);
                     } else {
 
                         var image = graphics.getGraphic(c.type);
@@ -295,15 +295,27 @@ var view = view || {},
                             var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
                             var tstring = view.toTransformString(transform);
 
+
+
                             group.transform(
                                 tstring + corner
                             );
+
+                            container = group;
                         }
                     }
+
+                    container.selectAll("*").forEach((el) => {
+                        el.data("tileInfo", {
+                            cell: c,
+                            x: x,
+                            y: y,
+                            program: this.program
+                        }).addClass("tile-part");
+                    });
                 }
             }
         }
-
     };
 
     ProgramView.prototype.drawConveyor = function drawConveyor(cell, x, y) {
@@ -367,7 +379,11 @@ var view = view || {},
             group.transform(
                 tstring + corner
             );
+
+            return group;
         }
+
+        return null;
 
     };
 
