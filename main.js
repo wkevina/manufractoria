@@ -5,7 +5,8 @@ var core = core || {},
     graphics = graphics || {},
     view = view || {},
     tmath = tmath || {},
-    loader = loader || {};
+    loader = loader || {},
+    editor = editor || {};
 
 function App() {
     this.program = null;
@@ -91,32 +92,36 @@ App.prototype.generateLink = function() {
 
 App.prototype.main = function() {
 
+    var paper = Snap(900, 640);
     // Set up UI elements
-    graphics.preload().then(function() {
+    graphics.preload(paper).then(function() {
 
-        var paper = Snap(640, 640);
-        this.paper = paper;
+        var programLayer = paper.g().addClass("program-layer");
+
         paper.appendTo(document.getElementById("main"));
-
-
-        var field = new core.TapeView(paper, 0, 0, 400, 20, this.tape);
-        field.drawTape();
 
         if (this.program == null) {
             this.program = new program.Program(10, 10);
         }
 
-        var pView = new view.ProgramView(
-            paper,
-            0,                          // x
-            40,                         // y
+        this.palette = new view.Palette(paper, 10, 30, 2);
+
+        this.programView = new view.ProgramView(
+            programLayer,
+            10 + this.palette.drawWidth,
+            30,
             56,
             this.program
         );
 
-        pView.drawProgram();
+        this.editor = new editor.Editor(paper, this.programView);
 
-        this.programView = pView;
+        this.programView.drawProgram();
+
+        var tapeView = new core.TapeView(paper, 0, 0, 400, 20, this.tape);
+        tapeView.drawTape();
+
+        editor.init();
 
     }.bind(this));
 

@@ -29,7 +29,7 @@ var graphics = graphics || {};
 
                 p.then(function(svg) {
                     imageMap[key] = svg;
-                    globalCanvas.append(svg);
+
                 });
 
                 return p;
@@ -44,6 +44,10 @@ var graphics = graphics || {};
 
     graphics.getGraphic = function getGraphic(name) {
         var original = imageMap[name];
+
+        if (original.parent() !== globalCanvas)
+            globalCanvas.append(original);
+
 
         if (original) {
             return globalCanvas.use(original).attr({visibility: "visible"});
