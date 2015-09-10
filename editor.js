@@ -12,7 +12,8 @@ editor.events = {
     tileSelected: "tile-selected",
     cellSelected: "cell-selected",
     mirror: "mirror",
-    rotate: "rotate"
+    rotate: "rotate",
+    setDirection: "set-direction"
 };
 
 editor.trigger = function(event, args) {
@@ -143,10 +144,25 @@ var startEditor = function() {
 
 function dispatchKeyEvents(evt) {
     console.log(evt);
-
+    var mouse = _.clone(mousePosition);
     switch (evt.key) {
         case "r":
-            editor.trigger(editor.events.rotate);
+            editor.trigger(editor.events.rotate, mouse);
+            break;
+        case "m":
+            editor.trigger(editor.events.mirror, mouse);
+        case "s":
+            editor.trigger(editor.events.setDirection, _.extend(mouse, {dir: "UP"}));
+            break;
+        case "d":
+            editor.trigger(editor.events.setDirection, _.extend(mouse, {dir: "RIGHT"}));
+            break;
+        case "w":
+            editor.trigger(editor.events.setDirection, _.extend(mouse, {dir: "DOWN"}));
+            break;
+        case "a":
+            editor.trigger(editor.events.setDirection, _.extend(mouse, {dir: "LEFT"}));
+            break;
     }
 }
 
@@ -159,24 +175,19 @@ var IDLE = Symbol("IDLE"),
     PLACING = Symbol("PLACING");
 
 var cycleOrientation = (function() {
-    var cur = 0,
-        os =  [tmath.Mat2x2.kID,
-               tmath.Mat2x2.kROT1,
-               tmath.Mat2x2.kROT2,
-               tmath.Mat2x2.kROT3],
-        mos = [tmath.Mat2x2.kMIR,
-               tmath.Mat2x2.kMROT1,
-               tmath.Mat2x2.kMROT2,
-               tmath.Mat2x2.kMROT3];
-    return function(mirror, reset) {
-        if (reset)
-            cur = 0;
+    var os = ["UP",
+              "RIGHT",
+              "DOWN",
+              "LEFT"];
 
-        var currentOrientation = !mirror ? os[cur] : mos[cur];
+    return function(current) {
+        if (!current)
+            current = "LEFT";
 
-        cur = (cur + 1) % os.length;
+        var index = (os.indexOf(current) + 1) % os.length,
+            oName = os[index];
 
-        return currentOrientation;
+        return oName;
     };
 })();
 
@@ -186,12 +197,15 @@ function Editor(paper, prog) {
     this.tileCursor = null;
     this.state = IDLE;
     this.currentTile = null;
-    this.currentOrientation = null;
+    this.currentOrientation = "UP";
+    this.mirror = false;
 
     var events = {
         tileSelected: (data) => this.onTileSelected(data),
         cellSelected: (data) => this.onCellSelected(data),
-        rotate: (data) => this.onRotateCell(data)
+        rotate: (data) => this.onRotateCell(data),
+        mirror: (data) => this.onMirror(data),
+        setDirection: (data) => this.onSetDirection(data)
     };
 
     registerEvents(events);
@@ -199,12 +213,18 @@ function Editor(paper, prog) {
 
 Editor.prototype.move = function move(evt, x, y) {
     if (this.state == PLACING && this.tileCursor) {
-        var mousePoint = graphics.screenPointToLocal(x, y, this.paper),
-            o = this.currentOrientation;
 
-        var rotate = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
-        rotate = view.toTransformString(rotate);
-        var translate = Snap.matrix()
+        var mousePoint = graphics.screenPointToLocal(x, y, this.paper),
+
+            oName = this.currentOrientation,
+
+            o = orientationByName(oName, this.mirror),
+
+            rotate = view.toTransformString(
+                Snap.matrix(o.a, o.b, o.c, o.d, 0, 0)
+            ),
+
+            translate = Snap.matrix()
                 .translate(mousePoint.x - 56/2, mousePoint.y - 56/2)
                 .toTransformString().toUpperCase();
 
@@ -230,7 +250,7 @@ Editor.prototype.move = function move(evt, x, y) {
 Editor.prototype.onTileSelected = function (data) {
     this.state = PLACING;
     this.currentTile = data.tile;
-    this.currentOrientation = cycleOrientation(false, true);
+    this.currentOrientation = "UP";
 
     if (this.tileCursor != null)
         this.tileCursor.remove();
@@ -266,7 +286,46 @@ Editor.prototype.onCellSelected = function (data) {
 
 Editor.prototype.onRotateCell = function (data) {
     if (this.state == PLACING) {
-        this.currentOrientation = cycleOrientation();
-        this.move(data, mousePosition.x, mousePosition.y);
+        this.currentOrientation = cycleOrientation(this.currentOrientation);
+        this.move(data, data.x, data.y);
     }
 };
+
+Editor.prototype.onSetDirection = function (data) {
+    if (this.state == PLACING) {
+        var dir = data.dir,
+            mir = this.mirror,
+            m = tmath.Mat2x2,
+            o = orientationByName(dir, mir);
+
+        if (o && o !== this.currentOrientation) {
+            this.currentOrientation = dir;
+            this.move(data, data.x, data.y);
+        }
+    }
+};
+
+Editor.prototype.onMirror = function (data) {
+    if (this.state == PLACING) {
+        this.mirror = !this.mirror;
+        this.move(data, data.x, data.y);
+    }
+};
+
+function orientationByName(dir, mirror) {
+    var m = tmath.Mat2x2,
+        regular = {
+            "UP": m.kID,
+            "RIGHT": m.kROT1,
+            "DOWN": m.kROT2,
+            "LEFT": m.kROT3
+        },
+        mirrored = {
+            "UP": m.kMIR,
+            "RIGHT": m.kMROT1,
+            "DOWN": m.kMROT2,
+            "LEFT": m.kMROT3
+        };
+
+    return mirror ? mirrored[dir] : regular[dir];
+}
