@@ -93,6 +93,7 @@ App.prototype.generateLink = function() {
 App.prototype.main = function() {
 
     var paper = Snap(900, 640);
+    this.paper = paper;
     // Set up UI elements
     graphics.preload(paper).then(function() {
 
@@ -135,10 +136,9 @@ App.prototype.run = function() {
     myInterpreter.setProgram(this.program);
     myInterpreter.setTape(this.tape);
 
-    pView.drawProgram();
-
     var token = paper.circle(0, 0, 10);
     token.attr({fill: "#E0E"});
+    token.appendTo(paper);
 
     myInterpreter.start();
 
