@@ -13,7 +13,8 @@ editor.events = {
     cellSelected: "cell-selected",
     mirror: "mirror",
     rotate: "rotate",
-    setDirection: "set-direction"
+    setDirection: "set-direction",
+    delete: "delete"
 };
 
 editor.trigger = function(event, args) {
@@ -82,6 +83,9 @@ function dispatchKeyEvents(evt) {
             what = editor.events.setDirection;
             data.dir = "LEFT";
             break;
+        case "x":
+            what = editor.events.delete;
+            break;
     }
 
     editor.trigger(what, data);
@@ -132,7 +136,8 @@ function Editor(paper, programView) {
         cellSelected: (data) => this.onCellSelected(data),
         rotate: (data) => this.onRotateCell(data),
         mirror: (data) => this.onMirror(data),
-        setDirection: (data) => this.onSetDirection(data)
+        setDirection: (data) => this.onSetDirection(data),
+        delete: (data) => this.onDelete(data)
     };
 
     registerEvents(events);
@@ -283,6 +288,31 @@ Editor.prototype.onMirror = function (data) {
             o = tmath.Mat2x2.kMIR.compose(o);
 
             this.programView.program.setCell(x, y, type, o);
+        }
+    }
+};
+
+Editor.prototype.onDelete = function (data) {
+    if (this.state == PLACING && this.tileCursor) {
+
+        this.state = IDLE;
+        this.tileCursor.remove();
+        this.tileCursor.unmousemove(this.move);
+        this.tileCursor = null;
+        this.currentTile = null;
+
+    } else if (this.state == IDLE) {
+        // see if we are hovering over the programview
+        var el = Snap.getElementByPoint(data.x, data.y);
+        var info = el.data("tileInfo");
+
+        if (el && info) {
+            // Now have reference to cell
+            var p = info.program,
+                x = info.x,
+                y = info.y;
+
+            p.setCell(x, y, "Empty");
         }
     }
 };
