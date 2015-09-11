@@ -11,7 +11,9 @@ var core = core || {},
 function App() {
     this.program = null;
     this.programView = null;
+    this.interpreter = null;
     this.tape = new core.Tape();
+    this.stepTime = 500; // default ms between steps
 
     var linkForm = $("#link-form");
     linkForm.find("button").click(this.generateLink.bind(this));
@@ -24,14 +26,13 @@ function App() {
 
     controls.find("[data-action=run]").click(() => {
         if (!this.isRunning) {
-            this.isRunning = true;
-            this.isPaused = false;
             this.run();
         }
     });
 
     controls.find("[data-action=pause]").click(() => {
-        this.isPaused = !!!this.isPaused;
+        if (this.isRunning)
+            this.isPaused = !!!this.isPaused;
     });
 
 
@@ -102,7 +103,10 @@ App.prototype.main = function() {
         paper.appendTo(document.getElementById("main"));
 
         if (this.program == null) {
-            this.program = new program.Program(10, 10);
+            this.program = new program.Program(9, 9);
+            // fill in start and end with defaults
+            this.program.setStart(4, 0);
+            this.program.setEnd(4, 8);
         }
 
         this.palette = new view.Palette(paper, 10, 30, 2);
@@ -128,70 +132,88 @@ App.prototype.main = function() {
 
 };
 
+App.prototype.drawToken = function(x, y, animate, callback) {
+    if (!this.token) {
+        this.token = this.paper.circle(0, 0, 10);
+
+        this.tapeView.tape.changed.add(() => {
+            var head = this.tapeView.tape.head();
+            if (head) {
+                token.attr({fill: view.colorForSymbol(head)});
+            } else {
+                token.attr({fill: "#E0E"});
+            }
+        });
+    }
+
+    this.paper.append(this.token); // make sure token is on top
+
+    var head = this.tapeView.tape.head();
+    if (head) {
+        this.token.attr({fill: view.colorForSymbol(head)});
+    } else {
+        this.token.attr({fill: "#E0E"});
+    }
+
+    if (!animated) {
+        this.token.transform(
+
+        );
+    } else {
+        this.token.animate(
+            {
+                transform: Snap.matrix().translate(x, y)
+            },
+            this.stepTime,
+            mina.linear,
+            function() {
+                //field.drawTape();
+                if (callback)
+                    callback();
+            }
+        );
+    }
+
+};
+
 App.prototype.run = function() {
     var paper = this.paper,
         pView = this.programView;
 
-    var myInterpreter = new interpreter.Interpreter();
-    myInterpreter.setProgram(this.program);
-    myInterpreter.setTape(this.tape);
+    // If we aren't running, set everything up and start the loop
+    if (!this.isRunning) {
+        this.isRunning = true;
 
-    var token = paper.circle(0, 0, 10);
+        var myInterpreter = new interpreter.Interpreter();
+        myInterpreter.setProgram(this.program);
+        myInterpreter.setTape(this.tape);
+        this.interpreter = myInterpreter;
 
-    var head = this.tapeView.tape.head();
-    if (head) {
-        token.attr({fill: view.colorForSymbol(head)});
+        myInterpreter.start();
     } else {
-        token.attr({fill: "#E0E"});
+        this._step();
     }
 
-    token.appendTo(paper);
+};
 
-    this.tapeView.tape.changed.add(() => {
-         var head = this.tapeView.tape.head();
-        if (head) {
-            token.attr({fill: view.colorForSymbol(head)});
-        } else {
-            token.attr({fill: "#E0E"});
-        }
-    });
+// Calls interpreter's step and manages animation
+App.prototype._step = function() {
+    var curPos = this.interpreter.position,
+        corner = this.programView.gridView.getGlobalCellMatrix(curPos.x, curPos.y);
 
-    myInterpreter.start();
+    this.drawToken();
 
-    var mainLoop = (function () {
+    if (!this.isPaused) {
+        myInterpreter.step();
 
-        var curPos = myInterpreter.position;
-        token.transform(
-            pView.gridView.getGlobalCellMatrix(curPos.x, curPos.y)
-                .toTransformString()
-        );
+        curPos = myInterpreter.position;
+    }
 
-        if (!this.isPaused) {
-            myInterpreter.step();
+    var update = function() {
 
-            curPos = myInterpreter.position;
-        }
+    };
 
-        var update = function() {
-            token.animate(
-                {
-                    transform:
-                    pView.gridView.getGlobalCellMatrix(curPos.x, curPos.y)
-                        .toTransformString()
-                },
-                500,
-                mina.linear,
-                function() {
-                    //field.drawTape();
-                    mainLoop();
-                }
-            );
-        };
-
-        setTimeout(update, 0);
-    }).bind(this);
-
-    mainLoop();
+    setTimeout(update, 0);
 };
 
 
