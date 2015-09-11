@@ -12,13 +12,11 @@ var view = view || {},
         this.height = height;
         this.x = x;
         this.y = y;
-        this.tape = tape;
 
         this._sw = 20; // Parameterize this later
         this._MAX = Math.floor((this.width - this._sw) / this._sw);
 
-        // Register for tape's changed signal
-        this.tape.changed.add(this.animate.bind(this));
+        this.setTape(tape);
     };
 
     /**
@@ -125,6 +123,27 @@ var view = view || {},
                 );
             }
         }
+    };
+
+    TapeView.prototype.setTape = function(newTape) {
+        if (this.tape) {
+            this.tape.changed.remove(this.animate);
+        }
+
+        this.tape = newTape;
+
+        if (newTape) {
+            // Register for tape's changed signal
+            newTape.changed.add(this.animate, this);
+        }
+    };
+
+    TapeView.prototype.remove = function() {
+        if (this.tape)
+            this.tape.changed.remove(this.animate);
+        this.tape = null;
+
+        this.tapeView.remove();
     };
 
     view.TapeView = TapeView;
