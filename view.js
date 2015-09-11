@@ -113,6 +113,8 @@ var view = view || {},
         }
     };
 
+    view.TapeView = TapeView;
+
     function colorForSymbol(symbol) {
         if (symbol === core.RED) {
             return "#E10";
@@ -127,7 +129,7 @@ var view = view || {},
         }
     }
 
-    core.TapeView = TapeView;
+    view.colorForSymbol = colorForSymbol;
 
     /**
      GridView

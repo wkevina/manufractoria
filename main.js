@@ -119,8 +119,8 @@ App.prototype.main = function() {
 
         this.programView.drawProgram();
 
-        var tapeView = new core.TapeView(paper, 0, 0, 400, 20, this.tape);
-        tapeView.drawTape();
+        this.tapeView = new view.TapeView(paper, 0, 0, 400, 20, this.tape);
+        this.tapeView.drawTape();
 
         editor.init();
 
