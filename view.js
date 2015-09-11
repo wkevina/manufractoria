@@ -110,6 +110,20 @@ var view = view || {},
             var head = this.tapeView.selectAll("*")[0];
             pop(head, slide);
 
+        } else if (action == "append") {
+            // Append symbol if it will fit
+            var length = this.tapeView.selectAll("*").length;
+            if (length < this._MAX && this.tape.symbols.length > length) {
+                var c = this._appendSymbol(this.tape.symbols[length], 0);
+                c.attr({opacity: 0});
+                c.animate(
+                    {
+                        opacity: 1
+                    },
+                    50,
+                    mina.easeinout
+                );
+            }
         }
     };
 

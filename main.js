@@ -137,8 +137,24 @@ App.prototype.run = function() {
     myInterpreter.setTape(this.tape);
 
     var token = paper.circle(0, 0, 10);
-    token.attr({fill: "#E0E"});
+
+    var head = this.tapeView.tape.head();
+    if (head) {
+        token.attr({fill: view.colorForSymbol(head)});
+    } else {
+        token.attr({fill: "#E0E"});
+    }
+
     token.appendTo(paper);
+
+    this.tapeView.tape.changed.add(() => {
+         var head = this.tapeView.tape.head();
+        if (head) {
+            token.attr({fill: view.colorForSymbol(head)});
+        } else {
+            token.attr({fill: "#E0E"});
+        }
+    });
 
     myInterpreter.start();
 
