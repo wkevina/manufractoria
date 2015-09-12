@@ -207,13 +207,13 @@ var view = view || {},
         var sy = this.height / this.rows;
 
         for (var x = 0; x <= this.cols; ++x) {
-            var l = this.paper.line(x*sw, 0, x*sw, this.height);
-            this.grid.append(l);
+            var l = this.grid.line(x*sw, 0, x*sw, this.height);
+            l.addClass("grid-line");
         }
 
         for (var y = 0; y <= this.rows; ++y) {
-            var l = this.paper.line(0, y*sy, this.width, y*sy);
-            this.grid.append(l);
+            var l = this.grid.line(0, y*sy, this.width, y*sy);
+            l.addClass("grid-line");
         }
 
         this.grid.attr({stroke: "#888", strokeWidth: 1});

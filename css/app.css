@@ -18,5 +18,11 @@ html, body {
 }
 
 .form button {
-    background-color: #3333BA !important;
+    background-color: #16e !important;
 }
+
+.grid-line {
+    stroke: #aaa;
+}
+
+/*  green: #03ec04 */
