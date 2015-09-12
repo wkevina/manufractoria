@@ -36,7 +36,7 @@ function App() {
     });
 
     controls.find("[data-action=stop]").click(() => {
-        this.isRunning = false;
+        this.stop();
     });
 
 
@@ -180,7 +180,13 @@ App.prototype.start = function() {
     this.interpreter.start();
 
     this.run();
-}
+};
+
+App.prototype.stop = function() {
+    this.isRunning = false;
+    this.isPaused = false;
+    this.token.remove();
+};
 
 App.prototype.run = function() {
 
@@ -195,7 +201,6 @@ App.prototype.run = function() {
             this.isRunning = false;
         }
     }
-    this;
 };
 
 // Calls interpreter's step and manages animation
@@ -215,7 +220,6 @@ App.prototype._step = function() {
     } else {
         requestAnimationFrame(this.run.bind(this));
     }
-    this;
 };
 
 
