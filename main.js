@@ -26,13 +26,17 @@ function App() {
 
     controls.find("[data-action=run]").click(() => {
         if (!this.isRunning) {
-            this.run();
+            this.start();
         }
     });
 
     controls.find("[data-action=pause]").click(() => {
         if (this.isRunning)
             this.isPaused = !!!this.isPaused;
+    });
+
+    controls.find("[data-action=stop]").click(() => {
+        this.isRunning = false;
     });
 
 
@@ -132,37 +136,26 @@ App.prototype.main = function() {
 
 };
 
-App.prototype.drawToken = function(x, y, animate, callback) {
+App.prototype.drawToken = function(mat, animate, callback) {
     if (!this.token) {
         this.token = this.paper.circle(0, 0, 10);
-
-        this.tapeView.tape.changed.add(() => {
-            var head = this.tapeView.tape.head();
-            if (head) {
-                token.attr({fill: view.colorForSymbol(head)});
-            } else {
-                token.attr({fill: "#E0E"});
-            }
-        });
     }
 
     this.paper.append(this.token); // make sure token is on top
 
     var head = this.tapeView.tape.head();
-    if (head) {
+    if (head && head.symbol != "empty") {
         this.token.attr({fill: view.colorForSymbol(head)});
     } else {
         this.token.attr({fill: "#E0E"});
     }
 
-    if (!animated) {
-        this.token.transform(
-
-        );
+    if (!animate) {
+        this.token.transform(mat);
     } else {
         this.token.animate(
             {
-                transform: Snap.matrix().translate(x, y)
+                transform: mat
             },
             this.stepTime,
             mina.linear,
@@ -176,44 +169,51 @@ App.prototype.drawToken = function(x, y, animate, callback) {
 
 };
 
+App.prototype.start = function() {
+    this.isRunning = true;
+    this.isPaused = false;
+    this.interpreter = new interpreter.Interpreter();
+    this.interpreter.setProgram(this.program);
+    this.interpreter.setTape(this.tape);
+    this.interpreter.start();
+
+    this.run();
+}
+
 App.prototype.run = function() {
-    var paper = this.paper,
-        pView = this.programView;
 
     // If we aren't running, set everything up and start the loop
-    if (!this.isRunning) {
-        this.isRunning = true;
-
-        var myInterpreter = new interpreter.Interpreter();
-        myInterpreter.setProgram(this.program);
-        myInterpreter.setTape(this.tape);
-        this.interpreter = myInterpreter;
-
-        myInterpreter.start();
-    } else {
-        this._step();
+    if (this.isRunning) {
+        // We're running. See if the interpreter has stopped
+        if (this.interpreter.running) {
+            this._step();
+        } else {
+            console.log("Program stopped.");
+            console.log("Accepted: " + this.interpreter.accept);
+            this.isRunning = false;
+        }
     }
-
+    this;
 };
 
 // Calls interpreter's step and manages animation
 App.prototype._step = function() {
-    var curPos = this.interpreter.position,
+    console.log("Step");
+    if (!this.isPaused) {
+        var curPos = this.interpreter.position,
+            corner = this.programView.gridView.getGlobalCellMatrix(curPos.x, curPos.y);
+
+        this.drawToken(corner);
+        this.interpreter.step();
+
+        curPos = this.interpreter.position;
         corner = this.programView.gridView.getGlobalCellMatrix(curPos.x, curPos.y);
 
-    this.drawToken();
-
-    if (!this.isPaused) {
-        myInterpreter.step();
-
-        curPos = myInterpreter.position;
+        this.drawToken(corner, true, this.run.bind(this));
+    } else {
+        requestAnimationFrame(this.run.bind(this));
     }
-
-    var update = function() {
-
-    };
-
-    setTimeout(update, 0);
+    this;
 };
 
 
