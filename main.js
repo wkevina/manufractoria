@@ -143,12 +143,14 @@ App.prototype.drawToken = function(mat, animate, callback) {
 
     this.paper.append(this.token); // make sure token is on top
 
-    var head = this.tapeView.tape.head();
+    var head = this.tapeView.tape.head(),
+        fill;
     if (head && head.symbol != "empty") {
-        this.token.attr({fill: view.colorForSymbol(head)});
+        fill =  view.colorForSymbol(head);
     } else {
-        this.token.attr({fill: "#E0E"});
+        fill = "#E0E";
     }
+    this.token.animate({fill: fill}, this.stepTime/2);
 
     if (!animate) {
         this.token.transform(mat);
