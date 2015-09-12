@@ -1,9 +1,22 @@
 
 html, body {
     background-color: #333;
+    color: #eef;
 }
-
 
 .grid-bg {
     fill: #3333BA;
+}
+
+#controls button {
+    font-size: 32px;
+    padding: 9px 22px;
+}
+
+.form label {
+    color: #eef;
+}
+
+.form button {
+    background-color: #3333BA !important;
 }

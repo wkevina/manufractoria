@@ -97,7 +97,7 @@ App.prototype.generateLink = function() {
 
 App.prototype.main = function() {
 
-    var paper = Snap(900, 640);
+    var paper = Snap(900, 550);
     this.paper = paper;
     // Set up UI elements
     graphics.preload(paper).then(function() {

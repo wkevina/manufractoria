@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="css/foundation.css" />
     <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/ionicons.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="css/palette.css" />
 
@@ -35,33 +36,50 @@
       <div id="main"></div>
     </div>
 
-    <div class="row" id="controls">
-      <div class="large-2 columns">
-        <button class="button" data-action="run">Run</button>
-      </div>
-      <div class="large-2 columns">
-        <button class="button" data-action="pause">Pause</button>
-      </div>
-      <div class="large-10"></div>
-    </div>
+    <div class="row">
+      <div class="large-4 columns">
+        <ul class="button-group radius" id="controls">
+          <li><button class="button success icon ion-play" data-action="run"></button></li>
 
-    <div class="row" id="link-form">
-      <div class="large-2 columns">
-        <button class="button">Generate</button>
-      </div>
-      <div class="large-10 columns">
-        <input type="text"></input>
+          <li><button class="button secondary icon ion-pause" data-action="pause"></button></li>
+
+          <li><button class="button alert icon ion-stop" data-action="stop"></button></li>
+        </ul>
       </div>
     </div>
 
-	<div class="row" id="load-form">
-      <div class="large-2 columns">
-        <button class="button">Load</button>
+    <form>
+      <div class="row form">
+        <div class="large-9 columns">
+          <div class="row collapse prefix-radius" id="link-form">
+            <label>Make a link to your program</label>
+          <div class="small-2 columns">
+            <button class="button prefix">Generate</button>
+          </div>
+          <div class="small-10 columns">
+            <input type="text"></input>
+          </div>
+          </div>
+        </div>
       </div>
-      <div class="large-10 columns">
-        <input type="text"></input>
+    </form>
+
+    <form>
+      <div class="row form">
+        <div class="large-9 columns">
+          <div class="row collapse prefix-radius" id="load-form">
+            <label class="secondary">Load a level string</label>
+            <div class="small-2 columns">
+              <button class="button prefix">Load</button>
+            </div>
+            <div class="small-10 columns">
+              <input type="text"></input>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </form>
+
 
     <script src="js/vendor/jquery.js"></script>
     <script src="js/foundation.min.js"></script>
@@ -72,8 +90,8 @@
 
     <script type="text/javascript">
       window.addEventListener("load", function() {
-        var app = new App();
-        app.main();
+      var app = new App();
+      app.main();
       });
     </script>
   </body>
