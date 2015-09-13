@@ -12,8 +12,8 @@ function App() {
     this.program = null;
     this.programView = null;
     this.interpreter = null;
-    this.tape = new core.Tape();
     this.stepTime = 500; // default ms between steps
+    this.tapeList = [];
 
     var linkForm = $("#link-form");
     linkForm.find("button").click(this.generateLink.bind(this));
@@ -22,20 +22,22 @@ function App() {
     var loadForm = $("#load-form");
     loadForm.find("button").click(this.loadLevel.bind(this));
 
-    var controls = $("#controls");
+    this.controlsEl = $("#controls");
 
-    controls.find("[data-action=run]").click(() => {
+    this.controlsEl.find("[data-action=run]").click(() => {
         if (!this.isRunning) {
             this.start();
+        } else if (this.isRunning && this.isPaused) {
+            this.pause(false); // or unpause
         }
     });
 
-    controls.find("[data-action=pause]").click(() => {
+    this.controlsEl.find("[data-action=pause]").click(() => {
         if (this.isRunning)
-            this.isPaused = !!!this.isPaused;
+            this.pause(true);
     });
 
-    controls.find("[data-action=stop]").click(() => {
+    this.controlsEl.find("[data-action=stop]").click(() => {
         this.stop();
     });
 
@@ -51,7 +53,7 @@ function App() {
             var level = loader.fromJson(hash);
             if (level) {
                 this.program = level.program;
-                this.tape = level.tape[0];
+                this.tapeList = level.tape;
             } else {
                 // Error case
                 console.log("Unable to load program string");
@@ -74,7 +76,7 @@ App.prototype.loadLevel = function() {
         var level = loader.fromJson(levelString);
         if (level) {
             newProgram = level.program;
-            this.tape = level.tape[0];
+            this.tapeList = level.tape;
         } else {
             // Error case
             console.log("Unable to load program string");
@@ -88,9 +90,9 @@ App.prototype.loadLevel = function() {
 };
 
 App.prototype.generateLink = function() {
-    if (this.program != null && this.tape != null) {
+    if (this.program != null && this.tapeList != null) {
         var link = window.location.href.split("#")[0] + "#";
-        link += loader.toJson("Sample", this.tape, this.program);
+        link += loader.toJson("Sample", this.tapeList, this.program);
         $("#link-form").find("input").val(decodeURI(link));
     }
 };
@@ -126,9 +128,6 @@ App.prototype.main = function() {
         this.editor = new editor.Editor(paper, this.programView);
 
         this.programView.drawProgram();
-
-        this.tapeView = new view.TapeView(paper, 0, 0, 400, 20, this.tape);
-        this.tapeView.drawTape();
 
         editor.init();
 
@@ -175,8 +174,14 @@ App.prototype.start = function() {
     this.isRunning = true;
     this.isPaused = false;
     this.interpreter = new interpreter.Interpreter();
+
+    var currentTape = core.Tape.clone(this.tapeList[0]);
+
+    this.tapeView = new view.TapeView(this.paper, 0, 0, 400, 20, currentTape);
+    this.tapeView.drawTape();
+
     this.interpreter.setProgram(this.program);
-    this.interpreter.setTape(this.tape);
+    this.interpreter.setTape(currentTape);
     this.interpreter.start();
 
     this.run();
@@ -186,7 +191,15 @@ App.prototype.stop = function() {
     this.isRunning = false;
     this.isPaused = false;
     this.token.remove();
+    this.tapeView.remove();
 };
+
+App.prototype.pause = function(shouldPause) {
+    if (shouldPause) {
+        this.isPaused = false;
+
+    }
+}
 
 App.prototype.run = function() {
 

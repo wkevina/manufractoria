@@ -46,5 +46,12 @@ var core = core || {};
         this.changed.dispatch("append");
     };
 
+
+    Tape.clone = function(otherTape) {
+        var newTape = new Tape();
+        newTape.symbols = otherTape.symbols.slice(0);
+        return newTape;
+    };
+
     core.Tape = Tape;
 })(signals);
