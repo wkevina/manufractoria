@@ -278,7 +278,9 @@ var editor = editor || {},
                     o = info.cell.orientation,
                     mirrored = isMirrored(o);
 
-                this.programView.program.setCell(x, y, type, orientationByName(dir, mirrored));
+                if (type != "Start" && type != "End" && type != "Empty")
+
+                    this.programView.program.setCell(x, y, type, orientationByName(dir, mirrored));
             }
         }
     };
@@ -299,8 +301,8 @@ var editor = editor || {},
                     x = info.x,
                     y = info.y;
                 o = tmath.Mat2x2.kMIR.compose(o);
-
-                this.programView.program.setCell(x, y, type, o);
+                if (type != "Start" && type != "End" && type != "Empty")
+                    this.programView.program.setCell(x, y, type, o);
             }
         }
     };
@@ -322,10 +324,11 @@ var editor = editor || {},
             if (el && info) {
                 // Now have reference to cell
                 var p = info.program,
+                    type = info.cell.type,
                     x = info.x,
                     y = info.y;
-
-                p.setCell(x, y, "Empty");
+                if (type != "Start" && type != "End" && type != "Empty")
+                    p.setCell(x, y, "Empty");
             }
         }
     };
