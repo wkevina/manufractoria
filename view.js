@@ -302,7 +302,7 @@ var view = view || {},
 
         this.gridView.drawGrid();
 
-        var binding = this.program.changed.add(this.drawProgram);
+        var binding = this.program.changed.add(this.updateCell);
         binding.context = this;
     }
 
@@ -320,6 +320,85 @@ var view = view || {},
         this.cells.clear();
     };
 
+    ProgramView.prototype.updateCell = function(data) {
+        // coordinates of updated cell
+        var x = data.x,
+            y = data.y;
+
+        // remove old cells in the region and redraw each
+        for (var c_x = x - 1; c_x <= x + 1; ++c_x) {
+            for (var c_y = y - 1; c_y <= y + 1; ++c_y) {
+                if (c_x >= 0 && c_x < this.program.cols &&
+                    c_y >= 0 && c_y < this.program.rows) {
+
+                    this.gridView.grid.selectAll("." + coordClass(c_x, c_y))
+                        .forEach((el) => el.remove());
+
+                    this.drawTile(this.program.getCell(c_x, c_y), c_x, c_y);
+                }
+            }
+        }
+
+    };
+
+    ProgramView.prototype.drawTile = function(cell, x, y) {
+        var c = cell,
+            paper = this.paper,
+            grid = this.gridView;
+
+        console.log("draw");
+
+        if (c.type != "Empty") {
+            var container;
+            if (c.type == "Conveyor") {
+                container = this.drawConveyor(c, x, y);
+            } else {
+
+                var image = graphics.getGraphic(c.type);
+
+                if (image) {
+
+                    paper.append(image);
+
+                    var group = paper.g(image);
+                    this.cells.append(group);
+
+                    var corner = grid.getCellMatrix(x, y, true)
+                            .toTransformString()
+                            .toUpperCase();
+
+                    var o = c.orientation;
+
+                    var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
+                    var tstring = view.toTransformString(transform);
+
+                    group.transform(
+                        tstring + corner
+                    );
+
+                    container = group;
+                }
+            }
+            if (container) {
+                container.selectAll("*").forEach((el) => {
+                    el.data("tileInfo", {
+                        cell: c,
+                        x: x,
+                        y: y,
+                        program: this.program
+                    }).addClass("tile-part");
+                });
+
+                container.addClass(coordClass(x, y));
+
+            }
+        }
+    };
+
+    function coordClass(x, y) {
+        return "cell-x" + x + "-y" + y;
+    }
+
     ProgramView.prototype.drawProgram = function drawProgram() {
         var paper = this.paper,
             grid = this.gridView,
@@ -331,52 +410,7 @@ var view = view || {},
         for (var x = 0; x < program.cols; ++x) {
             for (var y = 0; y < program.rows; ++y) {
                 var c = program.getCell(x, y);
-
-                if (c.type != "Empty") {
-                    var container;
-                    if (c.type == "Conveyor") {
-                        container = this.drawConveyor(c, x, y);
-                    } else {
-
-                        var image = graphics.getGraphic(c.type);
-
-                        if (image) {
-
-                            paper.append(image);
-
-                            var group = paper.g(image);
-                            this.cells.append(group);
-
-                            var corner = grid.getCellMatrix(x, y, true)
-                                    .toTransformString()
-                                    .toUpperCase();
-
-                            var o = c.orientation;
-
-                            var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
-                            var tstring = view.toTransformString(transform);
-
-
-
-                            group.transform(
-                                tstring + corner
-                            );
-
-                            container = group;
-                        }
-                    }
-                    if (container) {
-                        container.selectAll("*").forEach((el) => {
-                            el.data("tileInfo", {
-                                cell: c,
-                                x: x,
-                                y: y,
-                                program: this.program
-                            }).addClass("tile-part");
-                        });
-
-                    }
-                }
+                this.drawTile(c, x, y);
             }
         }
     };
