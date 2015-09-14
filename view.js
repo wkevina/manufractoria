@@ -484,6 +484,54 @@ var view = view || {},
 
     };
 
+    ProgramView.prototype.drawWriter = function drawWriter(cell, x, y) {
+        var neighbors = getNeighbors(this.program, cell, x, y),
+
+            target = {cell: cell, position: new tmath.Vec2(x, y)},
+
+            hasLeft = neighbors.left.cell != null ? isPointingTo(neighbors.left, target) : false,
+
+            hasRight = neighbors.right.cell != null ? isPointingTo(neighbors.right, target) : false,
+
+            image = null,
+
+            mirror = false,
+
+            connector = null;
+
+        image = graphics.getGraphic(cell.type);
+
+        if (image) {
+
+            this.paper.append(image);
+
+            var group = this.paper.g(image);
+            this.cells.append(group);
+
+            var corner = this.gridView.getCellMatrix(x, y, true)
+                    .toTransformString()
+                    .toUpperCase();
+
+            var o = cell.orientation;
+
+            if (mirror) {
+                o = tmath.Mat2x2.kMIR.compose(o);
+            }
+
+            var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
+            var tstring = view.toTransformString(transform);
+
+            group.transform(
+                tstring + corner
+            );
+
+            return group;
+        }
+
+        return null;
+
+    };
+
     function getNeighbors(prog, cell, x, y) {
         var o = cell.orientation,
             position = new tmath.Vec2(x, y),

@@ -15,6 +15,7 @@ var graphics = graphics || {};
         WriteR: "img/write-red.svg",
         WriteY: "img/write-yellow.svg",
         WriteG: "img/write-green.svg",
+        WriterConnector: "img/writer-connector.svg",
         Start: "img/start.svg",
         End: "img/end.svg"
     };
