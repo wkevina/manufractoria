@@ -234,7 +234,7 @@ var editor = editor || {},
                 data.cell.y
             );
 
-            if (curCell.type != "Start" || curCell.type != "End") {
+            if (curCell.type != "Start" && curCell.type != "End") {
 
                 this.programView.program.setCell(data.cell.x,
                                                  data.cell.y,
