@@ -14,7 +14,7 @@ var view = view || {},
         this.y = y;
 
         this._sw = radius;
-        this._MAX = Math.floor((this.width - this._sw) / this._sw);
+        this._MAX = Math.floor(this.width / this._sw);
 
         this.setTape(tape);
     };
