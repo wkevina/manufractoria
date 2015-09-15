@@ -48,5 +48,10 @@ ul.controls-desc li {
     .game-container {
         width: 100%;
     }
+
+    #controls button {
+        font-size: 24px;
+        padding: 5px 22px;
+    }
 }
 /*  green: #03ec04 */
