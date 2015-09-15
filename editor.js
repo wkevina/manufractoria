@@ -124,8 +124,8 @@ var editor = editor || {},
     };
 
     function trackMouse(evt) {
-        mousePosition.x = evt.pageX;
-        mousePosition.y = evt.pageY;
+        mousePosition.x = evt.clientX;
+        mousePosition.y = evt.clientY;
     }
 
     var IDLE = Symbol("IDLE"),

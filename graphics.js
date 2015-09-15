@@ -62,8 +62,8 @@ var graphics = graphics || {};
             spt = svg.createSVGPoint(),
             mat = element.node.getScreenCTM();
 
-        spt.x = x - window.scrollX;
-        spt.y = y - window.scrollY;
+        spt.x = x;
+        spt.y = y;
 
         return spt.matrixTransform(mat.inverse());
     };
