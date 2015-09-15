@@ -259,7 +259,7 @@ var view = view || {},
     GridView.prototype.getGlobalCellMatrix = function getGlobalCellMatrix(col, row, corner) {
 
         var transform = this.grid.transform();
-        var globalMatrix = transform.globalMatrix.clone();
+        var globalMatrix = transform.localMatrix.clone();
 
         var sw = this.width / this.cols;
         var sy = this.height / this.rows;
