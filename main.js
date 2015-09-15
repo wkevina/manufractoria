@@ -28,6 +28,10 @@ function App() {
         pauseButton = this.controlsEl.find("[data-action=pause]"),
         playButton = this.controlsEl.find("[data-action=run]");
 
+    stopButton.prop("disabled", true);
+    pauseButton.prop("disabled", true);
+    playButton.prop("disabled", false);
+
     playButton.click(() => {
         if (!this.isRunning) {
             this.editor.disable();
