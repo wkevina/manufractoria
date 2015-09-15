@@ -184,7 +184,12 @@ App.prototype.start = function() {
     }
     var currentTape = core.Tape.clone(this.tapeList[0]);
 
-    this.tapeView = new view.TapeView(this.paper, 0, 0, 400, 20, currentTape);
+    this.tapeView = new view.TapeView(this.paper,
+                                      this.programView.x,
+                                      0,
+                                      this.programView.width,
+                                      20,
+                                      currentTape);
     this.tapeView.drawTape();
 
     this.interpreter.setProgram(this.program);
