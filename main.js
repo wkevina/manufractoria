@@ -202,11 +202,8 @@ App.prototype.stop = function() {
 };
 
 App.prototype.pause = function(shouldPause) {
-    if (shouldPause) {
-        this.isPaused = false;
-
-    }
-}
+    this.isPaused = shouldPause;
+};
 
 App.prototype.run = function() {
 
