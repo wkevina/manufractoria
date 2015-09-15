@@ -24,24 +24,45 @@ function App() {
 
     this.controlsEl = $("#controls");
 
-    this.controlsEl.find("[data-action=run]").click(() => {
+    var stopButton = this.controlsEl.find("[data-action=stop]"),
+        pauseButton = this.controlsEl.find("[data-action=pause]"),
+        playButton = this.controlsEl.find("[data-action=run]");
+
+    playButton.click(() => {
         if (!this.isRunning) {
             this.editor.disable();
             this.start();
+
+            stopButton.prop("disabled", false);
+            pauseButton.prop("disabled", false);
+            playButton.prop("disabled", true);
+
         } else if (this.isRunning && this.isPaused) {
             this.editor.disable();
             this.pause(false); // or unpause
+
+            stopButton.prop("disabled", false);
+            pauseButton.prop("disabled", false);
+            playButton.prop("disabled", true);
         }
     });
 
-    this.controlsEl.find("[data-action=pause]").click(() => {
-        if (this.isRunning)
+    pauseButton.click(() => {
+        if (this.isRunning) {
             this.pause(true);
+
+            stopButton.prop("disabled", false);
+            pauseButton.prop("disabled", true);
+            playButton.prop("disabled", false);
+        }
     });
 
-    this.controlsEl.find("[data-action=stop]").click(() => {
+    stopButton.click(() => {
         this.stop();
         this.editor.enable();
+        stopButton.prop("disabled", true);
+        pauseButton.prop("disabled", true);
+        playButton.prop("disabled", false);
     });
 
 
@@ -203,8 +224,8 @@ App.prototype.start = function() {
 App.prototype.stop = function() {
     this.isRunning = false;
     this.isPaused = false;
-    this.token.remove();
-    this.tapeView.remove();
+    this.token && this.token.remove();
+    this.tapeView && this.tapeView.remove();
 };
 
 App.prototype.pause = function(shouldPause) {
