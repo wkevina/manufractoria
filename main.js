@@ -175,6 +175,9 @@ App.prototype.start = function() {
     this.isPaused = false;
     this.interpreter = new interpreter.Interpreter();
 
+    if (this.tapeList.length === 0) {
+        this.tapeList.push(new core.Tape());
+    }
     var currentTape = core.Tape.clone(this.tapeList[0]);
 
     this.tapeView = new view.TapeView(this.paper, 0, 0, 400, 20, currentTape);
