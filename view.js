@@ -355,8 +355,9 @@ var view = view || {},
             var container;
             if (c.type == "Conveyor") {
                 container = this.drawConveyor(c, x, y);
+            } else if (c.type.startsWith("Write")) {
+                container = this.drawWriter(c, x, y);
             } else {
-
                 var image = graphics.getGraphic(c.type);
 
                 if (image) {
@@ -498,9 +499,9 @@ var view = view || {},
 
             image = null,
 
-            mirror = false,
+            leftConnector = null,
 
-            connector = null;
+            rightConnector = null;
 
         image = graphics.getGraphic(cell.type);
 
@@ -511,15 +512,24 @@ var view = view || {},
             var group = this.paper.g(image);
             this.cells.append(group);
 
+            if (hasRight) {
+                rightConnector = graphics.getGraphic("WriterConnector");
+                group.append(rightConnector);
+            }
+
+            if (hasLeft) {
+                leftConnector = group.g(graphics.getGraphic("WriterConnector"));
+                group.append(leftConnector);
+                var rot = tmath.Mat2x2.kROT2,
+                    m = Snap.matrix(rot.a, rot.b, rot.c, rot.d, 0, 0);
+                leftConnector.transform(view.toTransformString(m));
+            }
+
             var corner = this.gridView.getCellMatrix(x, y, true)
                     .toTransformString()
                     .toUpperCase();
 
             var o = cell.orientation;
-
-            if (mirror) {
-                o = tmath.Mat2x2.kMIR.compose(o);
-            }
 
             var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
             var tstring = view.toTransformString(transform);
