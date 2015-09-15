@@ -217,7 +217,7 @@ var editor = editor || {},
     Editor.prototype.onTileSelected = function (data) {
         this.state = PLACING;
         this.currentTile = data.tile;
-        this.currentOrientation = "UP";
+        //this.currentOrientation = "UP";
 
         if (this.tileCursor != null)
             this.tileCursor.remove();
@@ -226,13 +226,15 @@ var editor = editor || {},
             mousePoint = graphics.screenPointToLocal(data.x, data.y, this.paper);
 
         tileGraphic.node.style.pointerEvents = "none"; // disable click events
-        tileGraphic.transform("t" + (mousePoint.x - 56/2) + "," + (mousePoint.y - 56/2));
+        // tileGraphic.transform("t" + (mousePoint.x - 56/2) + "," + (mousePoint.y - 56/2));
 
         this.paper.mousemove(
             this.move.bind(this)
         );
 
         this.tileCursor = tileGraphic;
+
+        this.move(data, data.x, data.y);
     };
 
     Editor.prototype.onCellSelected = function (data) {
@@ -346,6 +348,9 @@ var editor = editor || {},
         if (this.state == PLACING && this.tileCursor) {
 
             this.clearCursor();
+            // Reset orientation for next time
+            this.currentOrientation = "UP";
+            this.mirror = false;
 
         } else if (this.state == IDLE) {
             // see if we are hovering over the programview
