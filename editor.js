@@ -124,8 +124,8 @@ var editor = editor || {},
     };
 
     function trackMouse(evt) {
-        mousePosition.x = evt.clientX;
-        mousePosition.y = evt.clientY;
+        mousePosition.x = evt.pageX;
+        mousePosition.y = evt.pageY;
     }
 
     var IDLE = Symbol("IDLE"),
@@ -181,7 +181,7 @@ var editor = editor || {},
     Editor.prototype.move = function move(evt, x, y) {
         if (this.state == PLACING && this.tileCursor) {
 
-            var mousePoint = graphics.screenPointToLocal(x, y, this.paper),
+            var mousePoint = graphics.screenPointToLocal(mousePosition.x, mousePosition.y, this.paper),
 
                 oName = this.currentOrientation,
 
