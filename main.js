@@ -26,8 +26,10 @@ function App() {
 
     this.controlsEl.find("[data-action=run]").click(() => {
         if (!this.isRunning) {
+            this.editor.disable();
             this.start();
         } else if (this.isRunning && this.isPaused) {
+            this.editor.disable();
             this.pause(false); // or unpause
         }
     });
@@ -39,6 +41,7 @@ function App() {
 
     this.controlsEl.find("[data-action=stop]").click(() => {
         this.stop();
+        this.editor.enable();
     });
 
 
@@ -130,6 +133,7 @@ App.prototype.main = function() {
         this.programView.drawProgram();
 
         editor.init();
+        this.editor.enable();
 
     }.bind(this));
 

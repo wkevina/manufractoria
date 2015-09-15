@@ -26,6 +26,12 @@ var editor = editor || {},
         });
     }
 
+    function unregisterEvents(evts) {
+        Object.keys(evts).forEach(function(key) {
+            radio(editor.events[key]).unsubscribe(evts[key]);
+        });
+    }
+
     var startEditor = function() {
 
         var paper = Snap(900, 640);
@@ -141,7 +147,7 @@ var editor = editor || {},
         this.currentOrientation = "UP";
         this.mirror = false;
 
-        var events = {
+        this._events = {
             tileSelected: (data) => this.onTileSelected(data),
             cellSelected: (data) => this.onCellSelected(data),
             rotate: (data) => this.onRotateCell(data),
@@ -150,8 +156,17 @@ var editor = editor || {},
             delete: (data) => this.onDelete(data)
         };
 
-        registerEvents(events);
+        //registerEvents(events);
     }
+
+    Editor.prototype.enable = function() {
+        registerEvents(this._events);
+    };
+
+    Editor.prototype.disable = function() {
+        this.clearCursor();
+        unregisterEvents(this._events);
+    };
 
     Editor.prototype.move = function move(evt, x, y) {
         if (this.state == PLACING && this.tileCursor) {
@@ -307,14 +322,20 @@ var editor = editor || {},
         }
     };
 
-    Editor.prototype.onDelete = function (data) {
-        if (this.state == PLACING && this.tileCursor) {
-
-            this.state = IDLE;
+    Editor.prototype.clearCursor = function() {
+        this.state = IDLE;
+        if (this.tileCursor) {
             this.tileCursor.remove();
             this.tileCursor.unmousemove(this.move);
             this.tileCursor = null;
-            this.currentTile = null;
+        }
+        this.currentTile = null;
+    };
+
+    Editor.prototype.onDelete = function (data) {
+        if (this.state == PLACING && this.tileCursor) {
+
+            this.clearCursor();
 
         } else if (this.state == IDLE) {
             // see if we are hovering over the programview
