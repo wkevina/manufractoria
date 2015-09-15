@@ -1,7 +1,8 @@
 
 var view = view || {},
     core = core || {},
-    graphics = graphics || {};
+    graphics = graphics || {},
+    editor = editor || {};
 
 (function (core, graphics) {
 
@@ -640,7 +641,27 @@ var view = view || {},
 
         this.tiles.transform(Snap.matrix().translate(x, y).scale(scale_x, scale_x));
         this.drawPalette();
+
+        this._events = {
+            hotKey: (data) => this.hotKey(data)
+        };
+
+        editor.registerEvents(this._events);
     }
+
+    Palette.prototype.hotKey = function hotKey(data) {
+        var num = parseInt(data.key);
+        if (!isNaN(num) && num > 0 && num <= this.typesToDraw.length) {
+            editor.trigger(
+                editor.events.tileSelected,
+                {
+                    tile: this.typesToDraw[num - 1],
+                    x: data.x,
+                    y: data.y
+                }
+            );
+        }
+    };
 
     Palette.prototype.drawPalette = function drawPalette() {
         this.tiles.clear();
@@ -695,7 +716,7 @@ var view = view || {},
                 fontFamily: "monospace",
                 fontSize: 10,
                 textAnchor: "middle",
-                text: image.name == "CrossConveyor" ? "Crossover" : image.name
+                text: index + 1
             }).addClass("label-text");
 
             var title = Snap.parse('<title>'+image.name+'</title>');

@@ -13,7 +13,8 @@ var editor = editor || {},
         mirror: "mirror",
         rotate: "rotate",
         setDirection: "set-direction",
-        delete: "delete"
+        delete: "delete",
+        hotKey: "hot-key"
     };
 
     editor.trigger = function(event, args) {
@@ -26,11 +27,15 @@ var editor = editor || {},
         });
     }
 
+    editor.registerEvents = registerEvents;
+
     function unregisterEvents(evts) {
         Object.keys(evts).forEach(function(key) {
             radio(editor.events[key]).unsubscribe(evts[key]);
         });
     }
+
+    editor.unregisterEvents = unregisterEvents;
 
     var startEditor = function() {
 
@@ -102,6 +107,11 @@ var editor = editor || {},
             case "x":
                 what = editor.events.delete;
                 break;
+        }
+
+        if (!what) {
+            what = editor.events.hotKey;
+            data.key = key;
         }
 
         editor.trigger(what, data);
