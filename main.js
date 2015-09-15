@@ -102,14 +102,15 @@ App.prototype.generateLink = function() {
 
 App.prototype.main = function() {
 
-    var paper = Snap(900, 550);
+    var paper = Snap(document.getElementById("main-svg"));
+    paper.rect(0, 0, 680, 550).addClass("game-bg");
     this.paper = paper;
     // Set up UI elements
     graphics.preload(paper).then(function() {
 
         var programLayer = paper.g().addClass("program-layer");
 
-        paper.appendTo(document.getElementById("main"));
+        //paper.appendTo(document.getElementById("main"));
 
         if (this.program == null) {
             this.program = new program.Program(9, 9);
