@@ -5,15 +5,15 @@ var view = view || {},
 
 (function (core, graphics) {
 
-    function TapeView(paper, x, y, width, height, tape) {
+    function TapeView(paper, x, y, width, radius, tape) {
         this.paper = paper;
         this.tapeView = paper.g();
         this.width = width;
-        this.height = height;
+        this.height = radius;
         this.x = x;
         this.y = y;
 
-        this._sw = 20; // Parameterize this later
+        this._sw = radius;
         this._MAX = Math.floor((this.width - this._sw) / this._sw);
 
         this.setTape(tape);
@@ -299,6 +299,9 @@ var view = view || {},
                                      program.cols*tileSize,
                                      program.rows*tileSize,
                                      program.rows, program.cols);
+
+        this.width = this.gridView.width;
+        this.height = this.gridView.height;
 
         this.gridView.drawGrid();
 
