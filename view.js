@@ -6,16 +6,18 @@ var view = view || {},
 
 (function (core, graphics) {
 
-    function TapeView(paper, x, y, width, radius, tape) {
+    function TapeView(paper, x, y, width, radius, tape, rows) {
         this.paper = paper;
         this.tapeView = paper.g();
         this.width = width;
-        this.height = radius;
+        this.rows = rows || 1;
+        this.height = radius * this.rows;
         this.x = x;
         this.y = y;
 
         this._sw = radius;
-        this._MAX = Math.floor(this.width / this._sw);
+        this._MAX_PER_ROW = Math.floor(this.width / this._sw);
+        this._MAX = this.rows * this._MAX_PER_ROW;
 
         this.setTape(tape);
     };
@@ -31,20 +33,38 @@ var view = view || {},
 
         for (var i = 0; i < this.tape.symbols.length && i < MAX; ++i) {
             var curSym = this.tape.symbols[i];
-            this._appendSymbol(curSym);
+            this._appendSymbol(i, curSym);
+        }
+
+
+        for (var r = 1; r < this.rows; ++r) {
+            this.tapeView.line(0, r * this._sw, this.width, r * this._sw)
+                .addClass("tape-view-divider")
+                .attr({stroke: "#fff"});
         }
 
         this.tapeView.transform("");
         this.tapeView.transform("t" + this.x + "," + this.y);
     };
 
-    TapeView.prototype._appendSymbol = function(symbol, offset, color) {
+    TapeView.prototype._coordinateForIndex = function _coordinateForIndex(index) {
+        var row = Math.floor(index / this._MAX_PER_ROW),
+            col = index % this._MAX_PER_ROW;
+
+        return {
+            x: col * this._sw + this._sw / 2,
+            y: row * this._sw + this._sw / 2
+        };
+    };
+
+    TapeView.prototype._appendSymbol = function(index, symbol, offset, color) {
         offset = offset || 0;
 
         var sw = this._sw,
-            length = this.tapeView.selectAll("*").length;
+            length = this.tapeView.selectAll("circle").length,
+            coord = this._coordinateForIndex(index);
 
-        var circle = this.tapeView.circle(sw*(length + offset) + sw/2, sw/2, sw/2 - 2);
+        var circle = this.tapeView.circle(coord.x + offset * sw, coord.y, sw/2 - 2);
 
         if (symbol === core.EMPTY) {
             circle.attr({
@@ -60,7 +80,7 @@ var view = view || {},
             } else {
                 circle.attr({
                     fill: colorForSymbol(symbol)
-                });
+                }).addClass(classForSymbol(symbol));
             }
         }
 
@@ -84,16 +104,17 @@ var view = view || {},
 
         var slide = (function() {
             var sw = this._sw,
-                length = this.tapeView.selectAll("*").length;
+                allSymbols = this.tapeView.selectAll("circle"),
+                length = allSymbols.length;
 
             // Append symbol if necessary
             if (length < this._MAX && this.tape.symbols.length > length) {
-                var c = this._appendSymbol(this.tape.symbols[length - 1], 1);
+                var c = this._appendSymbol(length, this.tape.symbols[length - 1], 1);
                 c.attr({opacity: 0});
             }
 
             // Slide left
-            this.tapeView.selectAll("*").animate(
+            this.tapeView.selectAll("circle").animate(
                 {
                     cx: "-=" + sw,
                     opacity: 1
@@ -102,18 +123,39 @@ var view = view || {},
                 mina.easeinout
             );
 
+            // Iterate over all symbols that are the beginning of a row other than the first
+            for (var beginIndex = this._MAX_PER_ROW - 1;
+                 beginIndex < length;
+                 beginIndex += this._MAX_PER_ROW) {
+
+                var rowFront = allSymbols[beginIndex],
+                    coord = this._coordinateForIndex(beginIndex);
+
+                rowFront.stop(); // cancel sliding animation
+
+                rowFront.animate(
+                    {
+                        cx: coord.x,
+                        cy: coord.y,
+                        opacity: 1
+                    },
+                    200,
+                    mina.linear
+                );
+            }
+
         }).bind(this);
 
         if (action == "pop") {
             // Dissolve first element, then slide left
-            var head = this.tapeView.selectAll("*")[0];
+            var head = this.tapeView.selectAll("circle")[0];
             pop(head, slide);
 
         } else if (action == "append") {
             // Append symbol if it will fit
-            var length = this.tapeView.selectAll("*").length;
+            var length = this.tapeView.selectAll("circle").length;
             if (length < this._MAX && this.tape.symbols.length > length) {
-                var c = this._appendSymbol(this.tape.symbols[length], 0);
+                var c = this._appendSymbol(length, this.tape.symbols[length], 0);
                 c.attr({opacity: 0});
                 c.animate(
                     {
@@ -159,8 +201,23 @@ var view = view || {},
         } else if (symbol === core.YELLOW) {
             return "#FF0";
         } else {
-            return "FA3";
+            return "#FA3";
         }
+    }
+
+    function classForSymbol(symbol) {
+        if (symbol && symbol.symb && symbol.symbol != "empty") {
+            if (symbol === core.RED) {
+                return "symbol-red";
+            } else if (symbol === core.BLUE) {
+                return "symbol-blue";
+            } else if (symbol === core.GREEN) {
+                return "symbol-green";
+            } else if (symbol === core.YELLOW) {
+                return "symbol-yellow";
+            }
+        }
+        return "";
     }
 
     view.colorForSymbol = colorForSymbol;

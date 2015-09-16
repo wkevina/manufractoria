@@ -219,10 +219,11 @@ App.prototype.start = function() {
 
     this.tapeView = new view.TapeView(this.paper,
                                       this.programView.x,
-                                      this.programView.y + this.programView.height + 20,
+                                      this.programView.y + this.programView.height + 10,
                                       this.programView.width,
                                       20,
-                                      currentTape);
+                                      currentTape,
+                                      3); // 3 rows
 
     // hide Palette
     this.palette.show(false);

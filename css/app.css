@@ -44,6 +44,11 @@ ul.controls-desc li {
     stroke-width: 2px;
 }
 
+.tape-view-divider {
+    stroke: #aaa;
+    stroke-width: 1px;
+}
+
 @media only screen and (min-width: 680px) {
     .game-container {
         width: 680px;
