@@ -127,8 +127,11 @@ App.prototype.generateLink = function() {
 
 App.prototype.main = function() {
 
-    var paper = Snap(document.getElementById("main-svg"));
-    paper.rect(0, 0, 680, 550).addClass("game-bg");
+    var paper = Snap(document.getElementById("main-svg")),
+        bounds = paper.node.viewBox.baseVal;
+
+
+    paper.rect(bounds.x, bounds.y, bounds.width, bounds.height).addClass("game-bg");
     this.paper = paper;
     // Set up UI elements
     graphics.preload(paper).then(function() {
@@ -144,15 +147,19 @@ App.prototype.main = function() {
             this.program.setEnd(4, 8);
         }
 
-        this.palette = new view.Palette(paper, 10, 30, 2);
-
         this.programView = new view.ProgramView(
             programLayer,
-            10 + this.palette.drawWidth,
-            30,
+            10,
+            10,
             56,
             this.program
         );
+
+        this.palette = new view.Palette(paper,
+                                        10,
+                                        this.programView.height + this.programView.y + 10,
+                                        this.programView.width,
+                                        8);
 
         this.editor = new editor.Editor(paper, this.programView);
 
@@ -212,10 +219,14 @@ App.prototype.start = function() {
 
     this.tapeView = new view.TapeView(this.paper,
                                       this.programView.x,
-                                      0,
+                                      this.programView.y + this.programView.height + 20,
                                       this.programView.width,
                                       20,
                                       currentTape);
+
+    // hide Palette
+    this.palette.show(false);
+
     this.tapeView.drawTape();
 
     this.interpreter.setProgram(this.program);
@@ -230,6 +241,8 @@ App.prototype.stop = function() {
     this.isPaused = false;
     this.token && this.token.remove();
     this.tapeView && this.tapeView.remove();
+
+    this.palette.show();
 };
 
 App.prototype.pause = function(shouldPause) {

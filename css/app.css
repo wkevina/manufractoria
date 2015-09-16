@@ -38,6 +38,12 @@ ul.controls-desc li {
   /*display: inline-block;*/
 }
 
+.game-bg {
+    fill: none;
+    stroke: #eef;
+    stroke-width: 2px;
+}
+
 @media only screen and (min-width: 680px) {
     .game-container {
         width: 680px;

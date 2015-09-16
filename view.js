@@ -624,22 +624,29 @@ var view = view || {},
 
 
 
-    function Palette(paper, x, y, columns) {
+    function Palette(paper, x, y, max_width, columns, margin) {
         this.paper = paper;
         this.x = x;
         this.y = y;
         this.columns = columns > 0 ? columns : 1; // negative columns?
-        this.width = 56;
+        this.columnWidth = 56;
         this.tiles = paper.g();
-        this.drawWidth = columns * (56 + 20);
+        this.maxWidth = max_width;
+        this.margin = margin || 20;
+        this.tileWidth = 56; // tiles are 56 x 56 px
 
         // Get names of all types to draw
         this.typesToDraw = Object.keys(codeCell.codeCells);
 
-        // calculate scaling required
-        var scale_x = this.width / 56;
+        var actualColumns = this.columns <= this.typesToDraw.length ?
+                this.columns :
+                this.typesToDraw.length;
 
-        this.tiles.transform(Snap.matrix().translate(x, y).scale(scale_x, scale_x));
+        this.baseWidth = actualColumns * (this.tileWidth + this.margin) - this.margin;
+
+        this.width = this.baseWidth * this.getScale();
+
+        this.tiles.transform(Snap.matrix().translate(x, y));
         this.drawPalette();
 
         this._events = {
@@ -663,10 +670,24 @@ var view = view || {},
         }
     };
 
+    Palette.prototype.show = function show(shouldShow) {
+        shouldShow = shouldShow !== undefined ? shouldShow : true;
+        this.tiles.attr({
+            opacity: shouldShow ? 1 : 0
+        });
+    };
+
+    Palette.prototype.getScale = function getScale() {
+        if (this.baseWidth <= this.maxWidth)
+            return 1.0; // no scaling required
+        else
+            return this.maxWidth / this.baseWidth;
+    };
+
     Palette.prototype.drawPalette = function drawPalette() {
         this.tiles.clear();
 
-        var scale_x = this.width / 56;
+        var scale_x = this.getScale();
 
         var height = 56 + 20; // 56 pixel tile + 10 pixel text + 10 pixel padding
         var width = 56 + 20;
@@ -682,7 +703,7 @@ var view = view || {},
             var group = this.tiles.g(),
                 x_index = index % this.columns,
                 y_index = Math.floor(index / this.columns),
-                transform = Snap.matrix().translate(x_index * width, y_index * height);
+                transform = Snap.matrix().scale(scale_x).translate(x_index * width, y_index * height);
 
             group.click(
                 (evt, x, y) => {
