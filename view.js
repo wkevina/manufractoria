@@ -241,7 +241,7 @@ var view = view || {},
     };
 
     GridView.prototype.onClick = function onClick(evt, x, y) {
-        var cell = this.screenPointToCell(x, y);
+        var cell = this.screenPointToCell(evt.clientX, evt.clientY);
 
         if (cell.x >= 0 && cell.x < this.cols &&
             cell.y >= 0 && cell.y < this.rows) {
