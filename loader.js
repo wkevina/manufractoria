@@ -5,8 +5,9 @@
  The basic format is like this:
 
  {
-	title: title-string
- 	tape: [ tape-description1, ..., tape-descriptionN ],
+	title: title-string,
+	desc: desc-string,
+	testCases: [test-case-description1, ..., test-case-description2],
  	program: { ... program-description ... },
  }
 
@@ -14,6 +15,20 @@
  tape-description:
 
  A string of the characters R,B,G,Y in any combination or order
+
+
+ test-case-description:
+
+ A test vector for the user's program. Specified using a string with this format:
+
+ [a|r]:tape-description:tape-description[:cycle-limit]
+
+   1           2                3              4
+
+ 1: Accept or reject
+ 2: Input tape (can be empty)
+ 3: Output tape (can be empty)
+ 4: Max iterations as number (optional)
 
 
  program-description:
@@ -182,12 +197,12 @@ var loader = loader || {},
     loader.isProgram = isProgram;
 
     function isValid(level) {
-        if (!hasAll(level, ["title", "tape", "program"])) {
+        if (!hasAll(level, ["title", "testCases", "program"])) {
             return false;
         }
 
         return allTrue([
-            level.tape.every(isTape),
+            level.testCases.every(isTestVector),
             isProgram(level.program)
         ]);
     }
@@ -337,10 +352,72 @@ var loader = loader || {},
 
     loader.jsonToTape = jsonToTape;
 
-    function levelToJson(title, tapes, prog) {
+    /**
+     Validate test vector string
+     */
+    function isTestVector(json) {
+        var parts = json.split(":");
+
+        if (parts.length < 3) {
+            console.log("ERROR: test vector string does not contain all required parts");
+            return false;
+        }
+
+        if (parts.length == 3) {
+            parts[3] = 0; // fill in optional field with default value
+        }
+
+        return allTrue([
+            parts[0].match(/^[ar]$/),
+            isTape(parts[1]),
+            isTape(parts[2]),
+            _.isNumber(parts[3])
+        ]);
+    }
+
+    loader.isTestVector = isTestVector;
+
+    /**
+     Convert test vector object to string
+     */
+    function testVectorToJson(ob) {
+        return [
+            ob.accept ? "a" : "r",
+            tapeToJson(ob.input),
+            tapeToJson(ob.output),
+            ob.limit
+        ];
+    }
+
+    loader.testVectorToJson = testVectorToJson;
+
+    /**
+     Parse test vector string to object
+     */
+    function jsonToTestVector(json) {
+        var parts = json.split(":"),
+            accept = parts[0] == "a" ? true : false,
+            input = parts[1],
+            output = parts[2],
+            limit = parts.length > 3 ? parseInt(parts[3]) : 0;
+
+        if (isNaN(limit))
+            limit = 0;
+
+        return {
+            accept: accept,
+            input: jsonToTape(input),
+            output: jsonToTape(output),
+            limit: limit
+        };
+    }
+
+    loader.jsonToTestVector = jsonToTestVector;
+
+    function levelToJson(title, testCases, prog) {
         var json = {
             title: title,
-            tape: (_.isArray(tapes) ? tapes : [tapes]).map(tapeToJson),
+            testCases: (_.isArray(testCases) ? testCases : [testCases]).map(testVectorToJson),
             program: programToJson(prog)
         };
 
@@ -352,7 +429,7 @@ var loader = loader || {},
     function jsonToLevel(json) {
         var level = {
             title: json.title,
-            tape: json.tape.map(jsonToTape),
+            testCases: json.testCases.map(jsonToTestVector),
             program: jsonToProgram(json.program)
         };
 

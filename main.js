@@ -13,7 +13,7 @@ function App() {
     this.programView = null;
     this.interpreter = null;
     this.stepTime = 500; // default ms between steps
-    this.tapeList = [];
+    this.testCases = [];
 
     var linkForm = $("#link-form");
     linkForm.find("button").click(this.generateLink.bind(this));
@@ -81,7 +81,7 @@ function App() {
             var level = loader.fromJson(hash);
             if (level) {
                 this.program = level.program;
-                this.tapeList = level.tape;
+                this.testCases = level.testCases;
             } else {
                 // Error case
                 console.log("Unable to load program string");
@@ -104,7 +104,7 @@ App.prototype.loadLevel = function() {
         var level = loader.fromJson(levelString);
         if (level) {
             newProgram = level.program;
-            this.tapeList = level.tape;
+            this.testCases = level.testCases;
         } else {
             // Error case
             console.log("Unable to load program string");
@@ -118,9 +118,9 @@ App.prototype.loadLevel = function() {
 };
 
 App.prototype.generateLink = function() {
-    if (this.program != null && this.tapeList != null) {
+    if (this.program != null && this.testCases != null) {
         var link = window.location.href.split("#")[0] + "#";
-        link += loader.toJson("Sample", this.tapeList, this.program);
+        link += loader.toJson("Sample", this.testCases, this.program);
         $("#link-form").find("input").val(decodeURI(link));
     }
 };
@@ -212,10 +212,16 @@ App.prototype.start = function() {
     this.isPaused = false;
     this.interpreter = new interpreter.Interpreter();
 
-    if (this.tapeList.length === 0) {
-        this.tapeList.push(new core.Tape());
+    if (this.testCases.length === 0) {
+        this.testCases.push({
+            accept: true,
+            input: new core.Tape(),
+            output: new core.Tape(),
+            limit: 0
+        });
     }
-    var currentTape = core.Tape.clone(this.tapeList[0]);
+
+    var currentTape = core.Tape.clone(this.testCases[0].input);
 
     this.tapeView = new view.TapeView(this.paper,
                                       this.programView.x,
