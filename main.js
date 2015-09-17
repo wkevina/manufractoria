@@ -14,6 +14,7 @@ function App() {
     this.interpreter = null;
     this.stepTime = 500; // default ms between steps
     this.testCases = [];
+    this.currentTest = {test: null, index: 0};
 
     var linkForm = $("#link-form");
     linkForm.find("button").click(this.generateLink.bind(this));
@@ -212,6 +213,7 @@ App.prototype.start = function() {
     this.isPaused = false;
     this.interpreter = new interpreter.Interpreter();
 
+    // Special case for empty testCases
     if (this.testCases.length === 0) {
         this.testCases.push({
             accept: true,
@@ -221,8 +223,12 @@ App.prototype.start = function() {
         });
     }
 
-    var currentTape = core.Tape.clone(this.testCases[0].input);
+    this.currentTest.test = this.testCases[this.currentTest.index];
 
+    var currentTape = core.Tape.clone(this.currentTest.test.input);
+
+    if (this.tapeView)
+        this.tapeView.remove();
     this.tapeView = new view.TapeView(this.paper,
                                       this.programView.x,
                                       this.programView.y + this.programView.height + 10,
@@ -240,7 +246,7 @@ App.prototype.start = function() {
     this.interpreter.setTape(currentTape);
     this.interpreter.start();
 
-    this.run();
+    this.update();
 };
 
 App.prototype.stop = function() {
@@ -248,12 +254,51 @@ App.prototype.stop = function() {
     this.isPaused = false;
     this.token && this.token.remove();
     this.tapeView && this.tapeView.remove();
-
+    this.currentTest.index = 0;
     this.palette.show();
 };
 
 App.prototype.pause = function(shouldPause) {
     this.isPaused = shouldPause;
+};
+
+function tapesAreEqual(t1, t2) {
+    return loader.tapeToJson(t1) == loader.tapeToJson(t2);
+}
+
+// Governor for state when game is running
+// Responsibilities are:
+// Determine if test case has been passed or failed
+// Call run
+App.prototype.update = function() {
+    var test = this.currentTest.test,
+        int = this.interpreter;
+
+    if (this.isRunning) {
+        if (!int.running) {
+            // Interpreter has stopped
+            var finishedProperly = int.accept == test.accept,
+
+                correctOuput =
+                    test.output.symbols.length > 0 ?
+                    tapesAreEqual(int.tape, test.output) : // compare if output not empty
+                    true; // otherwise ignore final tape
+
+            console.log("Test finished.");
+            console.log(finishedProperly && correctOuput ? "Passed" : "Failed");
+
+            if (finishedProperly && correctOuput) {
+                if (this.currentTest.index < this.testCases.length -1) {
+                    this.currentTest.index++;
+                    window.setTimeout(() => this.start());
+                }
+            }
+            this.isRunning = false;
+        } else {
+            // check for cycle limit
+            this._step();
+        }
+    }
 };
 
 App.prototype.run = function() {
@@ -273,7 +318,7 @@ App.prototype.run = function() {
 
 // Calls interpreter's step and manages animation
 App.prototype._step = function() {
-    console.log("Step");
+
     if (!this.isPaused) {
         var curPos = this.interpreter.position,
             corner = this.programView.gridView.getGlobalCellMatrix(curPos.x, curPos.y);
@@ -284,9 +329,9 @@ App.prototype._step = function() {
         curPos = this.interpreter.position;
         corner = this.programView.gridView.getGlobalCellMatrix(curPos.x, curPos.y);
 
-        this.drawToken(corner, true, this.run.bind(this));
+        this.drawToken(corner, true, this.update.bind(this));
     } else {
-        requestAnimationFrame(this.run.bind(this));
+        requestAnimationFrame(this.update.bind(this));
     }
 };
 
