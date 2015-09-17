@@ -371,7 +371,7 @@ var loader = loader || {},
             parts[0].match(/^[ar]$/),
             isTape(parts[1]),
             isTape(parts[2]),
-            _.isNumber(parts[3])
+            !isNaN(parseInt(parts[3]))
         ]);
     }
 
@@ -386,7 +386,7 @@ var loader = loader || {},
             tapeToJson(ob.input),
             tapeToJson(ob.output),
             ob.limit
-        ];
+        ].join(":");
     }
 
     loader.testVectorToJson = testVectorToJson;
