@@ -1,8 +1,11 @@
 
-var view = view || {},
-    core = core || {},
-    graphics = graphics || {},
-    editor = editor || {};
+let view = view || {};
+
+export default view;
+
+import core from "core";
+import graphics from "graphics";
+import editor from "editor";
 
 (function (core, graphics) {
 
