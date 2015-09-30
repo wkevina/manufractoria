@@ -5,6 +5,7 @@ export default interpreter;
 import program from "program";
 import codeCell from "codeCell";
 import tmath from "tmath";
+import core from "core";
 
 var Interpreter = function() {
     this.tape = new core.Tape();

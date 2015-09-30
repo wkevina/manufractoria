@@ -1,4 +1,4 @@
-let graphics = graphics || {};
+let graphics = {};
 
 export default graphics;
 

@@ -1,11 +1,14 @@
 
-let view = view || {};
+let view = {};
 
 export default view;
 
 import core from "core";
 import graphics from "graphics";
 import editor from "editor";
+import codeCell from "codeCell";
+import tmath from "tmath";
+import program from "program";
 
 (function (core, graphics) {
 

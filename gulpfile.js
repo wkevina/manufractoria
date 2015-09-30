@@ -15,7 +15,7 @@ var dir = {
     source: ['./*.js', '!./gulpfile.js', '!main.js'],
     lib: ['!*.json',
           'libs/**/*.js',
-          'node_modules/systemjs/dist/system.src.js',
+          'node_modules/systemjs/dist/system.js',
           'node_modules/mathjs/dist/math.js'
 	 ],
     libOut: './dist/libs',

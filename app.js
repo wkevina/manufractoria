@@ -6,6 +6,7 @@ import view from "view";
 import tmath from "tmath";
 import loader from "loader";
 import editor from "editor";
+import core from "core";
 
 function App() {
     this.program = null;
@@ -334,12 +335,7 @@ App.prototype._step = function() {
     }
 };
 
-let a = {
-    imreal: "Hey."
-};
-
-export default a;
-
+export default App;
 
 /*
  Example hash level:
