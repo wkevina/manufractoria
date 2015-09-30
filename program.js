@@ -36,50 +36,53 @@ program.cellTypes = {
 };
 
 
-var Program = function Program(cols, rows) {
-    this.cols = cols;
-    this.rows = rows;
-    this.cells = [];
-    this.changed = new signals.Signal();
+class Program {
 
-    for (var x = 0; x < cols; ++x) {
-        this.cells.push([]);
-        for (var y = 0; y < rows; ++y) {
-            this.cells[x].push(new program.cellTypes.Empty());
+    constructor(cols, rows) {
+        this.cols = cols;
+        this.rows = rows;
+        this.cells = [];
+        this.changed = new signals.Signal();
+
+        for (var x = 0; x < cols; ++x) {
+            this.cells.push([]);
+            for (var y = 0; y < rows; ++y) {
+                this.cells[x].push(new program.cellTypes.Empty());
+            }
         }
     }
-};
 
-Program.prototype.getCell = function getCell(x, y) {
-    return this.cells[x][y];
-};
-
-Program.prototype.setCell = function setCell(x, y, type, orientation) {
-    var s = new program.cellTypes[type]();
-
-    if (orientation) {
-        s.orientation = orientation;
+    getCell(x, y) {
+        return this.cells[x][y];
     }
 
-    this.cells[x][y] = s;
+    setCell(x, y, type, orientation) {
+        var s = new program.cellTypes[type]();
 
-    this.changed.dispatch({
-        event: "set",
-        x: x,
-        y: y,
-        type: type,
-        orientation: orientation
-    });
-};
+        if (orientation) {
+            s.orientation = orientation;
+        }
 
-Program.prototype.setStart = function(x, y) {
-    this.setCell(x, y, "Start");
-};
+        this.cells[x][y] = s;
 
-Program.prototype.setEnd = function(x, y) {
-    this.setCell(x, y, "End");
-    this.start = {x: x, y: y};
-};
+        this.changed.dispatch({
+            event: "set",
+            x: x,
+            y: y,
+            type: type,
+            orientation: orientation
+        });
+    }
+
+    setStart(x, y) {
+        this.setCell(x, y, "Start");
+    }
+
+    setEnd(x, y) {
+        this.setCell(x, y, "End");
+        this.start = {x: x, y: y};
+    }
+}
 
 program.Program = Program;
 
