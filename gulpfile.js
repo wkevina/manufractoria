@@ -15,8 +15,9 @@ var dir = {
     source: ['./*.js', '!./gulpfile.js', '!main.js'],
     lib: ['!*.json',
           'libs/**/*.js',
-          'node_modules/systemjs/dist/system.js',
-          'node_modules/mathjs/dist/math.js'
+          'libs/**/*map*',
+          'node_modules/systemjs/dist/system.*',
+          'node_modules/babel-core/browser-polyfill.*'
 	 ],
     libOut: './dist/libs',
     fonts: 'fonts/**/*',
