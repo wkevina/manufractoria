@@ -7,6 +7,7 @@ import tmath from "tmath";
 import loader from "loader";
 import editor from "editor";
 import core from "core";
+import {Palette} from "gui";
 
 function App(width, height) {
     this.program = null;
@@ -163,7 +164,7 @@ App.prototype.main = function() {
             this.program
         );
 
-        this.palette = new view.Palette(paper,
+        this.palette = new Palette(paper,
                                         this.programView.width + this.programView.x + 10,
                                         this.canvasSize.height / 2,
                                         this.canvasSize.width - this.programView.width - 20,
