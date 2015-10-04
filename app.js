@@ -8,13 +8,14 @@ import loader from "loader";
 import editor from "editor";
 import core from "core";
 
-function App() {
+function App(width, height) {
     this.program = null;
     this.programView = null;
     this.interpreter = null;
     this.stepTime = 500; // default ms between steps
     this.testCases = [];
     this.currentTest = {test: null, index: 0};
+    this.canvasSize = {width:width, height:height};
 
     var linkForm = $("#link-form");
     linkForm.find("button").click(this.generateLink.bind(this));
@@ -126,11 +127,17 @@ App.prototype.generateLink = function() {
     }
 };
 
+function setViewbox(svgel, x, y, width, height) {
+    svgel.setAttribute("viewBox", [x,y,width,height].join(","));
+}
+
 App.prototype.main = function() {
 
-    var paper = Snap(document.getElementById("main-svg")),
-        bounds = paper.node.viewBox.baseVal;
+    let paper = Snap(document.getElementById("main-svg"));
 
+    setViewbox(paper.node, 0, 0, this.canvasSize.width, this.canvasSize.height);
+
+    let bounds = paper.node.viewBox.baseVal;
 
     paper.rect(bounds.x, bounds.y, bounds.width, bounds.height).addClass("game-bg");
     this.paper = paper;
@@ -157,10 +164,10 @@ App.prototype.main = function() {
         );
 
         this.palette = new view.Palette(paper,
-                                        10,
-                                        this.programView.height + this.programView.y + 10,
-                                        this.programView.width,
-                                        8);
+                                        this.programView.width + this.programView.x + 10,
+                                        this.canvasSize.height / 2,
+                                        this.canvasSize.width - this.programView.width - 20,
+                                        3);
 
         this.editor = new editor.Editor(paper, this.programView);
 
@@ -230,9 +237,9 @@ App.prototype.start = function() {
     if (this.tapeView)
         this.tapeView.remove();
     this.tapeView = new view.TapeView(this.paper,
-                                      this.programView.x,
-                                      this.programView.y + this.programView.height + 10,
-                                      this.programView.width,
+                                      this.programView.x + this.programView.width + 10,
+                                      this.programView.y,
+                                      this.canvasSize.width - this.programView.width - 30,
                                       20,
                                       currentTape,
                                       3); // 3 rows

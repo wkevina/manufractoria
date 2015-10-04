@@ -9,7 +9,7 @@ System.config({
 window.addEventListener("load", function() {
     console.log("Loading");
     System.import('app').then(function(App) {
-        var app = new App.default();
+        var app = new App.default(748, 524);
         app.main();
     });
 });
