@@ -4,7 +4,7 @@ export default editor;
 
 import program from "program";
 import graphics from "graphics";
-import view from "view";
+import * as view from "view";
 import tmath from "tmath";
 
 editor.events = {

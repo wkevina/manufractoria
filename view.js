@@ -1,8 +1,4 @@
 
-let view = {};
-
-export default view;
-
 import core from "core";
 import graphics from "graphics";
 import editor from "editor";
@@ -10,192 +6,193 @@ import codeCell from "codeCell";
 import tmath from "tmath";
 import program from "program";
 
-function TapeView(paper, x, y, width, radius, tape, rows) {
-    this.paper = paper;
-    this.tapeView = paper.g();
-    this.width = width;
-    this.rows = rows || 1;
-    this.height = radius * this.rows;
-    this.x = x;
-    this.y = y;
+export class TapeView {
+    constructor(paper, x, y, width, radius, tape, rows) {
+        this.paper = paper;
+        this.tapeView = paper.g();
+        this.width = width;
+        this.rows = rows || 1;
+        this.height = radius * this.rows;
+        this.x = x;
+        this.y = y;
 
-    this._sw = radius;
-    this._MAX_PER_ROW = Math.floor(this.width / this._sw);
-    this._MAX = this.rows * this._MAX_PER_ROW;
+        this._sw = radius;
+        this._MAX_PER_ROW = Math.floor(this.width / this._sw);
+        this._MAX = this.rows * this._MAX_PER_ROW;
 
-    this.setTape(tape);
-};
+        this.setTape(tape);
+    }
 
-/**
- Performs a clean draw of the tape with no animation
- */
-TapeView.prototype.drawTape = function drawTape() {
-    var MAX = this._MAX,
-        sw = this._sw;
+    /**
+     Performs a clean draw of the tape with no animation
+     */
+    drawTape() {
+        var MAX = this._MAX,
+            sw = this._sw;
 
-    this.tapeView.clear();
+        this.tapeView.clear();
 
-    for (var i = 0; i < this.tape.symbols.length && i < MAX; ++i) {
-        var curSym = this.tape.symbols[i];
-        this._appendSymbol(i, curSym);
+        for (var i = 0; i < this.tape.symbols.length && i < MAX; ++i) {
+            var curSym = this.tape.symbols[i];
+            this._appendSymbol(i, curSym);
+        }
+
+
+        for (var r = 1; r < this.rows; ++r) {
+            this.tapeView.line(0, r * this._sw, this.width, r * this._sw)
+                .addClass("tape-view-divider")
+                .attr({stroke: "#fff"});
+        }
+
+        this.tapeView.transform("");
+        this.tapeView.transform("t" + this.x + "," + this.y);
     }
 
 
-    for (var r = 1; r < this.rows; ++r) {
-        this.tapeView.line(0, r * this._sw, this.width, r * this._sw)
-            .addClass("tape-view-divider")
-            .attr({stroke: "#fff"});
+    _coordinateForIndex(index) {
+        var row = Math.floor(index / this._MAX_PER_ROW),
+            col = index % this._MAX_PER_ROW;
+
+        return {
+            x: col * this._sw + this._sw / 2,
+            y: row * this._sw + this._sw / 2
+        };
     }
 
-    this.tapeView.transform("");
-    this.tapeView.transform("t" + this.x + "," + this.y);
-};
+    _appendSymbol(index, symbol, offset, color) {
+        offset = offset || 0;
 
-TapeView.prototype._coordinateForIndex = function _coordinateForIndex(index) {
-    var row = Math.floor(index / this._MAX_PER_ROW),
-        col = index % this._MAX_PER_ROW;
+        var sw = this._sw,
+            length = this.tapeView.selectAll("circle").length,
+            coord = this._coordinateForIndex(index);
 
-    return {
-        x: col * this._sw + this._sw / 2,
-        y: row * this._sw + this._sw / 2
-    };
-};
+        var circle = this.tapeView.circle(coord.x + offset * sw, coord.y, sw/2 - 2);
 
-TapeView.prototype._appendSymbol = function(index, symbol, offset, color) {
-    offset = offset || 0;
-
-    var sw = this._sw,
-        length = this.tapeView.selectAll("circle").length,
-        coord = this._coordinateForIndex(index);
-
-    var circle = this.tapeView.circle(coord.x + offset * sw, coord.y, sw/2 - 2);
-
-    if (symbol === core.EMPTY) {
-        circle.attr({
-            stroke: "#111",
-            strokeWidth: 2,
-            fill: "#FFF"
-        });
-    } else {
-        if (color) {
+        if (symbol === core.EMPTY) {
             circle.attr({
+                stroke: "#111",
+                strokeWidth: 2,
                 fill: "#FFF"
             });
         } else {
-            circle.attr({
-                fill: colorForSymbol(symbol)
-            }).addClass(classForSymbol(symbol));
+            if (color) {
+                circle.attr({
+                    fill: "#FFF"
+                });
+            } else {
+                circle.attr({
+                    fill: colorForSymbol(symbol)
+                }).addClass(classForSymbol(symbol));
+            }
         }
+
+        return circle;
     }
 
-    return circle;
-};
+    animate(action) {
 
-TapeView.prototype.animate = function animate(action) {
+        var pop = function(head, callback) {
+            head.animate(
+                {opacity: 0},
+                100,
+                mina.linear,
+                function() {
+                    head.remove();
+                    if (callback)
+                        callback();
+                }
+            );
+        };
 
-    var pop = function(head, callback) {
-        head.animate(
-            {opacity: 0},
-            100,
-            mina.linear,
-            function() {
-                head.remove();
-                if (callback)
-                    callback();
+        var slide = (function() {
+            var sw = this._sw,
+                allSymbols = this.tapeView.selectAll("circle"),
+                length = allSymbols.length;
+
+            // Append symbol if necessary
+            if (length < this._MAX && this.tape.symbols.length > length) {
+                var c = this._appendSymbol(length, this.tape.symbols[length - 1], 1);
+                c.attr({opacity: 0});
             }
-        );
-    };
 
-    var slide = (function() {
-        var sw = this._sw,
-            allSymbols = this.tapeView.selectAll("circle"),
-            length = allSymbols.length;
-
-        // Append symbol if necessary
-        if (length < this._MAX && this.tape.symbols.length > length) {
-            var c = this._appendSymbol(length, this.tape.symbols[length - 1], 1);
-            c.attr({opacity: 0});
-        }
-
-        // Slide left
-        this.tapeView.selectAll("circle").animate(
-            {
-                cx: "-=" + sw,
-                opacity: 1
-            },
-            200,
-            mina.easeinout
-        );
-
-        // Iterate over all symbols that are the beginning of a row other than the first
-        for (var beginIndex = this._MAX_PER_ROW - 1;
-             beginIndex < length;
-             beginIndex += this._MAX_PER_ROW) {
-
-            var rowFront = allSymbols[beginIndex],
-                coord = this._coordinateForIndex(beginIndex);
-
-            rowFront.stop(); // cancel sliding animation
-
-            rowFront.animate(
+            // Slide left
+            this.tapeView.selectAll("circle").animate(
                 {
-                    cx: coord.x,
-                    cy: coord.y,
+                    cx: "-=" + sw,
                     opacity: 1
                 },
                 200,
-                mina.linear
-            );
-        }
-
-    }).bind(this);
-
-    if (action == "pop") {
-        // Dissolve first element, then slide left
-        var head = this.tapeView.selectAll("circle")[0];
-        pop(head, slide);
-
-    } else if (action == "append") {
-        // Append symbol if it will fit
-        var length = this.tapeView.selectAll("circle").length;
-        if (length < this._MAX && this.tape.symbols.length > length) {
-            var c = this._appendSymbol(length, this.tape.symbols[length], 0);
-            c.attr({opacity: 0});
-            c.animate(
-                {
-                    opacity: 1
-                },
-                50,
                 mina.easeinout
             );
+
+            // Iterate over all symbols that are the beginning of a row other than the first
+            for (var beginIndex = this._MAX_PER_ROW - 1;
+                 beginIndex < length;
+                 beginIndex += this._MAX_PER_ROW) {
+
+                var rowFront = allSymbols[beginIndex],
+                    coord = this._coordinateForIndex(beginIndex);
+
+                rowFront.stop(); // cancel sliding animation
+
+                rowFront.animate(
+                    {
+                        cx: coord.x,
+                        cy: coord.y,
+                        opacity: 1
+                    },
+                    200,
+                    mina.linear
+                );
+            }
+
+        }).bind(this);
+
+        if (action == "pop") {
+            // Dissolve first element, then slide left
+            var head = this.tapeView.selectAll("circle")[0];
+            pop(head, slide);
+
+        } else if (action == "append") {
+            // Append symbol if it will fit
+            var length = this.tapeView.selectAll("circle").length;
+            if (length < this._MAX && this.tape.symbols.length > length) {
+                var c = this._appendSymbol(length, this.tape.symbols[length], 0);
+                c.attr({opacity: 0});
+                c.animate(
+                    {
+                        opacity: 1
+                    },
+                    50,
+                    mina.easeinout
+                );
+            }
         }
     }
-};
 
-TapeView.prototype.setTape = function(newTape) {
-    if (this.tape) {
-        this.tape.changed.remove(this.animate);
+    setTape(newTape) {
+        if (this.tape) {
+            this.tape.changed.remove(this.animate);
+        }
+
+        this.tape = newTape;
+
+        if (newTape) {
+            // Register for tape's changed signal
+            newTape.changed.add(this.animate, this);
+        }
     }
 
-    this.tape = newTape;
+    remove() {
+        if (this.tape)
+            this.tape.changed.remove(this.animate);
+        this.tape = null;
 
-    if (newTape) {
-        // Register for tape's changed signal
-        newTape.changed.add(this.animate, this);
+        this.tapeView.remove();
     }
 };
 
-TapeView.prototype.remove = function() {
-    if (this.tape)
-        this.tape.changed.remove(this.animate);
-    this.tape = null;
-
-    this.tapeView.remove();
-};
-
-view.TapeView = TapeView;
-
-function colorForSymbol(symbol) {
+export function colorForSymbol(symbol) {
     if (symbol === core.RED) {
         return "#E10";
     } else if (symbol === core.BLUE) {
@@ -209,7 +206,7 @@ function colorForSymbol(symbol) {
     }
 }
 
-function classForSymbol(symbol) {
+export function classForSymbol(symbol) {
     if (symbol && symbol.symb && symbol.symbol != "empty") {
         if (symbol === core.RED) {
             return "symbol-red";
@@ -224,388 +221,385 @@ function classForSymbol(symbol) {
     return "";
 }
 
-view.colorForSymbol = colorForSymbol;
-
 /**
  GridView
 
  Draws a grid on the canvas
  */
-function GridView(paper, x, y, width, height, rows, cols) {
-    this.paper = paper;
-    this.grid = paper.g();
-    this.width = width;
-    this.height = height;
-    this.x = x;
-    this.y = y;
-    this.cols = cols;
-    this.rows = rows;
+export class GridView {
 
-    this.grid.click(this.onClick.bind(this));
-};
+    constructor(paper, x, y, width, height, rows, cols) {
+        this.paper = paper;
+        this.grid = paper.g();
+        this.width = width;
+        this.height = height;
+        this.x = x;
+        this.y = y;
+        this.cols = cols;
+        this.rows = rows;
 
-GridView.prototype.onClick = function onClick(evt, x, y) {
-    var cell = this.screenPointToCell(evt.clientX, evt.clientY);
+        this.grid.click(this.onClick.bind(this));
+    }
 
-    if (cell.x >= 0 && cell.x < this.cols &&
-        cell.y >= 0 && cell.y < this.rows) {
-        editor.trigger(editor.events.cellSelected, {cell: cell});
+    onClick(evt, x, y) {
+        var cell = this.screenPointToCell(evt.clientX, evt.clientY);
+
+        if (cell.x >= 0 && cell.x < this.cols &&
+            cell.y >= 0 && cell.y < this.rows) {
+            editor.trigger(editor.events.cellSelected, {cell: cell});
+        }
+    }
+
+    remove() {
+        this.grid.remove();
+    }
+
+    drawGrid() {
+        this.grid.clear();
+
+        var r = this.paper.rect(0,0, this.width, this.height);
+        r.attr({fill: "#FFF"});
+        r.addClass("grid-bg");
+        this.grid.append(r);
+
+        var sw = this.width / this.cols;
+        var sy = this.height / this.rows;
+
+        for (var x = 0; x <= this.cols; ++x) {
+            var l = this.grid.line(x*sw, 0, x*sw, this.height);
+            l.addClass("grid-line");
+        }
+
+        for (var y = 0; y <= this.rows; ++y) {
+            var l = this.grid.line(0, y*sy, this.width, y*sy);
+            l.addClass("grid-line");
+        }
+
+        this.grid.attr({stroke: "#888", strokeWidth: 1});
+
+        this.grid.transform("");
+        this.grid.transform("t1,1t" + this.x + "," + this.y);
+    }
+
+    /**
+     GridView.getCellMatrix(col, row, corner) -> Matrix
+
+     Returns local matrix describing location of cell
+
+     If corner == true, uses top left corner of cell
+
+     Otherwise, uses center of cell
+
+     */
+    getCellMatrix(col, row, corner) {
+        var mat = Snap.matrix(),
+            sw = this.width / this.cols,
+            sy = this.height / this.rows;
+
+        if (!corner) {
+            mat.translate(sw / 2, sy / 2);
+        }
+        mat.translate(sw * col, sy * row);
+
+        return mat;
+    }
+
+    /**
+     GridView.getGlobalCellMatrix(col, row, corner) -> Matrix
+
+     Returns global matrix describing location of cell
+
+     If corner == true, uses top left corner of cell
+
+     Otherwise, uses center of cell
+
+     */
+    getGlobalCellMatrix(col, row, corner) {
+
+        var transform = this.grid.transform();
+        var globalMatrix = transform.localMatrix.clone();
+
+        var sw = this.width / this.cols;
+        var sy = this.height / this.rows;
+
+        if (!corner) {
+            globalMatrix.translate(sw / 2, sy / 2);
+        }
+
+        globalMatrix.translate(sw * col, sy * row);
+
+        return globalMatrix;
+    }
+
+    screenPointToCell(x, y) {
+        var localPoint = graphics.screenPointToLocal(x, y, this.grid),
+            sw = this.width / this.cols,
+            sy = this.height / this.rows,
+            index_x = Math.floor(localPoint.x / sw),
+            index_y = Math.floor(localPoint.y / sy);
+
+        console.log("I think you want " + index_x + ", " + index_y);
+
+        return {x: index_x, y: index_y};
     }
 };
 
-GridView.prototype.remove = function remove() {
-    this.grid.remove();
-};
+export class ProgramView {
 
-GridView.prototype.drawGrid = function drawGrid() {
-    this.grid.clear();
+    constructor(paper, x, y, tileSize, program) {
+        this.paper = paper;
+        this.program = program;
+        this.tileSize = tileSize;
+        this.cells = paper.g().addClass("cells");
+        this.x = x;
+        this.y = y;
+        this.gridView = new GridView(paper, x, y,
+                                     program.cols*tileSize,
+                                     program.rows*tileSize,
+                                     program.rows, program.cols);
 
-    var r = this.paper.rect(0,0, this.width, this.height);
-    r.attr({fill: "#FFF"});
-    r.addClass("grid-bg");
-    this.grid.append(r);
+        this.width = this.gridView.width;
+        this.height = this.gridView.height;
 
-    var sw = this.width / this.cols;
-    var sy = this.height / this.rows;
+        this.gridView.drawGrid();
 
-    for (var x = 0; x <= this.cols; ++x) {
-        var l = this.grid.line(x*sw, 0, x*sw, this.height);
-        l.addClass("grid-line");
+        var binding = this.program.changed.add(this.updateCell);
+        binding.context = this;
     }
 
-    for (var y = 0; y <= this.rows; ++y) {
-        var l = this.grid.line(0, y*sy, this.width, y*sy);
-        l.addClass("grid-line");
+    setProgram(p) {
+        if (this.program)
+            this.program.changed.remove(this.drawProgram);
+
+        this.program = p;
+        this.gridView.remove();
+        this.gridView = new GridView(this.paper, this.x, this.y,
+                                     p.cols*this.tileSize,
+                                     p.rows*this.tileSize,
+                                     p.rows, p.cols);
+        this.gridView.drawGrid();
+        this.cells.clear();
     }
 
-    this.grid.attr({stroke: "#888", strokeWidth: 1});
+    updateCell(data) {
+        // coordinates of updated cell
+        var x = data.x,
+            y = data.y;
 
-    this.grid.transform("");
-    this.grid.transform("t1,1t" + this.x + "," + this.y);
-};
+        // remove old cells in the region and redraw each
+        for (var c_x = x - 1; c_x <= x + 1; ++c_x) {
+            for (var c_y = y - 1; c_y <= y + 1; ++c_y) {
+                if (c_x >= 0 && c_x < this.program.cols &&
+                    c_y >= 0 && c_y < this.program.rows) {
 
-/**
- GridView.getCellMatrix(col, row, corner) -> Matrix
+                    this.gridView.grid.selectAll("." + coordClass(c_x, c_y))
+                        .forEach((el) => el.remove());
 
- Returns local matrix describing location of cell
+                    this.drawTile(this.program.getCell(c_x, c_y), c_x, c_y);
+                }
+            }
+        }
 
- If corner == true, uses top left corner of cell
-
- Otherwise, uses center of cell
-
- */
-GridView.prototype.getCellMatrix = function getCellMatrix(col, row, corner) {
-    var mat = Snap.matrix(),
-        sw = this.width / this.cols,
-        sy = this.height / this.rows;
-
-    if (!corner) {
-        mat.translate(sw / 2, sy / 2);
-    }
-    mat.translate(sw * col, sy * row);
-
-    return mat;
-};
-
-/**
- GridView.getGlobalCellMatrix(col, row, corner) -> Matrix
-
- Returns global matrix describing location of cell
-
- If corner == true, uses top left corner of cell
-
- Otherwise, uses center of cell
-
- */
-GridView.prototype.getGlobalCellMatrix = function getGlobalCellMatrix(col, row, corner) {
-
-    var transform = this.grid.transform();
-    var globalMatrix = transform.localMatrix.clone();
-
-    var sw = this.width / this.cols;
-    var sy = this.height / this.rows;
-
-    if (!corner) {
-        globalMatrix.translate(sw / 2, sy / 2);
     }
 
-    globalMatrix.translate(sw * col, sy * row);
+    drawTile(cell, x, y) {
+        var c = cell,
+            paper = this.paper,
+            grid = this.gridView;
 
-    return globalMatrix;
-};
+        console.log("draw");
 
+        if (c.type != "Empty") {
+            var container;
+            if (c.type == "Conveyor") {
+                container = this.drawConveyor(c, x, y);
+            } else if (c.type.startsWith("Write")) {
+                container = this.drawWriter(c, x, y);
+            } else {
+                var image = graphics.getGraphic(c.type);
 
-GridView.prototype.screenPointToCell = function screenPointToCell(x, y) {
-    var localPoint = graphics.screenPointToLocal(x, y, this.grid),
-        sw = this.width / this.cols,
-        sy = this.height / this.rows,
-        index_x = Math.floor(localPoint.x / sw),
-        index_y = Math.floor(localPoint.y / sy);
+                if (image) {
 
-    console.log("I think you want " + index_x + ", " + index_y);
+                    paper.append(image);
 
-    return {x: index_x, y: index_y};
-};
+                    var group = paper.g(image);
+                    this.cells.append(group);
 
-view.GridView = GridView;
+                    var corner = grid.getCellMatrix(x, y, true)
+                            .toTransformString()
+                            .toUpperCase();
 
+                    var o = c.orientation;
 
-function ProgramView(paper, x, y, tileSize, program) {
-    this.paper = paper;
-    this.program = program;
-    this.tileSize = tileSize;
-    this.cells = paper.g().addClass("cells");
-    this.x = x;
-    this.y = y;
-    this.gridView = new GridView(paper, x, y,
-                                 program.cols*tileSize,
-                                 program.rows*tileSize,
-                                 program.rows, program.cols);
+                    var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
+                    var tstring = toTransformString(transform);
 
-    this.width = this.gridView.width;
-    this.height = this.gridView.height;
+                    group.transform(
+                        tstring + corner
+                    );
 
-    this.gridView.drawGrid();
+                    container = group;
+                }
+            }
+            if (container) {
+                container.selectAll("*").forEach((el) => {
+                    el.data("tileInfo", {
+                        cell: c,
+                        x: x,
+                        y: y,
+                        program: this.program
+                    }).addClass("tile-part");
+                });
 
-    var binding = this.program.changed.add(this.updateCell);
-    binding.context = this;
-}
+                container.addClass(coordClass(x, y));
 
-ProgramView.prototype.setProgram = function setProgram(p) {
-    if (this.program)
-        this.program.changed.remove(this.drawProgram);
-
-    this.program = p;
-    this.gridView.remove();
-    this.gridView = new GridView(this.paper, this.x, this.y,
-                                 p.cols*this.tileSize,
-                                 p.rows*this.tileSize,
-                                 p.rows, p.cols);
-    this.gridView.drawGrid();
-    this.cells.clear();
-};
-
-ProgramView.prototype.updateCell = function(data) {
-    // coordinates of updated cell
-    var x = data.x,
-        y = data.y;
-
-    // remove old cells in the region and redraw each
-    for (var c_x = x - 1; c_x <= x + 1; ++c_x) {
-        for (var c_y = y - 1; c_y <= y + 1; ++c_y) {
-            if (c_x >= 0 && c_x < this.program.cols &&
-                c_y >= 0 && c_y < this.program.rows) {
-
-                this.gridView.grid.selectAll("." + coordClass(c_x, c_y))
-                    .forEach((el) => el.remove());
-
-                this.drawTile(this.program.getCell(c_x, c_y), c_x, c_y);
             }
         }
     }
 
-};
 
-ProgramView.prototype.drawTile = function(cell, x, y) {
-    var c = cell,
-        paper = this.paper,
-        grid = this.gridView;
+    drawProgram() {
+        var paper = this.paper,
+            grid = this.gridView,
+            program = this.program;
 
-    console.log("draw");
+        this.cells.clear();
+        this.cells.appendTo(this.gridView.grid);
 
-    if (c.type != "Empty") {
-        var container;
-        if (c.type == "Conveyor") {
-            container = this.drawConveyor(c, x, y);
-        } else if (c.type.startsWith("Write")) {
-            container = this.drawWriter(c, x, y);
+        for (var x = 0; x < program.cols; ++x) {
+            for (var y = 0; y < program.rows; ++y) {
+                var c = program.getCell(x, y);
+                this.drawTile(c, x, y);
+            }
+        }
+    }
+
+    drawConveyor(cell, x, y) {
+        var neighbors = getNeighbors(this.program, cell, x, y),
+
+            target = {cell: cell, position: new tmath.Vec2(x, y)},
+
+            hasLeft = neighbors.left.cell != null ? isPointingTo(neighbors.left, target) : false,
+
+            hasRight = neighbors.right.cell != null ? isPointingTo(neighbors.right, target) : false,
+
+            hasDown = neighbors.down.cell != null ? isPointingTo(neighbors.down, target) : false,
+
+            image = null,
+
+            mirror = false;
+
+        if (!hasLeft && !hasRight) {
+
+            image = "Conveyor";
+
+        } else if (!hasLeft && hasRight ||
+                   hasLeft && !hasRight) {
+
+            image = hasDown ? "ConveyorTeeTwo" : "ConveyorElbow";
+
+            mirror = hasLeft;
+
+        } else if (!hasDown && hasLeft && hasRight) {
+
+            image = "ConveyorTee";
+
         } else {
-            var image = graphics.getGraphic(c.type);
 
-            if (image) {
+            image = "ConveyorEx";
 
-                paper.append(image);
+        }
 
-                var group = paper.g(image);
-                this.cells.append(group);
+        image = graphics.getGraphic(image);
 
-                var corner = grid.getCellMatrix(x, y, true)
-                        .toTransformString()
-                        .toUpperCase();
+        if (image) {
 
-                var o = c.orientation;
+            this.paper.append(image);
 
-                var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
-                var tstring = view.toTransformString(transform);
+            var group = this.paper.g(image);
+            this.cells.append(group);
 
-                group.transform(
-                    tstring + corner
-                );
+            var corner = this.gridView.getCellMatrix(x, y, true)
+                    .toTransformString()
+                    .toUpperCase();
 
-                container = group;
+            var o = cell.orientation;
+
+            if (mirror) {
+                o = tmath.Mat2x2.kMIR.compose(o);
             }
-        }
-        if (container) {
-            container.selectAll("*").forEach((el) => {
-                el.data("tileInfo", {
-                    cell: c,
-                    x: x,
-                    y: y,
-                    program: this.program
-                }).addClass("tile-part");
-            });
 
-            container.addClass(coordClass(x, y));
+            var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
+            var tstring = toTransformString(transform);
 
+            group.transform(
+                tstring + corner
+            );
+
+            return group;
         }
+
+        return null;
+
     }
-};
 
-function coordClass(x, y) {
-    return "cell-x" + x + "-y" + y;
+    drawWriter(cell, x, y) {
+        var neighbors = getNeighbors(this.program, cell, x, y),
+
+            target = {cell: cell, position: new tmath.Vec2(x, y)},
+
+            hasLeft = neighbors.left.cell != null ? isPointingTo(neighbors.left, target) : false,
+
+            hasRight = neighbors.right.cell != null ? isPointingTo(neighbors.right, target) : false,
+
+            image = null,
+
+            leftConnector = null,
+
+            rightConnector = null;
+
+        image = graphics.getGraphic(cell.type);
+
+        if (image) {
+
+            this.paper.append(image);
+
+            var group = this.paper.g(image);
+            this.cells.append(group);
+
+            if (hasRight) {
+                rightConnector = graphics.getGraphic("WriterConnector");
+                group.append(rightConnector);
+            }
+
+            if (hasLeft) {
+                leftConnector = group.g(graphics.getGraphic("WriterConnector"));
+                group.append(leftConnector);
+                var rot = tmath.Mat2x2.kROT2,
+                    m = Snap.matrix(rot.a, rot.b, rot.c, rot.d, 0, 0);
+                leftConnector.transform(toTransformString(m));
+            }
+
+            var corner = this.gridView.getCellMatrix(x, y, true)
+                    .toTransformString()
+                    .toUpperCase();
+
+            var o = cell.orientation;
+
+            var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
+            var tstring = toTransformString(transform);
+
+            group.transform(
+                tstring + corner
+            );
+
+            return group;
+        }
+
+        return null;
+
+    }
 }
-
-ProgramView.prototype.drawProgram = function drawProgram() {
-    var paper = this.paper,
-        grid = this.gridView,
-        program = this.program;
-
-    this.cells.clear();
-    this.cells.appendTo(this.gridView.grid);
-
-    for (var x = 0; x < program.cols; ++x) {
-        for (var y = 0; y < program.rows; ++y) {
-            var c = program.getCell(x, y);
-            this.drawTile(c, x, y);
-        }
-    }
-};
-
-ProgramView.prototype.drawConveyor = function drawConveyor(cell, x, y) {
-    var neighbors = getNeighbors(this.program, cell, x, y),
-
-        target = {cell: cell, position: new tmath.Vec2(x, y)},
-
-        hasLeft = neighbors.left.cell != null ? isPointingTo(neighbors.left, target) : false,
-
-        hasRight = neighbors.right.cell != null ? isPointingTo(neighbors.right, target) : false,
-
-        hasDown = neighbors.down.cell != null ? isPointingTo(neighbors.down, target) : false,
-
-        image = null,
-
-        mirror = false;
-
-    if (!hasLeft && !hasRight) {
-
-        image = "Conveyor";
-
-    } else if (!hasLeft && hasRight ||
-               hasLeft && !hasRight) {
-
-        image = hasDown ? "ConveyorTeeTwo" : "ConveyorElbow";
-
-        mirror = hasLeft;
-
-    } else if (!hasDown && hasLeft && hasRight) {
-
-        image = "ConveyorTee";
-
-    } else {
-
-        image = "ConveyorEx";
-
-    }
-
-    image = graphics.getGraphic(image);
-
-    if (image) {
-
-        this.paper.append(image);
-
-        var group = this.paper.g(image);
-        this.cells.append(group);
-
-        var corner = this.gridView.getCellMatrix(x, y, true)
-                .toTransformString()
-                .toUpperCase();
-
-        var o = cell.orientation;
-
-        if (mirror) {
-            o = tmath.Mat2x2.kMIR.compose(o);
-        }
-
-        var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
-        var tstring = view.toTransformString(transform);
-
-        group.transform(
-            tstring + corner
-        );
-
-        return group;
-    }
-
-    return null;
-
-};
-
-ProgramView.prototype.drawWriter = function drawWriter(cell, x, y) {
-    var neighbors = getNeighbors(this.program, cell, x, y),
-
-        target = {cell: cell, position: new tmath.Vec2(x, y)},
-
-        hasLeft = neighbors.left.cell != null ? isPointingTo(neighbors.left, target) : false,
-
-        hasRight = neighbors.right.cell != null ? isPointingTo(neighbors.right, target) : false,
-
-        image = null,
-
-        leftConnector = null,
-
-        rightConnector = null;
-
-    image = graphics.getGraphic(cell.type);
-
-    if (image) {
-
-        this.paper.append(image);
-
-        var group = this.paper.g(image);
-        this.cells.append(group);
-
-        if (hasRight) {
-            rightConnector = graphics.getGraphic("WriterConnector");
-            group.append(rightConnector);
-        }
-
-        if (hasLeft) {
-            leftConnector = group.g(graphics.getGraphic("WriterConnector"));
-            group.append(leftConnector);
-            var rot = tmath.Mat2x2.kROT2,
-                m = Snap.matrix(rot.a, rot.b, rot.c, rot.d, 0, 0);
-            leftConnector.transform(view.toTransformString(m));
-        }
-
-        var corner = this.gridView.getCellMatrix(x, y, true)
-                .toTransformString()
-                .toUpperCase();
-
-        var o = cell.orientation;
-
-        var transform = Snap.matrix(o.a, o.b, o.c, o.d, 0, 0);
-        var tstring = view.toTransformString(transform);
-
-        group.transform(
-            tstring + corner
-        );
-
-        return group;
-    }
-
-    return null;
-
-};
 
 function getNeighbors(prog, cell, x, y) {
     var o = cell.orientation,
@@ -681,142 +675,144 @@ function cellToGlobal(d, orientation) {
     return orientation.invert().apply(d);
 }
 
-view.ProgramView = ProgramView;
 
-
-
-function Palette(paper, x, y, max_width, columns, margin) {
-    this.paper = paper;
-    this.x = x;
-    this.y = y;
-    this.columns = columns > 0 ? columns : 1; // negative columns?
-    this.columnWidth = 56;
-    this.tiles = paper.g();
-    this.maxWidth = max_width;
-    this.margin = margin || 20;
-    this.tileWidth = 56; // tiles are 56 x 56 px
-
-    // Get names of all types to draw
-    this.typesToDraw = Object.keys(codeCell.codeCells);
-
-    var actualColumns = this.columns <= this.typesToDraw.length ?
-            this.columns :
-            this.typesToDraw.length;
-
-    this.baseWidth = actualColumns * (this.tileWidth + this.margin) - this.margin;
-
-    this.width = this.baseWidth * this.getScale();
-
-    this.tiles.transform(Snap.matrix().translate(x, y));
-    this.drawPalette();
-
-    this._events = {
-        hotKey: (data) => this.hotKey(data)
-    };
-
-    editor.registerEvents(this._events);
+function coordClass(x, y) {
+    return "cell-x" + x + "-y" + y;
 }
 
-Palette.prototype.hotKey = function hotKey(data) {
-    var num = parseInt(data.key);
-    if (!isNaN(num) && num > 0 && num <= this.typesToDraw.length) {
-        editor.trigger(
-            editor.events.tileSelected,
-            {
-                tile: this.typesToDraw[num - 1],
-                x: data.x,
-                y: data.y
-            }
-        );
+
+export class Palette {
+
+    constructor(paper, x, y, max_width, columns, margin) {
+        this.paper = paper;
+        this.x = x;
+        this.y = y;
+        this.columns = columns > 0 ? columns : 1; // negative columns?
+        this.columnWidth = 56;
+        this.tiles = paper.g();
+        this.maxWidth = max_width;
+        this.margin = margin || 20;
+        this.tileWidth = 56; // tiles are 56 x 56 px
+
+        // Get names of all types to draw
+        this.typesToDraw = Object.keys(codeCell.codeCells);
+
+        var actualColumns = this.columns <= this.typesToDraw.length ?
+                this.columns :
+                this.typesToDraw.length;
+
+        this.baseWidth = actualColumns * (this.tileWidth + this.margin) - this.margin;
+
+        this.width = this.baseWidth * this.getScale();
+
+        this.tiles.transform(Snap.matrix().translate(x, y));
+        this.drawPalette();
+
+        this._events = {
+            hotKey: (data) => this.hotKey(data)
+        };
+
+        editor.registerEvents(this._events);
     }
-};
 
-Palette.prototype.show = function show(shouldShow) {
-    shouldShow = shouldShow !== undefined ? shouldShow : true;
-    this.tiles.attr({
-        opacity: shouldShow ? 1 : 0
-    });
-};
+    hotKey(data) {
+        var num = parseInt(data.key);
+        if (!isNaN(num) && num > 0 && num <= this.typesToDraw.length) {
+            editor.trigger(
+                editor.events.tileSelected,
+                {
+                    tile: this.typesToDraw[num - 1],
+                    x: data.x,
+                    y: data.y
+                }
+            );
+        }
+    }
 
-Palette.prototype.getScale = function getScale() {
-    if (this.baseWidth <= this.maxWidth)
-        return 1.0; // no scaling required
-    else
-        return this.maxWidth / this.baseWidth;
-};
+    show(shouldShow) {
+        shouldShow = shouldShow !== undefined ? shouldShow : true;
+        this.tiles.attr({
+            opacity: shouldShow ? 1 : 0
+        });
+    }
 
-Palette.prototype.drawPalette = function drawPalette() {
-    this.tiles.clear();
+    getScale() {
+        if (this.baseWidth <= this.maxWidth)
+            return 1.0; // no scaling required
+        else
+            return this.maxWidth / this.baseWidth;
+    }
 
-    var scale_x = this.getScale();
+    drawPalette() {
+        this.tiles.clear();
 
-    var height = 56 + 20; // 56 pixel tile + 10 pixel text + 10 pixel padding
-    var width = 56 + 20;
-    var cellImages = this.typesToDraw.map(function(name) {
-        var image = this.paper.g(graphics.getGraphic(name));
-        if (image != null) return {name:name, image:image};
-        else return undefined;
+        var scale_x = this.getScale();
 
-    }.bind(this)).filter(_.negate(_.isUndefined));
+        var height = 56 + 20; // 56 pixel tile + 10 pixel text + 10 pixel padding
+        var width = 56 + 20;
+        var cellImages = this.typesToDraw.map(function(name) {
+            var image = this.paper.g(graphics.getGraphic(name));
+            if (image != null) return {name:name, image:image};
+            else return undefined;
 
-    cellImages.map(function(image, index){
+        }.bind(this)).filter(_.negate(_.isUndefined));
 
-        var group = this.tiles.g(),
-            x_index = index % this.columns,
-            y_index = Math.floor(index / this.columns),
-            transform = Snap.matrix().scale(scale_x).translate(x_index * width, y_index * height);
+        cellImages.map(function(image, index){
 
-        group.click(
-            (evt, x, y) => {
-                editor.trigger(
-                    editor.events.tileSelected,
-                    {
-                        tile: image.name,
-                        event: evt,
-                        x: x,
-                        y: y
-                    }
-                );
-            });
+            var group = this.tiles.g(),
+                x_index = index % this.columns,
+                y_index = Math.floor(index / this.columns),
+                transform = Snap.matrix().scale(scale_x).translate(x_index * width, y_index * height);
 
-        group.transform(transform.toTransformString());
+            group.click(
+                (evt, x, y) => {
+                    editor.trigger(
+                        editor.events.tileSelected,
+                        {
+                            tile: image.name,
+                            event: evt,
+                            x: x,
+                            y: y
+                        }
+                    );
+                });
 
-        var r = group.rect(-1, -1, 58, 58);
-        r.attr({
-            stroke: "#111",
-            fill: "#fff",
-            strokeWidth: 2
-        }).addClass("palette-tile-bg");
+            group.transform(transform.toTransformString());
 
-        image.image.addClass("palette-tile");
-        group.append(image.image);
+            var r = group.rect(-1, -1, 58, 58);
+            r.attr({
+                stroke: "#111",
+                fill: "#fff",
+                strokeWidth: 2
+            }).addClass("palette-tile-bg");
 
-
-
-        var label = group.text(56/2, height - 8, image.name);
-        label.attr({
-            fontFamily: "monospace",
-            fontSize: 10,
-            textAnchor: "middle",
-            text: index + 1
-        }).addClass("label-text");
-
-        var title = Snap.parse('<title>'+image.name+'</title>');
-
-        group.append(title);
+            image.image.addClass("palette-tile");
+            group.append(image.image);
 
 
-    }, this);
-};
 
-view.Palette = Palette;
+            var label = group.text(56/2, height - 8, image.name);
+            label.attr({
+                fontFamily: "monospace",
+                fontSize: 10,
+                textAnchor: "middle",
+                text: index + 1
+            }).addClass("label-text");
 
+            var title = Snap.parse('<title>'+image.name+'</title>');
+
+            group.append(title);
+
+
+        }, this);
+    }
+}
 
 
 /**
  Utility function that converts a Snap.Matrix to a Snap transform string
  */
-view.toTransformString = function (matrix) {
+export function toTransformString(matrix) {
     var E = "";
     var s = matrix.split();
     if (!+s.shear.toFixed(9)) {
