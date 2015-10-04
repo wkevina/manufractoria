@@ -28,7 +28,8 @@ var dir = {
     imgOut: './dist/img/',
     css: './css/*',
     cssOut: './dist/css',
-    build: './dist'
+    build: './dist',
+    ignore: '!**/#*'
 };
 
 var staticCopyTasks = [];
@@ -68,8 +69,14 @@ gulp.task('compileApp', function() {
         .pipe(gulp.dest(dir.build));
 });
 
-gulp.task('watch', function() {
-    return gulp.watch([dir.source, dir.lib, dir.index], ['build-dev']);
+gulp.task('watchJS', function() {
+    // return gulp.watch([dir.source, dir.lib, dir.index], ['build-dev']);
+    return gulp.watch([dir.ignore, dir.source], ['build-dev']);
+});
+
+gulp.task('watchStatic', function() {
+    // return gulp.watch([dir.source, dir.lib, dir.index], ['build-dev']);
+    return gulp.watch([dir.ignore, dir.lib, dir.index, dir.css], ['copy-static']);
 });
 
 gulp.task('connect', function() {
@@ -92,5 +99,5 @@ gulp.task('export', ['build-dev'], function() {
 });
 
 gulp.task('default', function(cb) {
-    runSeq('build-dev', ['watch', 'connect'], cb);
+    runSeq('build-dev', ['watchJS', 'watchStatic', 'connect'], cb);
 });
