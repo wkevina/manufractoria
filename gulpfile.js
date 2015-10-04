@@ -85,6 +85,12 @@ gulp.task('build-dev', function(cb) {
     runSeq('clean-build', 'copy-static', ['compileApp'], cb);
 });
 
+/* Build and copy files to outside directory */
+gulp.task('export', ['build-dev'], function() {
+    gulp.src(dir.build + '/**/*')
+        .pipe(gulp.dest('../manufractoria-build'));
+});
+
 gulp.task('default', function(cb) {
     runSeq('build-dev', ['watch', 'connect'], cb);
 });
