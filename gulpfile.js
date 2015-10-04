@@ -64,7 +64,7 @@ gulp.task('compileApp', function() {
 	.pipe(plumber())
 	.pipe(sourceMaps.init())
 	.pipe(babel(babelOptions))
-    //.pipe(concat('all.js'))
+        .pipe(concat('all.js'))
 	.pipe(sourceMaps.write('.', {sourceMappingURLPrefix: ''}))
         .pipe(gulp.dest(dir.build));
 });
