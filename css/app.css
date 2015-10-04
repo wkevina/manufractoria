@@ -49,17 +49,40 @@ ul.controls-desc li {
     stroke-width: 1px;
 }
 
-@media only screen and (min-width: 680px) {
+.game-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+@media only screen and (min-aspect-ratio: 748/524) {
     .game-container {
-        width: 680px;
+        /* width: unset; */
+    }
+    .game-container svg {
+        height: 100vh;
+
     }
 }
 
-@media only screen and (max-width: 679px) {
-    .game-container {
-        width: 100%;
+@media only screen and (max-aspect-ratio: 747/524) {
+
+    @media only screen and (min-width: 1000px) {
+        .game-container {
+            width: 1000px;
+        }
     }
 
+    @media only screen and (max-width: 999px) {
+        .game-container {
+            width: 100%;
+        }
+    }
+}
+
+
+
+@media only screen and (max-width: 999px) {
     #controls button {
         font-size: 24px;
         padding: 5px 22px;
