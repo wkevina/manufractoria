@@ -294,7 +294,7 @@ class Editor {
     onMirror (data) {
         if (this.state == PLACING) {
             this.tileControl.onMirror();
-        } else if (this.state == IDLE) {
+        } else if (this.state == IDLE && data && data.x && data.y) {
             // see if we are hovering over the programview
             var el = Snap.getElementByPoint(data.x, data.y);
             var info = el.data("tileInfo");
