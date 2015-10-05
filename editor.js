@@ -130,8 +130,8 @@ function trackMouse(evt) {
 var IDLE = Symbol("IDLE"),
     PLACING = Symbol("PLACING");
 
-var cycleOrientation = (function() {
-    var os = ["UP",
+function cycleGenerator() {
+    let os = ["UP",
               "RIGHT",
               "DOWN",
               "LEFT"];
@@ -140,12 +140,16 @@ var cycleOrientation = (function() {
         if (!current)
             current = "LEFT";
 
-        var index = (os.indexOf(current) + 1) % os.length,
+        let index = (os.indexOf(current) + 1) % os.length,
             oName = os[index];
 
         return oName;
     };
-})();
+};
+
+editor.cycleGenerator = cycleGenerator;
+
+let cycleOrientation = cycleGenerator();
 
 class Editor {
     constructor(paper, programView) {
@@ -370,6 +374,8 @@ function orientationByName(dir, mirror) {
 
     return mirror ? mirrored[dir] : regular[dir];
 }
+
+editor.orientationByName = orientationByName;
 
 function isMirrored(orientation) {
     var m = tmath.Mat2x2,

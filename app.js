@@ -7,7 +7,7 @@ import tmath from "tmath";
 import loader from "loader";
 import editor from "editor";
 import core from "core";
-import {Palette} from "gui";
+import {Palette, TileControl} from "gui";
 
 function App(width, height) {
     this.program = null;
@@ -165,10 +165,18 @@ App.prototype.main = function() {
         );
 
         this.palette = new Palette(paper,
-                                        this.programView.width + this.programView.x + 10,
-                                        this.canvasSize.height / 2,
-                                        this.canvasSize.width - this.programView.width - 20,
-                                        3);
+                                   this.programView.width + this.programView.x + 10,
+                                   this.canvasSize.height / 2,
+                                   this.canvasSize.width - this.programView.width - 20,
+                                   3);
+
+        this.tileController = new TileControl(
+            paper,
+            this.programView.width + this.programView.x + 10, // x
+            this.programView.y, // y
+            this.canvasSize.width - this.programView.width - 30, // width
+            0 // height
+        );
 
         this.editor = new editor.Editor(paper, this.programView);
 
