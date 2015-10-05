@@ -238,8 +238,8 @@ class Editor {
                                                  data.cell.y,
                                                  this.tileControl.currentTile,
                                                  orientationByName(
-                                                     this.currentOrientation,
-                                                     this.mirror)
+                                                     this.tileControl.currentOrientation,
+                                                     this.tileControl.mirror)
                                                 );
             }
         }
