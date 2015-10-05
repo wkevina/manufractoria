@@ -204,6 +204,8 @@ class Editor {
 
     onTileSelected (data) {
         this.state = PLACING;
+
+        this.tileControl.onTileSelected(data.tile);
         //this.currentTile = data.tile;
 
         // if (this.tileCursor != null)
@@ -246,11 +248,9 @@ class Editor {
     }
 
     onRotateCell (data) {
-        // if (this.state == PLACING) {
-//             this.currentOrientation = cycleOrientation(this.currentOrientation);
-//             this.move(data, data.x, data.y);
-//         } else
-        if (this.state == IDLE) {
+        if (this.state == PLACING) {
+            this.tileControl.onRotate();
+        } else if (this.state == IDLE) {
             // see if we are hovering over the programview
             var el = Snap.getElementByPoint(data.x, data.y);
             var info = el.data("tileInfo");
@@ -269,18 +269,9 @@ class Editor {
     }
 
     onSetDirection (data) {
-        // var dir = data.dir;
-        // if (this.state == PLACING) {
-        //     var mir = this.mirror,
-        //         m = tmath.Mat2x2,
-        //         o = orientationByName(dir, mir);
-
-        //     if (o && o !== this.currentOrientation) {
-        //         this.currentOrientation = dir;
-        //         this.move(data, data.x, data.y);
-        //     }
-        // } else
-        if (this.state == IDLE) {
+        if (this.state == PLACING) {
+            this.tileControl.onSetDirection(data.dir);
+        } else if (this.state == IDLE) {
             // see if we are hovering over the programview
             var el = Snap.getElementByPoint(data.x, data.y);
             var info = el.data("tileInfo");
@@ -301,11 +292,9 @@ class Editor {
     }
 
     onMirror (data) {
-        // if (this.state == PLACING) {
-        //     this.mirror = !this.mirror;
-        //     this.move(data, data.x, data.y);
-        // } else
-        if (this.state == IDLE) {
+        if (this.state == PLACING) {
+            this.tileControl.onMirror();
+        } else if (this.state == IDLE) {
             // see if we are hovering over the programview
             var el = Snap.getElementByPoint(data.x, data.y);
             var info = el.data("tileInfo");
@@ -334,14 +323,6 @@ class Editor {
     }
 
     onDelete(data) {
-        // if (this.state == PLACING && this.tileCursor) {
-
-        //     this.clearCursor();
-        //     // Reset orientation for next time
-        //     this.currentOrientation = "UP";
-        //     this.mirror = false;
-
-        // } else
          if (this.state == PLACING) {
              // Reset orientation for next time
              this.tileControl.clear();

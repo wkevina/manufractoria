@@ -176,16 +176,16 @@ export class TileControl {
 
         bt(up, "UP"); bt(right, "RIGHT"); bt(down, "DOWN"); bt(left, "LEFT");
 
-        this._events = {
-            tileSelected: (data) => this.onTileSelected(data.tile),
-            // cellSelected: (data) => this.onCellSelected(data),
-            rotate: (data) => this.onRotate(),
-            mirror: (data) => this.onMirror(),
-            setDirection: (data) => this.onSetDirection(data.dir)
-            // delete: (data) => this.onDelete(data)
-        };
+        // this._events = {
+        //     tileSelected: (data) => this.onTileSelected(data.tile),
+        //     // cellSelected: (data) => this.onCellSelected(data),
+        //     rotate: (data) => this.onRotate(),
+        //     mirror: (data) => this.onMirror(),
+        //     setDirection: (data) => this.onSetDirection(data.dir)
+        //     // delete: (data) => this.onDelete(data)
+        // };
 
-        editor.registerEvents(this._events);
+        // editor.registerEvents(this._events);
     }
 
     _makeButton(x, y, angle=0) {
