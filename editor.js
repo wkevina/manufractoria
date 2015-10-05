@@ -271,7 +271,7 @@ class Editor {
     onSetDirection (data) {
         if (this.state == PLACING) {
             this.tileControl.onSetDirection(data.dir);
-        } else if (this.state == IDLE) {
+        } else if (this.state == IDLE && data && data.x && data.y) {
             // see if we are hovering over the programview
             var el = Snap.getElementByPoint(data.x, data.y);
             var info = el.data("tileInfo");
@@ -326,14 +326,17 @@ class Editor {
          if (this.state == PLACING) {
              // Reset orientation for next time
              this.tileControl.clear();
-        } else if (this.state == IDLE) {
+             this.state = IDLE;
+        } else if (this.state == IDLE && data && data.x && data.y) {
             // see if we are hovering over the programview
-            var el = Snap.getElementByPoint(data.x, data.y);
-            var info = el.data("tileInfo");
+
+            let el = Snap.getElementByPoint(data.x, data.y),
+
+                info = el.data("tileInfo");
 
             if (el && info) {
                 // Now have reference to cell
-                var p = info.program,
+                let p = info.program,
                     type = info.cell.type,
                     x = info.x,
                     y = info.y;
