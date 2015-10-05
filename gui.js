@@ -158,6 +158,14 @@ export class TileControl {
         this.layer = this._layer.g();
         this.tileLayer = this.layer.g();
 
+        this.tileLayer.transform("T20,20");
+
+        this.tileLayer.click(
+            (evt)=> {
+                this.onRotate();
+                evt.preventDefault();
+            });
+
         this._layer.transform("T"+x+","+y);
         this.calculateScale();
 
@@ -263,7 +271,7 @@ export class TileControl {
                     Snap.matrix(o.a, o.b, o.c, o.d, 0, 0)
                 );
 
-            this.currentGraphic.transform(rotate + "T20,20");
+            this.currentGraphic.transform(rotate + "S" + 40/56);
         }
     }
 
