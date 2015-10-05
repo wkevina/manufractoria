@@ -16,6 +16,23 @@
     <script type="text/javascript" src="libs/browser-polyfill.min.js"></script>
     <script type="text/javascript" src="libs/system.js"></script>
     <script src="js/vendor/modernizr.js"></script>
+    <script type="text/javascript" src="js/vendor/fastclick.js"></script>
+    <script type="text/javascript">
+     if ('addEventListener' in document) {
+
+         document.addEventListener('DOMContentLoaded',
+                                     function() {
+
+                                         FastClick.attach(document.body);
+
+                                         var allSvg = document.querySelectorAll("svg");
+                                         Array.prototype.forEach.call(allSvg, function(svg) {
+                                             FastClick.attach(svg);
+                                         })
+                                         }, false);
+
+     }
+    </script>
     <script type="text/javascript" src="libs/Snap.svg-0.4.1/dist/snap.svg.js"></script>
     <script type="text/javascript" src="libs/underscore.min.js"></script>
     <script type="text/javascript" src="libs/js-signals/dist/signals.min.js"></script>
