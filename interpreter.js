@@ -35,8 +35,8 @@ class Interpreter {
         this.cycles = 0;
 
         // Go to the start
-        for (let x of this.program.cols) {
-            for (let y of this.program.rows) {
+        for (let x of _.range(this.program.cols)) {
+            for (let y of _.range(this.program.rows)) {
                 if (this.program.getCell(x, y).type == "Start") {
                     this.position.x = x;
                     this.position.y = y;
