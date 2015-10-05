@@ -9,6 +9,11 @@ import editor from "editor";
 import core from "core";
 import {Palette, TileControl} from "gui";
 
+const MARGIN = 10, // Space between elements
+      PROGRAM_WIDTH = 56 * 9, // program view width, not to exceed
+      PROGRAM_HEIGHT = PROGRAM_WIDTH,
+      CONTROL_X = MARGIN + PROGRAM_WIDTH + MARGIN;
+
 function App(width, height) {
     this.program = null;
     this.programView = null;
@@ -165,16 +170,16 @@ App.prototype.main = function() {
         );
 
         this.palette = new Palette(paper,
-                                   this.programView.width + this.programView.x + 10,
-                                   this.canvasSize.height / 2,
-                                   this.canvasSize.width - this.programView.width - 20,
-                                   3);
+                                   CONTROL_X,
+                                   this.canvasSize.height * 2 / 3 + 5,
+                                   this.canvasSize.width - CONTROL_X - 10,
+                                   5);
 
         this.tileControl = new TileControl(
             paper,
-            this.programView.width + this.programView.x + 10, // x
-            this.programView.y, // y
-            this.canvasSize.width - this.programView.width - 30, // width
+            CONTROL_X, // x
+            MARGIN, // y
+            (this.canvasSize.width - CONTROL_X) / 2 - MARGIN/2, // width
             0 // height
         );
 

@@ -9,7 +9,13 @@ System.config({
 window.addEventListener("load", function() {
     console.log("Loading");
     System.import('app').then(function(App) {
-        var app = new App.default(748, 524);
+        var vertical_resolution = 524,
+
+            aspect_ratio = 1.775,
+
+            horizontal_resolution = vertical_resolution * aspect_ratio;
+
+        var app = new App.default(horizontal_resolution, vertical_resolution);
         app.main();
     });
 });

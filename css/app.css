@@ -55,17 +55,16 @@ ul.controls-desc li {
     justify-content: center;
 }
 
-@media only screen and (min-aspect-ratio: 748/524) {
+@media only screen and (min-aspect-ratio: 568/320) {
     .game-container {
         /* width: unset; */
     }
     .game-container svg {
         height: 100vh;
-
     }
 }
 
-@media only screen and (max-aspect-ratio: 747/524) {
+@media only screen and (max-aspect-ratio: 567/320) {
 
     @media only screen and (min-width: 1000px) {
         .game-container {
