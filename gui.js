@@ -186,6 +186,12 @@ export class TileControl {
             () => editor.trigger(editor.events.delete, {})
         );
 
+        let mirror = this._makeMirrorButton(96+32, 96/3);
+
+        mirror.click(
+            () => editor.trigger(editor.events.mirror)
+        );
+
         // this._events = {
         //     tileSelected: (data) => this.onTileSelected(data.tile),
         //     // cellSelected: (data) => this.onCellSelected(data),
@@ -200,6 +206,7 @@ export class TileControl {
 
     _makeDirButton(x, y, angle=0) {
         let button = this.layer.g();
+        button.addClass("tile-control-button").addClass("direction");
 
         let rect = button.rect(1,1,30,18, 2, 2).attr({fill: "gray"});
         rect.addClass("tile-control-button-bg");
@@ -221,8 +228,9 @@ export class TileControl {
         return button;
     }
 
-    _makeDeleteButton(x, y) {
-        let button = this.layer.g(graphics.getGraphic("DeleteButton"));
+    _makeButton(x, y, image, _class) {
+        let button = this.layer.g(graphics.getGraphic(image));
+        button.addClass("tile-control-button").addClass(_class);
 
         let bg = button.rect(1, 1, 30, 30, 2, 2).prependTo(button);
         bg.attr({fill: "gray"}).addClass("tile-control-button-bg");
@@ -230,6 +238,14 @@ export class TileControl {
         button.transform("T"+x+","+y);
 
         return button;
+    }
+
+    _makeDeleteButton(x, y) {
+        return this._makeButton(x, y, "DeleteButton", "delete");
+    }
+
+    _makeMirrorButton(x, y) {
+        return this._makeButton(x, y, "MirrorButton", "mirror");
     }
 
     calculateScale() {
