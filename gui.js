@@ -161,8 +161,6 @@ export class TileControl {
         this._layer.transform("T"+x+","+y);
         this.calculateScale();
 
-        this.currentTile = "Conveyor";
-        this.drawTile();
         // this._makeButton(32,0,0);
         // this._makeButton(32,20+56,180);
         // this._makeButton(,,90);
@@ -182,7 +180,7 @@ export class TileControl {
             tileSelected: (data) => this.onTileSelected(data.tile),
             // cellSelected: (data) => this.onCellSelected(data),
             rotate: (data) => this.onRotate(),
-            mirror: (data) => this.onMirror(data),
+            mirror: (data) => this.onMirror(),
             setDirection: (data) => this.onSetDirection(data.dir)
             // delete: (data) => this.onDelete(data)
         };
@@ -245,6 +243,16 @@ export class TileControl {
         }
     }
 
+    clear() {
+
+        this.tileLayer.clear();
+
+        this.currentGraphic = null;
+        this.currentTile = null;
+        this.currentOrientation = "UP";
+        this.mirror = false;
+    }
+
     orientTile() {
         if (this.currentGraphic) {
             let oName = this.currentOrientation,
@@ -266,6 +274,11 @@ export class TileControl {
 
     onSetDirection(dir) {
         this.currentOrientation = dir;
+        this.orientTile();
+    }
+
+    onMirror() {
+        this.mirror = !!!this.mirror;
         this.orientTile();
     }
 };

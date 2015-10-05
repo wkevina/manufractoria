@@ -152,14 +152,15 @@ editor.cycleGenerator = cycleGenerator;
 let cycleOrientation = cycleGenerator();
 
 class Editor {
-    constructor(paper, programView) {
+    constructor(paper, programView, tileControl) {
         this.paper = paper;
         this.programView = programView;
-        this.tileCursor = null;
+        //this.tileCursor = null;
         this.state = IDLE;
-        this.currentTile = null;
-        this.currentOrientation = "UP";
-        this.mirror = false;
+        // this.currentTile = null;
+        // this.currentOrientation = "UP";
+        //this.mirror = false;
+        this.tileControl = tileControl;
 
         this._events = {
             tileSelected: (data) => this.onTileSelected(data),
@@ -176,7 +177,7 @@ class Editor {
     }
 
     disable() {
-        this.clearCursor();
+        //this.clearCursor();
         unregisterEvents(this._events);
     }
 
@@ -203,27 +204,27 @@ class Editor {
 
     onTileSelected (data) {
         this.state = PLACING;
-        this.currentTile = data.tile;
+        //this.currentTile = data.tile;
 
-        if (this.tileCursor != null)
-            this.tileCursor.remove();
+        // if (this.tileCursor != null)
+        //     this.tileCursor.remove();
 
-        var tileGraphic = this.paper.g(graphics.getGraphic(data.tile)),
-            mousePoint = graphics.screenPointToLocal(data.x, data.y, this.paper);
+        // var tileGraphic = this.paper.g(graphics.getGraphic(data.tile)),
+        //     mousePoint = graphics.screenPointToLocal(data.x, data.y, this.paper);
 
-        tileGraphic.node.style.pointerEvents = "none"; // disable click events
+        // tileGraphic.node.style.pointerEvents = "none"; // disable click events
 
-        this.paper.mousemove(
-            this.move.bind(this)
-        );
+        // this.paper.mousemove(
+        //     this.move.bind(this)
+        // );
 
-        this.tileCursor = tileGraphic;
+        // this.tileCursor = tileGraphic;
 
-        this.move(data, data.x, data.y);
+        // this.move(data, data.x, data.y);
     }
 
     onCellSelected (data) {
-        if (this.state == PLACING && this.currentTile) {
+        if (this.state == PLACING && this.tileControl.currentTile) {
             // We can now place the tile
 
             var curCell = this.programView.program.getCell(
@@ -235,7 +236,7 @@ class Editor {
 
                 this.programView.program.setCell(data.cell.x,
                                                  data.cell.y,
-                                                 this.currentTile,
+                                                 this.tileControl.currentTile,
                                                  orientationByName(
                                                      this.currentOrientation,
                                                      this.mirror)
@@ -245,10 +246,11 @@ class Editor {
     }
 
     onRotateCell (data) {
-        if (this.state == PLACING) {
-            this.currentOrientation = cycleOrientation(this.currentOrientation);
-            this.move(data, data.x, data.y);
-        } else if (this.state == IDLE) {
+        // if (this.state == PLACING) {
+//             this.currentOrientation = cycleOrientation(this.currentOrientation);
+//             this.move(data, data.x, data.y);
+//         } else
+        if (this.state == IDLE) {
             // see if we are hovering over the programview
             var el = Snap.getElementByPoint(data.x, data.y);
             var info = el.data("tileInfo");
@@ -267,17 +269,18 @@ class Editor {
     }
 
     onSetDirection (data) {
-        var dir = data.dir;
-        if (this.state == PLACING) {
-            var mir = this.mirror,
-                m = tmath.Mat2x2,
-                o = orientationByName(dir, mir);
+        // var dir = data.dir;
+        // if (this.state == PLACING) {
+        //     var mir = this.mirror,
+        //         m = tmath.Mat2x2,
+        //         o = orientationByName(dir, mir);
 
-            if (o && o !== this.currentOrientation) {
-                this.currentOrientation = dir;
-                this.move(data, data.x, data.y);
-            }
-        } else if (this.state == IDLE) {
+        //     if (o && o !== this.currentOrientation) {
+        //         this.currentOrientation = dir;
+        //         this.move(data, data.x, data.y);
+        //     }
+        // } else
+        if (this.state == IDLE) {
             // see if we are hovering over the programview
             var el = Snap.getElementByPoint(data.x, data.y);
             var info = el.data("tileInfo");
@@ -298,10 +301,11 @@ class Editor {
     }
 
     onMirror (data) {
-        if (this.state == PLACING) {
-            this.mirror = !this.mirror;
-            this.move(data, data.x, data.y);
-        } else if (this.state == IDLE) {
+        // if (this.state == PLACING) {
+        //     this.mirror = !this.mirror;
+        //     this.move(data, data.x, data.y);
+        // } else
+        if (this.state == IDLE) {
             // see if we are hovering over the programview
             var el = Snap.getElementByPoint(data.x, data.y);
             var info = el.data("tileInfo");
@@ -330,13 +334,17 @@ class Editor {
     }
 
     onDelete(data) {
-        if (this.state == PLACING && this.tileCursor) {
+        // if (this.state == PLACING && this.tileCursor) {
 
-            this.clearCursor();
-            // Reset orientation for next time
-            this.currentOrientation = "UP";
-            this.mirror = false;
+        //     this.clearCursor();
+        //     // Reset orientation for next time
+        //     this.currentOrientation = "UP";
+        //     this.mirror = false;
 
+        // } else
+         if (this.state == PLACING) {
+             // Reset orientation for next time
+             this.tileControl.clear();
         } else if (this.state == IDLE) {
             // see if we are hovering over the programview
             var el = Snap.getElementByPoint(data.x, data.y);

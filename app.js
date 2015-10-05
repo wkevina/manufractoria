@@ -170,7 +170,7 @@ App.prototype.main = function() {
                                    this.canvasSize.width - this.programView.width - 20,
                                    3);
 
-        this.tileController = new TileControl(
+        this.tileControl = new TileControl(
             paper,
             this.programView.width + this.programView.x + 10, // x
             this.programView.y, // y
@@ -178,7 +178,7 @@ App.prototype.main = function() {
             0 // height
         );
 
-        this.editor = new editor.Editor(paper, this.programView);
+        this.editor = new editor.Editor(paper, this.programView, this.tileControl);
 
         this.programView.drawProgram();
 
