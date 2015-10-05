@@ -19,7 +19,8 @@ var imageMap = {
     Start: "img/start.svg",
     End: "img/end.svg",
 
-    DeleteButton: "img/delete-button.svg"
+    DeleteButton: "img/delete-button.svg",
+    MirrorButton: "img/mirror-button.svg"
 };
 
 var globalCanvas = null;
