@@ -36,14 +36,16 @@ class Picker {
     }
 
     _clickHandler(mouseEvt) {
-        console.log("Clicked");
-
-        for (let child of this.el.querySelectorAll(this.children)) {
-            child.classList.remove(this.class);
-        }
+        this.clear();
 
         let elem = mouseEvt.currentTarget;
         elem.classList.add(this.class);
+    }
+
+    clear() {
+        for (let child of this.el.querySelectorAll(this.children)) {
+            child.classList.remove(this.class);
+        }
     }
 
 };
