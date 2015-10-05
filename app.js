@@ -171,9 +171,9 @@ App.prototype.main = function() {
 
         this.palette = new Palette(paper,
                                    CONTROL_X,
-                                   this.canvasSize.height * 2 / 3 + 5,
+                                   this.canvasSize.height / 2  + 5,
                                    this.canvasSize.width - CONTROL_X - 10,
-                                   5);
+                                   4);
 
         this.tileControl = new TileControl(
             paper,
