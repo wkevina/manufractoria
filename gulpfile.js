@@ -76,7 +76,7 @@ gulp.task('watchJS', function() {
 
 gulp.task('watchStatic', function() {
     // return gulp.watch([dir.source, dir.lib, dir.index], ['build-dev']);
-    return gulp.watch([dir.ignore, dir.lib, dir.index, dir.css], ['copy-static']);
+    return gulp.watch([dir.ignore, dir.lib, dir.index, dir.css, dir.img], ['copy-static']);
 });
 
 gulp.task('connect', function() {
