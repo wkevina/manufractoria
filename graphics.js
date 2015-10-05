@@ -17,7 +17,9 @@ var imageMap = {
     WriteG: "img/write-green.svg",
     WriterConnector: "img/writer-connector.svg",
     Start: "img/start.svg",
-    End: "img/end.svg"
+    End: "img/end.svg",
+
+    DeleteButton: "img/delete-button.svg"
 };
 
 var globalCanvas = null;
