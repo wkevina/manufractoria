@@ -169,20 +169,22 @@ export class TileControl {
         this._layer.transform("T"+x+","+y);
         this.calculateScale();
 
-        // this._makeButton(32,0,0);
-        // this._makeButton(32,20+56,180);
-        // this._makeButton(,,90);
-        // this._makeButton(32+56,20,270);
-        let down = this._makeButton(32, 0, 0),
-            right = this._makeButton(20+56, 32, 90),
-            up = this._makeButton(32, 20+56, 180),
-            left = this._makeButton(0, 32, 270);
+        let down = this._makeDirButton(32, 0, 0),
+            right = this._makeDirButton(20+56, 32, 90),
+            up = this._makeDirButton(32, 20+56, 180),
+            left = this._makeDirButton(0, 32, 270);
 
         function bt(el, dir) {
             el.click(() => editor.trigger(editor.events.setDirection, {dir: dir}));
         }
 
         bt(up, "UP"); bt(right, "RIGHT"); bt(down, "DOWN"); bt(left, "LEFT");
+
+        let del = this._makeDeleteButton(96+32,96*2/3);
+
+        del.click(
+            () => editor.trigger(editor.events.delete, {})
+        );
 
         // this._events = {
         //     tileSelected: (data) => this.onTileSelected(data.tile),
@@ -196,7 +198,7 @@ export class TileControl {
         // editor.registerEvents(this._events);
     }
 
-    _makeButton(x, y, angle=0) {
+    _makeDirButton(x, y, angle=0) {
         let button = this.layer.g();
 
         let rect = button.rect(1,1,30,18, 2, 2).attr({fill: "gray"});
@@ -215,6 +217,17 @@ export class TileControl {
         }
 
         button.transform("r"+angle+",0,0"+"T"+x+","+y);
+
+        return button;
+    }
+
+    _makeDeleteButton(x, y) {
+        let button = this.layer.g(graphics.getGraphic("DeleteButton"));
+
+        let bg = button.rect(1, 1, 30, 30, 2, 2).prependTo(button);
+        bg.attr({fill: "gray"}).addClass("tile-control-button-bg");
+
+        button.transform("T"+x+","+y);
 
         return button;
     }
