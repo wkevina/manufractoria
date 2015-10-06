@@ -278,7 +278,7 @@ export class GridView {
         this.grid.attr({stroke: "#888", strokeWidth: 1});
 
         this.grid.transform("");
-        this.grid.transform("t1,1t" + this.x + "," + this.y);
+        this.grid.transform("t" + this.x + "," + this.y);
     }
 
     /**
@@ -317,7 +317,7 @@ export class GridView {
     getGlobalCellMatrix(col, row, corner) {
 
         var transform = this.grid.transform();
-        var globalMatrix = transform.localMatrix.clone();
+        var globalMatrix = transform.globalMatrix.clone();
 
         var sw = this.width / this.cols;
         var sy = this.height / this.rows;
@@ -346,16 +346,26 @@ export class GridView {
 
 export class ProgramView {
 
-    constructor(paper, x, y, tileSize, program) {
+    constructor(paper, x, y,  program, maxWidth, maxHeight) {
         this.paper = paper;
-        this.program = program;
-        this.tileSize = tileSize;
-        this.cells = paper.g().addClass("cells");
+
         this.x = x;
         this.y = y;
-        this.gridView = new GridView(paper, x, y,
-                                     program.cols*tileSize,
-                                     program.rows*tileSize,
+
+        this.program = program;
+
+        this._maxWidth = maxWidth;
+        this._maxHeight = maxHeight;
+
+        this.tileSize = 56;
+
+        this._layer = paper.g().addClass("program-view");
+
+        this.cells = this._layer.g().addClass("cells");
+
+        this.gridView = new GridView(this._layer, 0, 0,
+                                     program.cols*this.tileSize,
+                                     program.rows*this.tileSize,
                                      program.rows, program.cols);
 
         this.width = this.gridView.width;
@@ -363,8 +373,23 @@ export class ProgramView {
 
         this.gridView.drawGrid();
 
+        this.calculateTransform();
+
         var binding = this.program.changed.add(this.updateCell);
         binding.context = this;
+    }
+
+    calculateTransform() {
+        let maxw = this._maxHeight,
+            maxh = this._maxWidth,
+
+            scale_x = maxw / this.gridView.width,
+            scale_y = maxh / this.gridView.height,
+
+            scale = Math.min(scale_x, scale_y);
+
+        this._layer.transform("T"+this.x+","+this.y+"s"+scale+",0,0");
+
     }
 
     setProgram(p) {
@@ -373,12 +398,14 @@ export class ProgramView {
 
         this.program = p;
         this.gridView.remove();
-        this.gridView = new GridView(this.paper, this.x, this.y,
+        this.gridView = new GridView(this._layer, this.x, this.y,
                                      p.cols*this.tileSize,
                                      p.rows*this.tileSize,
                                      p.rows, p.cols);
         this.gridView.drawGrid();
         this.cells.clear();
+
+        this.calculateTransform();
     }
 
     updateCell(data) {
@@ -599,7 +626,7 @@ export class ProgramView {
         return null;
 
     }
-}
+};
 
 function getNeighbors(prog, cell, x, y) {
     var o = cell.orientation,

@@ -139,10 +139,13 @@ class App {
     }
     main() {
         let paper = Snap(document.getElementById('main-svg'));
+
         setViewbox(paper.node, 0, 0, this.canvasSize.width, this.canvasSize.height);
+
         const bounds = paper.node.viewBox.baseVal;
         paper.rect(bounds.x, bounds.y, bounds.width, bounds.height).addClass('game-bg');
         this.paper = paper;
+        this.scratch = paper.g();
         // Set up UI elements
         graphics.preload(paper).then(function () {
 
@@ -152,13 +155,13 @@ class App {
             const CONTROL_WIDTH = this.canvasSize.width - CONTROL_X;
 
             if (this.program == null) {
-                this.program = new program.Program(9, 9);
+                this.program = new program.Program(5, 5);
                 // fill in start and end with defaults
                 this.program.setStart(4, 0);
                 this.program.setEnd(4, 8);
             }
 
-            this.programView = new view.ProgramView(programLayer, 10, 10, 56, this.program);
+            this.programView = new view.ProgramView(programLayer, MARGIN, MARGIN, this.program, 56*9, 56*9);
 
             this.palette = new Palette(
                 paper,
@@ -311,18 +314,44 @@ class App {
     }
     // Calls interpreter's step and manages animation
     _step() {
+
         if (!this.isPaused) {
-            let curPos = this.interpreter.position, corner = this.programView.gridView.getGlobalCellMatrix(curPos.x, curPos.y);
+
+            let oldPos = this.interpreter.position,
+
+                corner = this.exchange(
+                    this.programView.gridView.getGlobalCellMatrix(oldPos.x, oldPos.y, false)
+                );
+
+
             this.drawToken(corner);
             this.interpreter.step();
-            curPos = this.interpreter.position;
-            corner = this.programView.gridView.getGlobalCellMatrix(curPos.x, curPos.y);
-            this.drawToken(corner, true, this.update.bind(this));
+
+            let curPos = this.interpreter.position,
+
+                curCorner = this.exchange(
+                    this.programView.gridView.getGlobalCellMatrix(curPos.x, curPos.y, false)
+                );
+
+            this.drawToken(curCorner, true, this.update.bind(this));
+
         } else {
             requestAnimationFrame(this.update.bind(this));
         }
     }
+
+    /**
+     Convert one coordinate system to another.
+     Converts from system with global matrix g to system with global matrix l
+
+     */
+    exchange(g) {
+        return this.scratch.transform().globalMatrix.invert().add(g);
+    }
 }
+
+
+
 function setViewbox(svgel, x, y, width, height) {
     svgel.setAttribute('viewBox', [
         x,
