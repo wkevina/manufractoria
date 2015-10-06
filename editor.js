@@ -174,11 +174,13 @@ class Editor {
 
     enable() {
         registerEvents(this._events);
+        this.tileControl.show(true);
     }
 
     disable() {
         //this.clearCursor();
         unregisterEvents(this._events);
+        this.tileControl.show(false);
     }
 
     move(evt, x, y) {
