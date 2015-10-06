@@ -1,5 +1,5 @@
 
-class Picker {
+export class Picker {
 
     constructor(root) {
         let args = {
@@ -49,9 +49,3 @@ class Picker {
     }
 
 };
-
-var p = new Picker({
-    el: "#container",
-    class: "picked",
-    children: "*"
-});

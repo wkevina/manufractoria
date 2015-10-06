@@ -55,6 +55,14 @@ ul.controls-desc li {
     justify-content: center;
 }
 
+.play-control {
+    opacity: 1.0;
+}
+
+.play-control.active {
+    opacity: 0.6;
+}
+
 .play-control.play .bg {
     fill: #368A55;
 }

@@ -6,6 +6,7 @@ import editor from "editor";
 import graphics from "graphics";
 import codeCell from "codeCell";
 import {toTransformString} from "view";
+import {Picker} from "picker";
 
 class BaseControl {
     constructor(paper, x, y) {
@@ -341,8 +342,14 @@ export class PlayControl extends BaseControl {
         this.pause = makeButton(32, 0, this.buttonLayer, "PauseButton", "play-control", "pause", 0, 0);
         this.stop = makeButton(32*2, 0, this.buttonLayer, "StopButton", "play-control", "stop", 0, 0);
 
+        this.picker = new Picker({
+            el: this.buttonLayer.node,
+            children: ".play-control",
+            class: "active"
+        });
+
         function bc (btn, which) {
-            btn.click(function() {
+            btn.click(() => {
                 radio(which+"-clicked").broadcast();
             });
         }
