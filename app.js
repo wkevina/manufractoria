@@ -147,9 +147,9 @@ class App {
 
             this.tileControl = new TileControl(
                 paper,
-                CONTROL_X, // x
+                CONTROL_X + 40, // x
                 MARGIN, // y
-                (this.canvasSize.width - CONTROL_X) / 2 - MARGIN / 2, // width
+                CONTROL_WIDTH / 2 - MARGIN / 2, // width
                 0    // height
             );
 
