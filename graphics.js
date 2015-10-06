@@ -20,7 +20,10 @@ var imageMap = {
     End: "img/end.svg",
 
     DeleteButton: "img/delete-button.svg",
-    MirrorButton: "img/mirror-button.svg"
+    MirrorButton: "img/mirror-button.svg",
+    PlayButton: "img/play-button.svg",
+    PauseButton: "img/pause-button.svg",
+    StopButton:  "img/stop-button.svg"
 };
 
 var globalCanvas = null;
