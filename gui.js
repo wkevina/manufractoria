@@ -11,8 +11,8 @@ export class Palette {
 
     constructor(paper, x, y, max_width, columns, margin) {
         this.paper = paper;
-        this.x = x;
-        this.y = y;
+        this._x = x;
+        this._y = y;
         this.columns = columns > 0 ? columns : 1; // negative columns?
         this.columnWidth = 56;
         this.tiles = paper.g();
@@ -31,7 +31,7 @@ export class Palette {
 
         this.width = this.baseWidth * this.getScale();
 
-        this.tiles.transform(Snap.matrix().translate(x, y));
+        this._translate();
         this.drawPalette();
 
         this._events = {
@@ -63,10 +63,29 @@ export class Palette {
     }
 
     getScale() {
-        if (this.baseWidth <= this.maxWidth)
-            return 1.0; // no scaling required
-        else
-            return this.maxWidth / this.baseWidth;
+        return this.maxWidth / this.baseWidth;
+    }
+
+    get x() {
+        return this._x;
+    }
+
+    set x(_x) {
+        this._x = _x;
+        this._translate();
+    }
+
+    get y() {
+        return this._y;
+    }
+
+    set y(_y) {
+        this._y = _y;
+        this._translate();
+    }
+
+    _translate() {
+        this.tiles.transform(Snap.matrix().translate(this._x, this._y));
     }
 
     drawPalette() {
