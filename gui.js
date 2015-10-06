@@ -247,24 +247,14 @@ export class TileControl {
         return button;
     }
 
-    _makeButton(x, y, image, _class) {
-        let button = this.layer.g(graphics.getGraphic(image));
-        button.addClass("tile-control-button").addClass(_class);
 
-        let bg = button.rect(1, 1, 30, 30, 2, 2).prependTo(button);
-        bg.attr({fill: "gray"}).addClass("tile-control-button-bg");
-
-        button.transform("T"+x+","+y);
-
-        return button;
-    }
 
     _makeDeleteButton(x, y) {
-        return this._makeButton(x, y, "DeleteButton", "delete");
+        return makeButton(x, y, this.layer, "DeleteButton", "tile-control-button", "delete");
     }
 
     _makeMirrorButton(x, y) {
-        return this._makeButton(x, y, "MirrorButton", "mirror");
+        return makeButton(x, y, this.layer, "MirrorButton", "tile-control-button", "mirror");
     }
 
     calculateScale() {
@@ -338,3 +328,16 @@ export class TileControl {
         this.orientTile();
     }
 };
+
+
+function makeButton(x, y, layer,  image, mainClass="", subClass="") {
+    let button = layer.g(graphics.getGraphic(image));
+    button.addClass(mainClass).addClass(subClass);
+
+    let bg = button.rect(1, 1, 30, 30, 2, 2).prependTo(button);
+    bg.attr({fill: "gray"}).addClass("bg");
+
+    button.transform("T"+x+","+y);
+
+    return button;
+}
