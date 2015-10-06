@@ -199,11 +199,24 @@ class App {
                 limit: 0
             });
         }
+
         this.currentTest.test = this.testCases[this.currentTest.index];
-        const currentTape = core.Tape.clone(this.currentTest.test.input);
+
+        const currentTape = core.Tape.clone(this.currentTest.test.input),
+
+              CONTROL_WIDTH = this.canvasSize.width - CONTROL_X;
+
         if (this.tapeView)
             this.tapeView.remove();
-        this.tapeView = new view.TapeView(this.paper, this.programView.x + this.programView.width + 10, this.programView.y, this.canvasSize.width - this.programView.width - 30, 20, currentTape, 3);
+        this.tapeView = new view.TapeView(
+            this.paper,
+            CONTROL_X,
+            MARGIN,
+            CONTROL_WIDTH - 10,
+            (CONTROL_WIDTH - 10) / 10,
+            currentTape,
+            Math.floor((this.canvasSize.height - 3 * MARGIN - 32) / ((CONTROL_WIDTH - 10) / 10))
+        );
         // 3 rows
         // hide Palette
         this.palette.show(false);
