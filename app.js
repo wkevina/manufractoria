@@ -7,7 +7,7 @@ import tmath from "tmath";
 import loader from "loader";
 import editor from "editor";
 import core from "core";
-import {Palette, TileControl} from "gui";
+import {Palette, TileControl, PlayControl} from "gui";
 
 
 const MARGIN = 10, // Space between elements
@@ -40,37 +40,60 @@ class App {
         stopButton.prop('disabled', true);
         pauseButton.prop('disabled', true);
         playButton.prop('disabled', false);
+
         playButton.click(() => {
-            if (!this.isRunning) {
-                this.editor.disable();
-                this.start();
-                stopButton.prop('disabled', false);
-                pauseButton.prop('disabled', false);
-                playButton.prop('disabled', true);
-            } else if (this.isRunning && this.isPaused) {
-                this.editor.disable();
-                this.pause(false); // or unpause
-                stopButton.prop('disabled', false);
-                pauseButton.prop('disabled', false);
-                playButton.prop('disabled', true);
-            }
+            radio("play-clicked").broadcast();
         });
+
         pauseButton.click(() => {
-            if (this.isRunning) {
-                this.pause(true);
-                stopButton.prop('disabled', false);
+            radio("pause-clicked").broadcast();
+        });
+
+        stopButton.click(() => {
+            radio("stop-clicked").broadcast();
+        });
+
+        radio("play-clicked").subscribe(
+            () => {
+                if (!this.isRunning) {
+                    this.editor.disable();
+                    this.start();
+                    stopButton.prop('disabled', false);
+                    pauseButton.prop('disabled', false);
+                    playButton.prop('disabled', true);
+                } else if (this.isRunning && this.isPaused) {
+                    this.editor.disable();
+                    this.pause(false); // or unpause
+                    stopButton.prop('disabled', false);
+                    pauseButton.prop('disabled', false);
+                    playButton.prop('disabled', true);
+                }
+            }
+        );
+
+        radio("pause-clicked").subscribe(
+            () => {
+                if (this.isRunning) {
+                    this.pause(true);
+                    stopButton.prop('disabled', false);
+                    pauseButton.prop('disabled', true);
+                    playButton.prop('disabled', false);
+                }
+            }
+        );
+
+        radio("stop-clicked").subscribe(
+            () => {
+                this.stop();
+                this.editor.enable();
+                stopButton.prop('disabled', true);
                 pauseButton.prop('disabled', true);
                 playButton.prop('disabled', false);
             }
-        });
-        stopButton.click(() => {
-            this.stop();
-            this.editor.enable();
-            stopButton.prop('disabled', true);
-            pauseButton.prop('disabled', true);
-            playButton.prop('disabled', false);
-        });
+        );
+
         let hash = window.location.hash;
+
         if (hash) {
             hash = decodeURI(hash.replace('#', '')).trim();
             if (hash.startsWith('lvl')) {
@@ -152,6 +175,15 @@ class App {
                 CONTROL_WIDTH / 2 - MARGIN / 2, // width
                 0    // height
             );
+
+            this.playButton = new PlayControl(
+                paper,
+                CONTROL_X,
+                this.canvasSize.height - 64 - MARGIN,
+                64
+            );
+
+            this.playButton.x = CONTROL_X + CONTROL_WIDTH / 2 - this.playButton.width / 2;
 
             this.editor = new editor.Editor(paper, this.programView, this.tileControl);
 

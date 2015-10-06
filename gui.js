@@ -46,24 +46,6 @@ class BaseControl {
         });
     }
 
-    get x() {
-        return this._x;
-    }
-
-    set x(_x) {
-        this._x = _x;
-        this._translate();
-    }
-
-    get y() {
-        return this._y;
-    }
-
-    set y(_y) {
-        this._y = _y;
-        this._translate();
-    }
-
     _translate() {
         this._layer.transform(Snap.matrix().translate(this._x, this._y));
     }
@@ -346,12 +328,41 @@ export class TileControl extends BaseControl {
     }
 };
 
+export class PlayControl extends BaseControl {
+    constructor(paper, x, y, height=32) {
+        super(paper, x, y);
+        this.height = height;
 
-function makeButton(x, y, layer,  image, mainClass="", subClass="") {
+        this.buttonLayer = this._layer.g();
+
+        this.buttonLayer.transform("s"+height/32);
+
+        this.play = makeButton(0, 0, this.buttonLayer, "PlayButton", "play-control", "play", 0, 0);
+        this.pause = makeButton(32, 0, this.buttonLayer, "PauseButton", "play-control", "pause", 0, 0);
+        this.stop = makeButton(32*2, 0, this.buttonLayer, "StopButton", "play-control", "stop", 0, 0);
+
+        function bc (btn, which) {
+            btn.click(function() {
+                radio(which+"-clicked").broadcast();
+            });
+        }
+
+        bc(this.play, "play");
+        bc(this.pause, "pause");
+        bc(this.stop, "stop");
+    }
+
+    get width() {
+        return this.height * 3;
+    }
+};
+
+
+function makeButton(x, y, layer,  image, mainClass="", subClass="", margin=1, r=2) {
     let button = layer.g(graphics.getGraphic(image));
     button.addClass(mainClass).addClass(subClass);
 
-    let bg = button.rect(1, 1, 30, 30, 2, 2).prependTo(button);
+    let bg = button.rect(margin, margin, 32-2*margin, 32-2*margin, r, r).prependTo(button);
     bg.attr({fill: "gray"}).addClass("bg");
 
     button.transform("T"+x+","+y);

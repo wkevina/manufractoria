@@ -55,6 +55,18 @@ ul.controls-desc li {
     justify-content: center;
 }
 
+.play-control.play .bg {
+    fill: #368A55;
+}
+
+.play-control.pause .bg {
+    fill: #B9B9B9;
+}
+
+.play-control.stop .bg {
+    fill: #F04124;
+}
+
 @media only screen and (min-aspect-ratio: 568/320) {
     .game-container {
         /* width: unset; */
