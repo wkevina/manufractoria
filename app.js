@@ -179,8 +179,8 @@ class App {
             this.playButton = new PlayControl(
                 paper,
                 CONTROL_X,
-                this.canvasSize.height - 64 - MARGIN,
-                64
+                this.canvasSize.height - 68 - MARGIN,
+                68
             );
 
             this.playButton.x = CONTROL_X + CONTROL_WIDTH / 2 - this.playButton.width / 2;

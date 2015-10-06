@@ -150,8 +150,6 @@ export class Palette extends BaseControl {
 
             var label = group.text(56/2, height - 8, image.name);
             label.attr({
-                fontFamily: "monospace",
-                fontSize: 10,
                 textAnchor: "middle",
                 text: index + 1
             }).addClass("label-text");
@@ -210,13 +208,13 @@ export class TileControl extends BaseControl {
 
         bt(up, "UP"); bt(right, "RIGHT"); bt(down, "DOWN"); bt(left, "LEFT");
 
-        let del = this._makeDeleteButton(96+32,96*2/3);
+        let del = this._makeDeleteButton(96+32, 96*2/3, "tile-control-button", "delete");
 
         del.click(
             () => editor.trigger(editor.events.delete, {})
         );
 
-        let mirror = this._makeMirrorButton(96+32, 96/3);
+        let mirror = this._makeMirrorButton(96+32, 96/3, "tile-control-button", "mirror");
 
         mirror.click(
             () => editor.trigger(editor.events.mirror)
@@ -228,7 +226,7 @@ export class TileControl extends BaseControl {
         button.addClass("tile-control-button").addClass("direction");
 
         let rect = button.rect(1,1,30,18, 2, 2).attr({fill: "gray"});
-        rect.addClass("tile-control-button-bg");
+        rect.addClass("bg");
 
         let arrow = button.path("M6,16L16,4L26,16L6,16");
         arrow.attr({fill:"white"});
@@ -338,9 +336,9 @@ export class PlayControl extends BaseControl {
 
         this.buttonLayer.transform("s"+height/32);
 
-        this.play = makeButton(0, 0, this.buttonLayer, "PlayButton", "play-control", "play", 0, 0);
-        this.pause = makeButton(32, 0, this.buttonLayer, "PauseButton", "play-control", "pause", 0, 0);
-        this.stop = makeButton(32*2, 0, this.buttonLayer, "StopButton", "play-control", "stop", 0, 0);
+        this.play = makeButton(0, 0, this.buttonLayer, "PlayButton", "play-control", "play");
+        this.pause = makeButton(32, 0, this.buttonLayer, "PauseButton", "play-control", "pause");
+        this.stop = makeButton(32*2, 0, this.buttonLayer, "StopButton", "play-control", "stop");
 
         this.picker = new Picker({
             el: this.buttonLayer.node,

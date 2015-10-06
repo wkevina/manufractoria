@@ -55,6 +55,16 @@ ul.controls-desc li {
     justify-content: center;
 }
 
+.tile-control-button .bg {
+    fill: none;
+    stroke: white;
+}
+
+.tile-control-button.direction .bg {
+    fill: none;
+    stroke: none;
+}
+
 .play-control {
     opacity: 1.0;
 }
@@ -64,15 +74,21 @@ ul.controls-desc li {
 }
 
 .play-control.play .bg {
-    fill: #368A55;
+    /* fill: #368A55; */
+    fill: none;
+    stroke: white;
 }
 
 .play-control.pause .bg {
-    fill: #B9B9B9;
+    /* fill: #B9B9B9; */
+    fill: none;
+    stroke: white;
 }
 
 .play-control.stop .bg {
-    fill: #F04124;
+    /* fill: #F04124; */
+    fill: none;
+    stroke: white;
 }
 
 @media only screen and (min-aspect-ratio: 568/320) {

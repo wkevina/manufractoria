@@ -1,10 +1,12 @@
 .label-text {
     fill: #eee;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10px;
 }
 
 .palette-tile-bg {
-    fill: #3333BA;
-    stroke: unset;
+    fill: none;
+    stroke: none;
     opacity: 1
 }
 
