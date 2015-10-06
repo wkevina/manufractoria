@@ -215,7 +215,7 @@ class App {
             CONTROL_WIDTH - 10,
             (CONTROL_WIDTH - 10) / 10,
             currentTape,
-            Math.floor((this.canvasSize.height - 3 * MARGIN - 32) / ((CONTROL_WIDTH - 10) / 10))
+            Math.floor((this.canvasSize.height/2 - MARGIN) / ((CONTROL_WIDTH - 10) / 10))
         );
         // 3 rows
         // hide Palette
