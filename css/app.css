@@ -9,7 +9,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .grid-bg {
-    fill: #3333BA;
+    fill: #16e;
 }
 
 #controls button {
@@ -40,7 +40,7 @@ ul.controls-desc li {
 
 .game-bg {
     fill: none;
-    stroke: #eef;
+    stroke: none;
     stroke-width: 2px;
 }
 
@@ -65,6 +65,7 @@ ul.controls-desc li {
     stroke: none;
 }
 
+/* #0000C9 */
 .play-control {
     opacity: 1.0;
 }
