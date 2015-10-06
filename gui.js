@@ -7,63 +7,14 @@ import graphics from "graphics";
 import codeCell from "codeCell";
 import {toTransformString} from "view";
 
-export class Palette {
-
-    constructor(paper, x, y, max_width, columns, margin) {
+class BaseControl {
+    constructor(paper, x, y) {
         this.paper = paper;
         this._x = x;
         this._y = y;
-        this.columns = columns > 0 ? columns : 1; // negative columns?
-        this.columnWidth = 56;
-        this.tiles = paper.g();
-        this.maxWidth = max_width;
-        this.margin = margin || 20;
-        this.tileWidth = 56; // tiles are 56 x 56 px
 
-        // Get names of all types to draw
-        this.typesToDraw = Object.keys(codeCell.codeCells);
-
-        var actualColumns = this.columns <= this.typesToDraw.length ?
-                this.columns :
-                this.typesToDraw.length;
-
-        this.baseWidth = actualColumns * (this.tileWidth + this.margin) - this.margin;
-
-        this.width = this.baseWidth * this.getScale();
-
+        this._layer = paper.g();
         this._translate();
-        this.drawPalette();
-
-        this._events = {
-            hotKey: (data) => this.hotKey(data)
-        };
-
-        editor.registerEvents(this._events);
-    }
-
-    hotKey(data) {
-        var num = parseInt(data.key);
-        if (!isNaN(num) && num > 0 && num <= this.typesToDraw.length) {
-            editor.trigger(
-                editor.events.tileSelected,
-                {
-                    tile: this.typesToDraw[num - 1],
-                    x: data.x,
-                    y: data.y
-                }
-            );
-        }
-    }
-
-    show(shouldShow) {
-        shouldShow = shouldShow !== undefined ? shouldShow : true;
-        this.tiles.attr({
-            opacity: shouldShow ? 1 : 0
-        });
-    }
-
-    getScale() {
-        return this.maxWidth / this.baseWidth;
     }
 
     get x() {
@@ -85,7 +36,87 @@ export class Palette {
     }
 
     _translate() {
-        this.tiles.transform(Snap.matrix().translate(this._x, this._y));
+        this._layer.transform(Snap.matrix().translate(this._x, this._y));
+    }
+
+    show(shouldShow) {
+        shouldShow = shouldShow !== undefined ? shouldShow : true;
+        this._layer.attr({
+            opacity: shouldShow ? 1 : 0
+        });
+    }
+
+    get x() {
+        return this._x;
+    }
+
+    set x(_x) {
+        this._x = _x;
+        this._translate();
+    }
+
+    get y() {
+        return this._y;
+    }
+
+    set y(_y) {
+        this._y = _y;
+        this._translate();
+    }
+
+    _translate() {
+        this._layer.transform(Snap.matrix().translate(this._x, this._y));
+    }
+}
+
+export class Palette extends BaseControl {
+
+    constructor(paper, x, y, max_width, columns, margin) {
+        super(paper, x, y);
+
+        this.columns = columns > 0 ? columns : 1; // negative columns?
+        this.columnWidth = 56;
+        this.tiles = this._layer.g();
+        this.maxWidth = max_width;
+        this.margin = margin || 20;
+        this.tileWidth = 56; // tiles are 56 x 56 px
+
+        // Get names of all types to draw
+        this.typesToDraw = Object.keys(codeCell.codeCells);
+
+        var actualColumns = this.columns <= this.typesToDraw.length ?
+                this.columns :
+                this.typesToDraw.length;
+
+        this.baseWidth = actualColumns * (this.tileWidth + this.margin) - this.margin;
+
+        this.width = this.baseWidth * this.getScale();
+
+        this.drawPalette();
+
+        this._events = {
+            hotKey: (data) => this.hotKey(data)
+        };
+
+        editor.registerEvents(this._events);
+    }
+
+    getScale() {
+        return this.maxWidth / this.baseWidth;
+    }
+
+    hotKey(data) {
+        var num = parseInt(data.key);
+        if (!isNaN(num) && num > 0 && num <= this.typesToDraw.length) {
+            editor.trigger(
+                editor.events.tileSelected,
+                {
+                    tile: this.typesToDraw[num - 1],
+                    x: data.x,
+                    y: data.y
+                }
+            );
+        }
     }
 
     drawPalette() {
@@ -160,11 +191,10 @@ export class Palette {
  * @param {number} height Maximum height to fit contentxs
  */
 
-export class TileControl {
+export class TileControl extends BaseControl {
     constructor(paper, x, y, width, height) {
-        this.paper = paper;
-        this.x = x;
-        this.y = y;
+        super(paper, x, y);
+
         this.width = width;
         this.height = height;
         this.currentTile = null;
@@ -173,7 +203,6 @@ export class TileControl {
 
         this.cycleOrientation = editor.cycleGenerator();
 
-        this._layer = paper.g();
         this.layer = this._layer.g();
         this.tileLayer = this.layer.g();
 
@@ -185,7 +214,6 @@ export class TileControl {
                 evt.preventDefault();
             });
 
-        this._layer.transform("T"+x+","+y);
         this.calculateScale();
 
         let down = this._makeDirButton(32, 0, 0),
@@ -210,17 +238,6 @@ export class TileControl {
         mirror.click(
             () => editor.trigger(editor.events.mirror)
         );
-
-        // this._events = {
-        //     tileSelected: (data) => this.onTileSelected(data.tile),
-        //     // cellSelected: (data) => this.onCellSelected(data),
-        //     rotate: (data) => this.onRotate(),
-        //     mirror: (data) => this.onMirror(),
-        //     setDirection: (data) => this.onSetDirection(data.dir)
-        //     // delete: (data) => this.onDelete(data)
-        // };
-
-        // editor.registerEvents(this._events);
     }
 
     _makeDirButton(x, y, angle=0) {
