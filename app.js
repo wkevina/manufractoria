@@ -122,25 +122,45 @@ class App {
         this.paper = paper;
         // Set up UI elements
         graphics.preload(paper).then(function () {
+
             const programLayer = paper.g().addClass('program-layer');
             //paper.appendTo(document.getElementById("main"));
+
+            const CONTROL_WIDTH = this.canvasSize.width - CONTROL_X;
+
             if (this.program == null) {
                 this.program = new program.Program(9, 9);
                 // fill in start and end with defaults
                 this.program.setStart(4, 0);
                 this.program.setEnd(4, 8);
             }
+
             this.programView = new view.ProgramView(programLayer, 10, 10, 56, this.program);
-            this.palette = new Palette(paper, CONTROL_X, this.canvasSize.height / 2 + 5, this.canvasSize.width - CONTROL_X - 10, 4);
-            this.tileControl = new TileControl(paper, CONTROL_X, // x
-                                               MARGIN, // y
-                                               (this.canvasSize.width - CONTROL_X) / 2 - MARGIN / 2, // width
-                                               0    // height
-                                              );
+
+            this.palette = new Palette(
+                paper,
+                CONTROL_X + CONTROL_WIDTH / 8,
+                this.canvasSize.height / 2,
+                CONTROL_WIDTH * 3 / 4,
+                4
+            );
+
+            this.tileControl = new TileControl(
+                paper,
+                CONTROL_X, // x
+                MARGIN, // y
+                (this.canvasSize.width - CONTROL_X) / 2 - MARGIN / 2, // width
+                0    // height
+            );
+
             this.editor = new editor.Editor(paper, this.programView, this.tileControl);
+
             this.programView.drawProgram();
+
             editor.init();
+
             this.editor.enable();
+
         }.bind(this));
     }
     drawToken(mat, animate, callback) {
