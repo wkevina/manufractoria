@@ -191,8 +191,7 @@ export class TileControl extends BaseControl {
 
         this.tileLayer.click(
             (evt)=> {
-                this.onRotate();
-                evt.preventDefault();
+                editor.trigger(editor.events.rotate, {});
             });
 
         this.calculateScale();

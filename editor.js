@@ -1,3 +1,5 @@
+/*global radio */
+
 let editor = editor || {};
 
 export default editor;
@@ -128,7 +130,8 @@ function trackMouse(evt) {
 }
 
 var IDLE = Symbol("IDLE"),
-    PLACING = Symbol("PLACING");
+    PLACING = Symbol("PLACING"),
+    INPLACE = Symbol("INPLACE");
 
 function cycleGenerator() {
     let os = ["UP",
@@ -205,9 +208,14 @@ class Editor {
     }
 
     onTileSelected (data) {
-        this.state = PLACING;
 
         this.tileControl.onTileSelected(data.tile);
+
+        if (this.state === IDLE || this.state === PLACING) {
+            this.state = PLACING;
+        } else if (this.state === INPLACE) {
+            this.setInplace();
+        }
         //this.currentTile = data.tile;
 
         // if (this.tileCursor != null)
@@ -231,7 +239,7 @@ class Editor {
         if (this.state == PLACING && this.tileControl.currentTile) {
             // We can now place the tile
 
-            var curCell = this.programView.program.getCell(
+            let curCell = this.programView.program.getCell(
                 data.cell.x,
                 data.cell.y
             );
@@ -246,13 +254,76 @@ class Editor {
                                                      this.tileControl.mirror)
                                                 );
             }
+        } else if (this.state == IDLE) {
+            let cellIndex = {x: data.cell.x, y: data.cell.y},
+
+                curCell = this.programView.program.getCell(
+                    cellIndex.x,
+                    cellIndex.y
+                ),
+
+                type = curCell.type;
+
+            if (type != "Start" && type != "End" && type != "Empty") {
+                this.state = INPLACE;
+
+                // Highlight selected cell
+                radio("highlighted").broadcast(cellIndex);
+
+                this.highlightedCell = cellIndex;
+
+                let cellState = nameFromOrientation(curCell);
+
+                this.tileControl.currentOrientation = cellState.direction;
+                this.tileControl.mirror = cellState.mirrored;
+
+                this.tileControl.onTileSelected(curCell.type);
+            }
+        } else if (this.state == INPLACE) {
+
+            if (this.highlightedCell && data && data.cell) {
+                let cellIndex = {x: data.cell.x, y: data.cell.y},
+
+                    curCell = this.programView.program.getCell(
+                        cellIndex.x,
+                        cellIndex.y
+                    ),
+
+                    type = curCell.type;
+
+                if (type != "Start" && type != "End" && type != "Empty") {
+                    this.state = INPLACE;
+
+                    // Highlight selected cell
+                    radio("highlighted").broadcast(cellIndex);
+
+                    this.highlightedCell = cellIndex;
+
+                    let cellState = nameFromOrientation(curCell);
+
+                    this.tileControl.currentOrientation = cellState.direction;
+                    this.tileControl.mirror = cellState.mirrored;
+
+                    this.tileControl.onTileSelected(curCell.type);
+                } else if (type == "Empty") {
+                    this.clearHighlight();
+                    this.state = IDLE;
+                }
+            } else {
+                this.clearHighlight();
+                this.state = IDLE;
+            }
         }
     }
+
 
     onRotateCell (data) {
         if (this.state == PLACING) {
             this.tileControl.onRotate();
-        } else if (this.state == IDLE) {
+        } else if (this.state == IDLE &&
+                   data.x !== undefined &&
+                   data.y !== undefined) {
+
             // see if we are hovering over the programview
             var el = Snap.getElementByPoint(data.x, data.y);
             var info = el.data("tileInfo");
@@ -267,11 +338,26 @@ class Editor {
 
                 this.programView.program.setCell(x, y, type, o);
             }
+        } else if (this.state === INPLACE &&
+                   this.tileControl.currentTile &&
+                   this.highlightedCell) {
+            // Rotate highlighted cell
+            this.tileControl.onRotate();
+
+            this.programView.program.setCell(
+                this.highlightedCell.x,
+                this.highlightedCell.y,
+                this.tileControl.currentTile,
+                orientationByName(
+                    this.tileControl.currentOrientation,
+                    this.tileControl.mirror)
+            );
+
         }
     }
 
     onSetDirection (data) {
-        if (this.state == PLACING) {
+        if (this.state == PLACING || this.state == INPLACE) {
             this.tileControl.onSetDirection(data.dir);
         } else if (this.state == IDLE && data && data.x && data.y) {
             // see if we are hovering over the programview
@@ -291,10 +377,29 @@ class Editor {
                     this.programView.program.setCell(x, y, type, orientationByName(dir, mirrored));
             }
         }
+
+        if (this.state == INPLACE) {
+            this.setInplace();
+        }
+    }
+
+    setInplace() {
+        if (this.tileControl.currentTile &&
+            this.highlightedCell) {
+
+            this.programView.program.setCell(
+                this.highlightedCell.x,
+                this.highlightedCell.y,
+                this.tileControl.currentTile,
+                orientationByName(
+                    this.tileControl.currentOrientation,
+                    this.tileControl.mirror)
+            );
+        }
     }
 
     onMirror (data) {
-        if (this.state == PLACING) {
+        if (this.state == PLACING || this.state == INPLACE) {
             this.tileControl.onMirror();
         } else if (this.state == IDLE && data && data.x && data.y) {
             // see if we are hovering over the programview
@@ -312,6 +417,10 @@ class Editor {
                     this.programView.program.setCell(x, y, type, o);
             }
         }
+
+        if (this.state == INPLACE) {
+            this.setInplace();
+        }
     }
 
     clearCursor() {
@@ -325,10 +434,10 @@ class Editor {
     }
 
     onDelete(data) {
-         if (this.state == PLACING) {
-             // Reset orientation for next time
-             this.tileControl.clear();
-             this.state = IDLE;
+        if (this.state == PLACING) {
+            // Reset orientation for next time
+            this.tileControl.clear();
+            this.state = IDLE;
         } else if (this.state == IDLE && data && data.x && data.y) {
             // see if we are hovering over the programview
 
@@ -345,7 +454,22 @@ class Editor {
                 if (type != "Start" && type != "End" && type != "Empty")
                     p.setCell(x, y, "Empty");
             }
+        } else if (this.state === INPLACE) {
+            if (this.highlightedCell) {
+                let c = this.highlightedCell;
+
+                this.programView.program.setCell(c.x, c.y, "Empty");
+            }
+            this.tileControl.clear();
+            this.clearHighlight();
+            this.state = IDLE;
         }
+    }
+
+    clearHighlight() {
+        this.highlightedCell = null;
+        this.tileControl.clear();
+        radio("unhighlighted").broadcast();
     }
 };
 
@@ -378,4 +502,23 @@ function isMirrored(orientation) {
     return l.some(
         (mat) => _.isEqual(mat, orientation)
     );
+}
+
+function nameFromOrientation(o) {
+    let mirror = isMirrored(o),
+
+        direction = "UP",
+
+        m = tmath.Mat2x2;
+
+    if (_.isEqual(o, m.kID) || _.isEqual(o, m.kMIR))
+        direction = "UP";
+    if (_.isEqual(o, m.kROT1) || _.isEqual(o, m.kMROT1))
+        direction = "RIGHT";
+    if (_.isEqual(o, m.kROT2) || _.isEqual(o, m.kMROT2))
+        direction = "DOWN";
+    if (_.isEqual(o, m.kROT3) || _.isEqual(o, m.kMROT3))
+        direction = "LEFT";
+
+    return {direction: direction, mirror: mirror};
 }
