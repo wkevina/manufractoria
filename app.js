@@ -155,7 +155,7 @@ class App {
             const CONTROL_WIDTH = this.canvasSize.width - CONTROL_X;
 
             if (this.program == null) {
-                this.program = new program.Program(5, 5);
+                this.program = new program.Program(9, 9);
                 // fill in start and end with defaults
                 this.program.setStart(4, 0);
                 this.program.setEnd(4, 8);
