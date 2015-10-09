@@ -52,7 +52,25 @@ ul.controls-desc li {
 rect.highlight {
     fill: none;
     stroke: white;
-    stroke-width: 3px;
+    stroke-width: 2px;
+
+    animation: glow 2s linear infinite;
+}
+
+@keyframes glow {
+    0% {
+
+        stroke-opacity: 1.0;
+    }
+
+    50% {
+
+        stroke-opacity: 0.1;
+    }
+
+    100% {
+        stroke-opacity: 1.0;
+    }
 }
 
 .tile-control-button .bg {
