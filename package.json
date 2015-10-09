@@ -4,7 +4,7 @@
   "description": "Logic based puzzle game",
   "main": "index.html",
   "dependencies": {
-    "systemjs": "^0.19.3",
+    "systemjs": "^0.19.4",
     "wiredep": "^2.2.2"
   },
   "devDependencies": {
