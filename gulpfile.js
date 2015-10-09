@@ -22,10 +22,6 @@ var dir = {
           'bower_components/**/*'
 	 ],
     libOut: './dist/libs',
-    fonts: 'fonts/**/*',
-    fontsOut: 'dist/fonts',
-    foundation: 'js/**/*',
-    foundationOut: 'dist/js',
     img: './img/**/*.svg',
     imgOut: './dist/img/',
     css: './css/*',
@@ -41,8 +37,6 @@ copyTask('index');
 copyTask('img');
 copyTask('lib');
 copyTask('css');
-copyTask('foundation');
-copyTask('fonts');
 
 gulp.task('clean-build', function(done) {
     del(dir.build).then(function(){done();});
@@ -91,7 +85,7 @@ gulp.task('connect', function() {
 });
 
 gulp.task('build-dev', function(cb) {
-    runSeq('clean-build', 'copy-static', ['compileApp', 'bower'], cb);
+    runSeq('clean-build', ['compileApp', 'bower'], cb);
 });
 
 /* Build and copy files to outside directory */
