@@ -1,38 +1,42 @@
 {
-    "name": "manufractoria",
-    "version": "0.0.1",
-    "description": "Logic based puzzle game",
-    "main": "index.html",
-    "dependencies": {
-        "systemjs": "^0.19.3"
-    },
-    "devDependencies": {
-        "del": "^2.0.2",
-        "gulp": "^3.9.0",
-        "gulp-babel": "^5.2.1",
-        "gulp-bower": "0.0.10",
-        "gulp-concat": "^2.6.0",
-        "gulp-connect": "^2.2.0",
-        "gulp-newer": "^0.5.1",
-        "gulp-plumber": "^1.0.1",
-        "gulp-sourcemaps": "^1.6.0",
-        "gulp-util": "^3.0.6",
-        "run-sequence": "^1.1.4"
-    },
-    "scripts": {},
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/wkevina/manufractoria.git"
-    },
-    "keywords": [
-        "celestial",
-        "mechanics",
-        "math"
-    ],
-    "author": ["Kevin Ward", "Chase Meadors"],
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/wkevina/manufractoria/issues"
-    },
-    "homepage": "https://github.com/wkevina/manufractoria#readme"
+  "name": "manufractoria",
+  "version": "0.0.1",
+  "description": "Logic based puzzle game",
+  "main": "index.html",
+  "dependencies": {
+    "systemjs": "^0.19.3",
+    "wiredep": "^2.2.2"
+  },
+  "devDependencies": {
+    "del": "^2.0.2",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.2.1",
+    "gulp-bower": "0.0.10",
+    "gulp-concat": "^2.6.0",
+    "gulp-connect": "^2.2.0",
+    "gulp-newer": "^0.5.1",
+    "gulp-plumber": "^1.0.1",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-util": "^3.0.6",
+    "run-sequence": "^1.1.4"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wkevina/manufractoria.git"
+  },
+  "keywords": [
+    "celestial",
+    "mechanics",
+    "math"
+  ],
+  "author": [
+    "Kevin Ward",
+    "Chase Meadors"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wkevina/manufractoria/issues"
+  },
+  "homepage": "https://github.com/wkevina/manufractoria#readme"
 }

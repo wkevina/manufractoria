@@ -8,6 +8,7 @@ var concat = require('gulp-concat');
 var runSeq = require('run-sequence');
 var del = require('del');
 var connect = require('gulp-connect');
+var wiredep = require('wiredep').stream;
 
 var dir = {
     index: ['./index.html', 'main.js'],
@@ -17,7 +18,8 @@ var dir = {
           'libs/**/*.js',
           'libs/**/*map*',
           'node_modules/systemjs/dist/system.*',
-          'node_modules/babel-core/browser-polyfill.*'
+          'node_modules/babel-core/browser-polyfill.*',
+          'bower_components/**/*'
 	 ],
     libOut: './dist/libs',
     fonts: 'fonts/**/*',
@@ -76,7 +78,7 @@ gulp.task('watchJS', function() {
 
 gulp.task('watchStatic', function() {
     // return gulp.watch([dir.source, dir.lib, dir.index], ['build-dev']);
-    return gulp.watch([dir.ignore, dir.lib, dir.index, dir.css, dir.img], ['copy-static']);
+    return gulp.watch([dir.ignore, dir.lib, dir.index, dir.css, dir.img], ['bower']);
 });
 
 gulp.task('connect', function() {
@@ -89,7 +91,7 @@ gulp.task('connect', function() {
 });
 
 gulp.task('build-dev', function(cb) {
-    runSeq('clean-build', 'copy-static', ['compileApp'], cb);
+    runSeq('clean-build', 'copy-static', ['compileApp', 'bower'], cb);
 });
 
 /* Build and copy files to outside directory */
@@ -100,4 +102,21 @@ gulp.task('export', ['build-dev'], function() {
 
 gulp.task('default', function(cb) {
     runSeq('build-dev', ['watchJS', 'watchStatic', 'connect'], cb);
+});
+
+gulp.task('bower', ['copy-static'], function() {
+    return gulp.src(dir.build + '/index.html')
+	.pipe(wiredep({
+	    cwd: '.',
+	    ignorePath: /\.\.\/bower_components\//,
+	    fileTypes: {
+		html: {
+		    replace: {
+			js: '<script type="text/javascript" src="libs/{{filePath}}"></script>',
+                        css:'<link rel="stylesheet" href="libs/{{filePath}}" />'
+		    }
+		}
+	    }
+	}))
+	.pipe(gulp.dest(dir.build));
 });

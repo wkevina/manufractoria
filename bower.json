@@ -1,0 +1,42 @@
+{
+  "name": "manufractoria",
+  "version": "0.0.0",
+  "authors": [
+    "Kevin Ward <antiomiae@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "github.com/wkevina/manufractoria",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "Snap.svg": "~0.4.1",
+    "foundation": "~5.5.3",
+    "underscore": "~1.8.3",
+    "radiojs": "~0.2.0",
+    "js-signals": "signals#~1.0.0"
+  },
+  "resolutions": {
+    "Snap.svg": "master"
+  },
+  "overrides": {
+    "foundation": {
+      "main": [
+        "css/foundation.min.css",
+        "css/normalize.min.css",
+        "js/foundation.js"
+      ]
+    },
+    "radiojs": {
+      "main": "./radio.js"
+    }
+  }
+}
