@@ -35,7 +35,7 @@ ul.controls-desc{
 }
 
 ul.controls-desc li {
-  /*display: inline-block;*/
+    /*display: inline-block;*/
 }
 
 .game-bg {
@@ -49,11 +49,7 @@ ul.controls-desc li {
     stroke-width: 1px;
 }
 
-.game-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-}
+
 
 .tile-control-button .bg {
     fill: none;
@@ -92,36 +88,13 @@ ul.controls-desc li {
     stroke: white;
 }
 
-@media only screen and (min-aspect-ratio: 568/320) {
-    .game-container {
-        /* width: unset; */
-    }
-    .game-container svg {
-        height: 100vh;
-    }
+.game-container {
+    width: 100%;
 }
 
-@media only screen and (max-aspect-ratio: 567/320) {
-
-    @media only screen and (min-width: 1000px) {
-        .game-container {
-            width: 1000px;
-        }
-    }
-
-    @media only screen and (max-width: 999px) {
-        .game-container {
-            width: 100%;
-        }
-    }
+.game-container svg {
+    width: 100%;
+    max-height: 100vh;
 }
 
-
-
-@media only screen and (max-width: 999px) {
-    #controls button {
-        font-size: 24px;
-        padding: 5px 22px;
-    }
-}
 /*  green: #03ec04 */
