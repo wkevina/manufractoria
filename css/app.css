@@ -49,7 +49,11 @@ ul.controls-desc li {
     stroke-width: 1px;
 }
 
-
+rect.highlight {
+    fill: none;
+    stroke: white;
+    stroke-width: 3px;
+}
 
 .tile-control-button .bg {
     fill: none;

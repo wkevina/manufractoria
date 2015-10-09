@@ -1,3 +1,5 @@
+/*global radio */
+
 
 import core from "core";
 import graphics from "graphics";
@@ -239,6 +241,10 @@ export class GridView {
         this.rows = rows;
 
         this.grid.click(this.onClick.bind(this));
+
+        radio("highlighted").subscribe([this.highlight, this]);
+        radio("unhighlighted").subscribe([this.clearHighlight, this]);
+
     }
 
     onClick(evt, x, y) {
@@ -250,8 +256,27 @@ export class GridView {
         }
     }
 
+    highlight(cell) {
+
+        if (cell && cell.x !== undefined && cell.y !== undefined) {
+            this.clearHighlight();
+
+            let sw = this.width / this.cols,
+                sh = this.height / this.rows,
+
+                highlight = this.grid.rect(cell.x * sw, cell.y * sh, sw, sh).
+                    addClass("highlight").attr({fill: "white"});
+        }
+    }
+
+    clearHighlight() {
+        this.grid.selectAll(".highlight").forEach((el) => el.remove());
+    }
+
     remove() {
         this.grid.remove();
+        radio("hightlighted").unsubscribe(this.highlight);
+        radio("unhightlighted").unsubscribe(this.clearHighlight);
     }
 
     drawGrid() {
@@ -266,12 +291,12 @@ export class GridView {
         var sy = this.height / this.rows;
 
         for (var x = 0; x <= this.cols; ++x) {
-            var l = this.grid.line(x*sw, 0, x*sw, this.height);
+            let l = this.grid.line(x*sw, 0, x*sw, this.height);
             l.addClass("grid-line");
         }
 
         for (var y = 0; y <= this.rows; ++y) {
-            var l = this.grid.line(0, y*sy, this.width, y*sy);
+            let l = this.grid.line(0, y*sy, this.width, y*sy);
             l.addClass("grid-line");
         }
 
