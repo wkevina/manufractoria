@@ -21,39 +21,41 @@ core.symbols = {
 /* Tape
  Represents an ordered queue of symbols
  */
-function Tape() {
-    this.symbols = [];
-    this.changed = new signals.Signal();
-};
-
-Tape.prototype.head = function head() {
-    if (this.symbols.length > 0) {
-        return this.symbols[0];
-    } else {
-        return core.EMPTY;
+export class Tape {
+    constructor() {
+        this.symbols = [];
+        this.changed = new signals.Signal();
     }
-};
 
-Tape.prototype.pop = function pop() {
-    if (this.symbols.length > 0) {
-        var popped = this.symbols.shift();
-        this.changed.dispatch("pop");
-        return popped;
-    } else {
-        return core.EMPTY;
+    head() {
+        if (this.symbols.length > 0) {
+            return this.symbols[0];
+        } else {
+            return core.EMPTY;
+        }
     }
-};
 
-Tape.prototype.append = function append(s) {
-    this.symbols.push(s);
-    this.changed.dispatch("append");
-};
+    pop() {
+        if (this.symbols.length > 0) {
+            var popped = this.symbols.shift();
+            this.changed.dispatch("pop");
+            return popped;
+        } else {
+            return core.EMPTY;
+        }
+    }
 
+    append(s) {
+        this.symbols.push(s);
+        this.changed.dispatch("append");
+    }
 
-Tape.clone = function(otherTape) {
-    var newTape = new Tape();
-    newTape.symbols = otherTape.symbols.slice(0);
-    return newTape;
+    static clone(otherTape) {
+        var newTape = new Tape();
+        newTape.symbols = otherTape.symbols.slice(0);
+        return newTape;
+    }
+
 };
 
 core.Tape = Tape;
