@@ -114,3 +114,20 @@ gulp.task('bower', ['copy-static'], function() {
 	}))
 	.pipe(gulp.dest(dir.build));
 });
+
+
+gulp.task('icons', ['bower'], function() {
+    var favicons = require('gulp-favicons');
+
+    return gulp.src(dir.build + '/index.html')
+        .pipe(favicons({
+            files: {
+                src: "img/icon.png",
+                dest: "img"
+            },
+            settings: {
+                background: "#333333"
+            }
+        }))
+        .pipe(gulp.dest(dir.build));
+});
