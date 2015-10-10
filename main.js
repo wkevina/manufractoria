@@ -8,6 +8,11 @@ System.config({
 
 window.addEventListener("load", function() {
     console.log("Loading");
+
+    if (window.navigator.standalone == true) {
+        $(".hide-fullscreen").addClass("hide");
+    }
+
     System.import('app').then(function(App) {
         var vertical_resolution = 524,
 

@@ -4,6 +4,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <title>Manufractoria</title>
 
@@ -38,7 +41,7 @@
 
   </head>
   <body>
-    <div class="row">
+    <div class="row hide-fullscreen">
       <div class="small-12 medium-6 small-only-text-center columns">
         <h1>Manufractoria</h1>
       </div>
@@ -49,10 +52,10 @@
         <svg id="main-svg"></svg>
       </div>
     </div>
-    <div class="row">
+    <div class="row hide-fullscreen">
       <div class="columns"><p></p></div>
     </div>
-    <div class="row large-center hide-for-touch">
+    <div class="row large-center hide-for-touch hide-fullscreen">
 
       <!-- <div class="medium-4 small-only-text-center columns">
       <ul class="button-group radius" id="controls">
@@ -76,7 +79,7 @@
     </div>
 
     <form>
-      <div class="row form">
+      <div class="row form hide-fullscreen">
         <div class="medium-9 large-9 columns">
           <div class="row collapse prefix-radius" id="link-form">
             <label>Make a link to your program</label>
@@ -92,7 +95,7 @@
     </form>
 
     <form>
-      <div class="row form">
+      <div class="row form hide-fullscreen">
         <div class="medium-9 large-9 columns">
           <div class="row collapse prefix-radius" id="load-form">
             <label class="secondary">Load a level string</label>
