@@ -35,8 +35,8 @@
 // $total-columns: 12;
 
 // We use these to control various global styles
-// $body-bg: #fff;
-// $body-font-color: #222;
+$body-bg: #1b1b1b;
+$body-font-color: #eef;
 // $body-font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 // $body-font-weight: normal;
 // $body-font-style: normal;
@@ -371,7 +371,7 @@
 // $form-label-pointer: pointer;
 // $form-label-font-size: rem-calc(14);
 // $form-label-font-weight: normal;
-// $form-label-font-color: scale-color(#000, $lightness: 30%);
+$form-label-font-color: scale-color(#fff, $lightness: 30%);
 // $form-label-bottom-margin: rem-calc(8);
 // $input-font-family: inherit;
 // $input-font-color: rgba(0,0,0,0.75);
@@ -1086,7 +1086,7 @@
 // $header-font-family: join("Open Sans", $body-font-family);
 // $header-font-weight: 300;
 // $header-font-style: normal;
-// $header-font-color: #222;
+$header-font-color: #eef;
 // $header-line-height: 1.4;
 // $header-top-margin: .2rem;
 // $header-bottom-margin: .5rem;
