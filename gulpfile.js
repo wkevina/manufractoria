@@ -28,6 +28,8 @@ var dir = {
     imgOut: './dist/img/',
     css: './css/*',
     cssOut: './dist/css',
+    scss: 'scss/**/*.scss',
+    scssIgnore: '!scss/build.scss',
     build: './dist',
     ignore: '!**/#*'
 };
@@ -38,7 +40,6 @@ var copyTask = require('./copyTask')(staticCopyTasks, dir, dir.build);
 copyTask('index');
 copyTask('img');
 copyTask('lib');
-copyTask('css');
 
 gulp.task('clean-build', function(done) {
     del([dir.build + "/*.js", dir.build + "/*.map"]).then(function(){done();});
@@ -74,7 +75,12 @@ gulp.task('watchJS', function() {
 
 gulp.task('watchStatic', function() {
     // return gulp.watch([dir.source, dir.lib, dir.index], ['build-dev']);
-    return gulp.watch([dir.ignore, dir.index, dir.css, dir.img], ['bower']);
+    return gulp.watch([dir.ignore, dir.index, dir.img], ['bower']);
+});
+
+gulp.task('watch-scss', function() {
+    // return gulp.watch([dir.source, dir.lib, dir.index], ['build-dev']);
+    return gulp.watch([dir.ignore, dir.scssIgnore, dir.scss], ['scss']);
 });
 
 gulp.task('connect', function() {
@@ -87,7 +93,7 @@ gulp.task('connect', function() {
 });
 
 gulp.task('build-dev', function(cb) {
-    runSeq('clean-build', ['compileApp', 'bower'], cb);
+    runSeq('clean-build', ['compileApp', 'bower', 'scss'], cb);
 });
 
 /* Build and copy files to outside directory */
@@ -97,7 +103,7 @@ gulp.task('export', ['build-dev'], function() {
 });
 
 gulp.task('default', function(cb) {
-    runSeq('build-dev', ['watchJS', 'watchStatic', 'connect'], cb);
+    runSeq('build-dev', ['watchJS', 'watchStatic', 'watch-scss', 'connect'], cb);
 });
 
 gulp.task('bower', ['copy-static'], function() {
@@ -117,7 +123,7 @@ gulp.task('bower', ['copy-static'], function() {
 	.pipe(gulp.dest(dir.build));
 });
 
-gulp.task('bower-scss', ['copy-static'], function() {
+gulp.task('bower-scss', function() {
     return gulp.src('scss/main.scss')
 	.pipe(wiredep({
             overrides: {
@@ -125,14 +131,6 @@ gulp.task('bower-scss', ['copy-static'], function() {
                     main: ["./scss/foundation.scss", "./scss/normalize.scss"]
                 }
             }
-	    // fileTypes: {
-	    //     html: {
-	    //         replace: {
-	    //     	js: '<script type="text/javascript" src="libs/{{filePath}}"></script>',
-            //             css:'<link rel="stylesheet" href="libs/{{filePath}}" />'
-	    //         }
-	    //     }
-	    // }
 	}))
         .pipe($.rename('build.scss'))
 
