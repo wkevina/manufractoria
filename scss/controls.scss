@@ -1,0 +1,24 @@
+
+.tile-control-button {
+	.bg {
+		fill: none;
+		stroke: #fff;
+	}
+	&.direction .bg {
+		fill: #1b1b1b;
+		stroke: none;
+	}
+}
+
+.play-control {
+	opacity: 1.0;
+	&.active {
+		opacity: 0.6;
+	}
+	&.play, &.pause, &.stop {
+            .bg {
+		fill: none;
+		stroke: #fff;
+	    }
+	}
+}

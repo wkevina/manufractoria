@@ -1,0 +1,29 @@
+
+html, body {
+    background-color: #1b1b1b;
+    color: #eef;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #eef;
+}
+
+ul.controls-desc{
+    list-style: none;
+    margin-left: 0px;
+}
+
+.game-container {
+    width: 100%;
+
+    svg {
+        width: 100%;
+        max-height: 100vh;
+    }
+}
+
+/*  green: #03ec04 */
+@import "controls.scss";
+@import "program-view.scss";
+@import "tape-view.scss";
+@import "palette.scss";

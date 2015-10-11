@@ -10,6 +10,8 @@ var del = require('del');
 var connect = require('gulp-connect');
 var wiredep = require('wiredep').stream;
 
+var $ = require('gulp-load-plugins')({camelize: true});
+
 var dir = {
     index: ['./index.html', 'main.js'],
     sourceDir: './',
@@ -39,7 +41,7 @@ copyTask('lib');
 copyTask('css');
 
 gulp.task('clean-build', function(done) {
-    del(dir.build).then(function(){done();});
+    del([dir.build + "/*.js", dir.build + "/*.map"]).then(function(){done();});
 });
 
 gulp.task('copy-static', function(callback) {
@@ -72,7 +74,7 @@ gulp.task('watchJS', function() {
 
 gulp.task('watchStatic', function() {
     // return gulp.watch([dir.source, dir.lib, dir.index], ['build-dev']);
-    return gulp.watch([dir.ignore, dir.lib, dir.index, dir.css, dir.img], ['bower']);
+    return gulp.watch([dir.ignore, dir.index, dir.css, dir.img], ['bower']);
 });
 
 gulp.task('connect', function() {
@@ -113,6 +115,39 @@ gulp.task('bower', ['copy-static'], function() {
 	    }
 	}))
 	.pipe(gulp.dest(dir.build));
+});
+
+gulp.task('bower-scss', ['copy-static'], function() {
+    return gulp.src('scss/main.scss')
+	.pipe(wiredep({
+            overrides: {
+                foundation: {
+                    main: ["./scss/foundation.scss", "./scss/normalize.scss"]
+                }
+            }
+	    // fileTypes: {
+	    //     html: {
+	    //         replace: {
+	    //     	js: '<script type="text/javascript" src="libs/{{filePath}}"></script>',
+            //             css:'<link rel="stylesheet" href="libs/{{filePath}}" />'
+	    //         }
+	    //     }
+	    // }
+	}))
+        .pipe($.rename('build.scss'))
+
+	.pipe(gulp.dest("scss"));
+});
+
+gulp.task('scss', ['bower-scss'], function() {
+    return gulp.src('scss/build.scss')
+    	.pipe(plumber())
+	.pipe($.sourcemaps.init())
+        .pipe($.sass({
+            includePaths: ['bower_components/foundation/scss']
+        }))
+        .pipe($.sourcemaps.write('.'))
+        .pipe(gulp.dest(dir.cssOut));
 });
 
 

@@ -5,6 +5,9 @@
   "main": "index.html",
   "dependencies": {
     "gulp-favicons": "^1.0.9",
+    "gulp-load-plugins": "^0.10.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.0.4",
     "systemjs": "^0.19.4",
     "wiredep": "^2.2.2"
   },

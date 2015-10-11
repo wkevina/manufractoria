@@ -23,19 +23,13 @@
     "underscore": "~1.8.3",
     "radiojs": "~0.2.0",
     "js-signals": "signals#~1.0.0",
-    "Ionicons": "ionicons#~2.0.1"
+    "Ionicons": "ionicons#~2.0.1",
+    "bourbon": "~4.2.5"
   },
   "resolutions": {
     "Snap.svg": "master"
   },
   "overrides": {
-    "foundation": {
-      "main": [
-        "css/foundation.min.css",
-        "css/normalize.min.css",
-        "js/foundation.js"
-      ]
-    },
     "radiojs": {
       "main": "./radio.js"
     }

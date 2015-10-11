@@ -1,0 +1,36 @@
+
+.grid-bg {
+    fill: #16e;
+}
+
+.grid-line {
+    stroke: #aaa;
+}
+
+.game-bg {
+    fill: none;
+    stroke: none;
+    stroke-width: 2px;
+}
+
+rect.highlight {
+    fill: none;
+    stroke: white;
+    stroke-width: 2px;
+
+    @include animation(glow 2s linear);
+}
+
+@include keyframes(glow) {
+    0% {
+        stroke-opacity: 1.0;
+    }
+
+    50% {
+        stroke-opacity: 0.1;
+    }
+
+    100% {
+        stroke-opacity: 1.0;
+    }
+}
