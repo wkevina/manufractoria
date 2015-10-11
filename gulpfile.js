@@ -70,7 +70,7 @@ gulp.task('compileApp', function() {
 
 gulp.task('watchJS', function() {
     // return gulp.watch([dir.source, dir.lib, dir.index], ['build-dev']);
-    return gulp.watch([dir.ignore, dir.source], ['build-dev']);
+    return gulp.watch([dir.ignore, dir.source], ['compileApp']);
 });
 
 gulp.task('watchStatic', function() {
