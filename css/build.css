@@ -55,8 +55,8 @@ body {
   font-size: 100%; }
 
 body {
-  background: #fff;
-  color: #222;
+  background: #1b1b1b;
+  color: #eef;
   cursor: auto;
   font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
   font-style: normal;
@@ -2560,7 +2560,7 @@ form .row textarea.columns {
 
 /* Label Styles */
 label {
-  color: #4d4d4d;
+  color: white;
   cursor: pointer;
   display: block;
   font-size: 0.875rem;
@@ -2576,7 +2576,7 @@ label {
     padding: 0.5625rem 0; }
   label small {
     text-transform: capitalize;
-    color: #676767; }
+    color: white; }
 
 /* Attach elements to the beginning or end of an input */
 .prefix,
@@ -2934,7 +2934,7 @@ span.error, small.error {
 
 .error > label > small {
   background: transparent;
-  color: #676767;
+  color: white;
   display: inline;
   font-size: 60%;
   font-style: normal;
@@ -5301,7 +5301,7 @@ p {
 
 /* Default header styles */
 h1, h2, h3, h4, h5, h6 {
-  color: #222222;
+  color: #eef;
   font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
   font-style: normal;
   font-weight: normal;
@@ -5310,7 +5310,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 0.2rem;
   text-rendering: optimizeLegibility; }
   h1 small, h2 small, h3 small, h4 small, h5 small, h6 small {
-    color: #6f6f6f;
+    color: #f4f4ff;
     font-size: 60%;
     line-height: 0; }
 
@@ -5334,7 +5334,7 @@ h6 {
 
 .subheader {
   line-height: 1.4;
-  color: #6f6f6f;
+  color: #f4f4ff;
   font-weight: normal;
   margin-top: 0.2rem;
   margin-bottom: 0.5rem; }
@@ -5437,7 +5437,7 @@ abbr,
 acronym {
   text-transform: uppercase;
   font-size: 90%;
-  color: #222;
+  color: #eef;
   cursor: help; }
 
 abbr {
@@ -5453,17 +5453,17 @@ blockquote {
   blockquote cite {
     display: block;
     font-size: 0.8125rem;
-    color: #555555; }
+    color: #f2f2ff; }
     blockquote cite:before {
       content: "\2014 \0020"; }
     blockquote cite a,
     blockquote cite a:visited {
-      color: #555555; }
+      color: #f2f2ff; }
 
 blockquote,
 blockquote p {
   line-height: 1.6;
-  color: #6f6f6f; }
+  color: #f4f4ff; }
 
 /* Microformats */
 .vcard {
@@ -6912,13 +6912,6 @@ table {
 td,
 th {
   padding: 0; }
-
-html, body {
-  background-color: #1b1b1b;
-  color: #eef; }
-
-h1, h2, h3, h4, h5, h6 {
-  color: #eef; }
 
 ul.controls-desc {
   list-style: none;
