@@ -8,7 +8,7 @@ import loader from "loader";
 import editor from "editor";
 import core from "core";
 import {Palette, TileControl, PlayControl} from "gui";
-
+import {Modal} from "modal";
 
 const MARGIN = 10, // Space between elements
       PROGRAM_WIDTH = 56 * 9, // program view width, not to exceed
@@ -146,58 +146,84 @@ class App {
         paper.rect(bounds.x, bounds.y, bounds.width, bounds.height).addClass('game-bg');
         this.paper = paper;
         this.scratch = paper.g();
+
+
+
         // Set up UI elements
-        graphics.preload(paper).then(function () {
+        graphics.preload(paper)
+            .then(() => {
 
-            const programLayer = paper.g().addClass('program-layer');
-            //paper.appendTo(document.getElementById("main"));
+                const programLayer = paper.g().addClass('program-layer');
+                //paper.appendTo(document.getElementById("main"));
 
-            const CONTROL_WIDTH = this.canvasSize.width - CONTROL_X;
+                const CONTROL_WIDTH = this.canvasSize.width - CONTROL_X;
 
-            if (this.program == null) {
-                this.program = new program.Program(9, 9);
-                // fill in start and end with defaults
-                this.program.setStart(4, 0);
-                this.program.setEnd(4, 8);
-            }
+                if (this.program == null) {
+                    this.program = new program.Program(9, 9);
+                    // fill in start and end with defaults
+                    this.program.setStart(4, 0);
+                    this.program.setEnd(4, 8);
+                }
 
-            this.programView = new view.ProgramView(programLayer, MARGIN, MARGIN, this.program, 56*9, 56*9);
+                this.programView = new view.ProgramView(programLayer, MARGIN, MARGIN, this.program, 56*9, 56*9);
 
-            this.palette = new Palette(
-                paper,
-                CONTROL_X + CONTROL_WIDTH / 8,
-                this.canvasSize.height / 2,
-                CONTROL_WIDTH * 3 / 4,
-                4
-            );
+                this.palette = new Palette(
+                    paper,
+                    CONTROL_X + CONTROL_WIDTH / 8,
+                    this.canvasSize.height / 2,
+                    CONTROL_WIDTH * 3 / 4,
+                    4
+                );
 
-            this.tileControl = new TileControl(
-                paper,
-                CONTROL_X + 40, // x
-                MARGIN, // y
-                CONTROL_WIDTH / 2 - MARGIN / 2, // width
-                0    // height
-            );
+                this.tileControl = new TileControl(
+                    paper,
+                    CONTROL_X + 40, // x
+                    MARGIN, // y
+                    CONTROL_WIDTH / 2 - MARGIN / 2, // width
+                    0    // height
+                );
 
-            this.playButton = new PlayControl(
-                paper,
-                CONTROL_X,
-                this.canvasSize.height - 68 - MARGIN,
-                68
-            );
+                this.playButton = new PlayControl(
+                    paper,
+                    CONTROL_X,
+                    this.canvasSize.height - 68 - MARGIN,
+                    68
+                );
 
-            this.playButton.x = CONTROL_X + CONTROL_WIDTH / 2 - this.playButton.width / 2;
+                this.playButton.x = CONTROL_X + CONTROL_WIDTH / 2 - this.playButton.width / 2;
 
-            this.editor = new editor.Editor(paper, this.programView, this.tileControl);
+                this.editor = new editor.Editor(paper, this.programView, this.tileControl);
 
-            this.programView.drawProgram();
+                this.programView.drawProgram();
 
-            editor.init();
+                editor.init();
 
-            this.editor.enable();
+                this.editor.enable();
 
-        }.bind(this));
+            })
+            .then(() => {
+                this.showWelcome();
+            });
     }
+
+    showWelcome() {
+        let modal = new Modal(
+            this.paper,
+            this.paper.rect(
+                0, 0,
+                this.canvasSize.width, this.canvasSize.height)
+                .attr({fill: "white"}),
+            300,
+            true
+        );
+
+        modal.show().then(function() {
+            setTimeout(function() {
+                modal.hide();
+            }, 1000);
+        });
+    }
+
     drawToken(mat, animate, callback) {
         if (!this.token) {
             this.token = this.paper.circle(0, 0, 10);
