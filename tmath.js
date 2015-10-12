@@ -57,3 +57,49 @@ Mat2x2.prototype.equals = function(m2) {
 };
 
 tmath.Mat2x2 = Mat2x2;
+
+export function orientationByName(dir, mirror) {
+    var m = tmath.Mat2x2,
+        regular = {
+            "UP": m.kID,
+            "RIGHT": m.kROT1,
+            "DOWN": m.kROT2,
+            "LEFT": m.kROT3
+        },
+        mirrored = {
+            "UP": m.kMIR,
+            "RIGHT": m.kMROT1,
+            "DOWN": m.kMROT2,
+            "LEFT": m.kMROT3
+        };
+
+    return mirror ? mirrored[dir] : regular[dir];
+}
+
+export function isMirrored(orientation) {
+    var m = tmath.Mat2x2,
+        l = [m.kMIR, m.kMROT1, m.kMROT2, m.kMROT3];
+
+    return l.some(
+        (mat) => _.isEqual(mat, orientation)
+    );
+}
+
+export function nameFromOrientation(o) {
+    let mirror = isMirrored(o),
+
+        direction = "UP",
+
+        m = tmath.Mat2x2;
+
+    if (_.isEqual(o, m.kID) || _.isEqual(o, m.kMIR))
+        direction = "UP";
+    if (_.isEqual(o, m.kROT1) || _.isEqual(o, m.kMROT1))
+        direction = "RIGHT";
+    if (_.isEqual(o, m.kROT2) || _.isEqual(o, m.kMROT2))
+        direction = "DOWN";
+    if (_.isEqual(o, m.kROT3) || _.isEqual(o, m.kMROT3))
+        direction = "LEFT";
+
+    return {direction: direction, mirror: mirror};
+}

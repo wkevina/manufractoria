@@ -1,22 +1,21 @@
-let core = core || {};
-
-export default core;
 
 import signals from "signals.js";
 
 /* Symbols */
-core.EMPTY = {symbol: 'empty'};
-core.RED = {symbol: 'red'};
-core.BLUE = {symbol: 'blue'};
-core.GREEN = {symbol: 'green'};
-core.YELLOW = {symbol: 'yellow'};
+let EMPTY = {symbol: 'empty'},
+    RED = {symbol: 'red'},
+    BLUE = {symbol: 'blue'},
+    GREEN = {symbol: 'green'},
+    YELLOW = {symbol: 'yellow'},
 
-core.symbols = {
-    R: core.RED,
-    B: core.BLUE,
-    G: core.GREEN,
-    Y: core.YELLOW
-};
+    symbols = {
+        R: RED,
+        B: BLUE,
+        G: GREEN,
+        Y: YELLOW
+    };
+
+export {RED, GREEN, BLUE, YELLOW, symbols};
 
 /* Tape
  Represents an ordered queue of symbols
@@ -58,4 +57,11 @@ export class Tape {
 
 };
 
-core.Tape = Tape;
+export default {
+    Tape: Tape,
+    RED: RED,
+    GREEN: GREEN,
+    BLUE: BLUE,
+    YELLOW: YELLOW,
+    symbols: symbols
+};

@@ -1,6 +1,3 @@
-let program = program || {};
-
-export default program;
 
 import core from "core";
 import tmath from "tmath";
@@ -12,16 +9,14 @@ var dir = {                     // regardless of how graphics are handled, these
     RIGHT:  new tmath.Vec2(1, 0)      // +x
 };
 
-program.directions = dir;
-
-var makeCellClass = function(typeID) {
+function makeCellClass(typeID) {
     return function() {
         this.type = typeID;
         this.orientation = tmath.Mat2x2.ID();
     };
 };
 
-program.cellTypes = {
+let cellTypes = {
     Empty: makeCellClass("Empty"),
     Start: makeCellClass("Start"),
     End: makeCellClass("End"),
@@ -35,7 +30,6 @@ program.cellTypes = {
     WriteY: makeCellClass("WriteY")
 };
 
-
 class Program {
 
     constructor(cols, rows) {
@@ -47,7 +41,7 @@ class Program {
         for (var x = 0; x < cols; ++x) {
             this.cells.push([]);
             for (var y = 0; y < rows; ++y) {
-                this.cells[x].push(new program.cellTypes.Empty());
+                this.cells[x].push(new cellTypes.Empty());
             }
         }
     }
@@ -57,7 +51,7 @@ class Program {
     }
 
     setCell(x, y, type, orientation) {
-        var s = new program.cellTypes[type]();
+        var s = new cellTypes[type]();
 
         if (orientation) {
             s.orientation = orientation;
@@ -82,11 +76,9 @@ class Program {
         this.setCell(x, y, "End");
         this.start = {x: x, y: y};
     }
-}
+};
 
-program.Program = Program;
-
-program.readLegacyProgramString = function(s) {
+function readLegacyProgramString(s) {
 
     // [lvlString]&[codeString]&[metaInfo]
 
@@ -119,7 +111,7 @@ program.readLegacyProgramString = function(s) {
 
     var typeMap = {c: "Conveyor", b: "WriteB", r: "WriteR", g: "WriteG", y: "WriteY", p: "BranchBR", q: "BranchGY", i: "CrossConveyor"};
 
-    var p = new program.Program(attrs.cols, attrs.rows);
+    var p = new Program(attrs.cols, attrs.rows);
     var parts = attrs.codeString.split(";");
 
     for (var i = 0; i < parts.length; i ++) {
@@ -174,4 +166,11 @@ program.readLegacyProgramString = function(s) {
 
     return p;
 
+};
+
+export default {
+    directions: dir,
+    cellTypes,
+    Program,
+    readLegacyProgramString
 };

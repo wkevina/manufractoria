@@ -6,7 +6,8 @@ import editor from "editor";
 import graphics from "graphics";
 import codeCell from "codeCell";
 import {toTransformString} from "view";
-import {Picker} from "picker";
+import {LockedPicker} from "picker";
+import {orientationByName} from "tmath";
 
 class BaseControl {
     constructor(paper, x, y) {
@@ -300,7 +301,7 @@ export class TileControl extends BaseControl {
         if (this.currentGraphic) {
             let oName = this.currentOrientation,
 
-                o = editor.orientationByName(oName, this.mirror),
+                o = orientationByName(oName, this.mirror),
 
                 rotate = toTransformString(
                     Snap.matrix(o.a, o.b, o.c, o.d, 0, 0)
@@ -339,10 +340,30 @@ export class PlayControl extends BaseControl {
         this.pause = makeButton(32, 0, this.buttonLayer, "PauseButton", "play-control", "pause");
         this.stop = makeButton(32*2, 0, this.buttonLayer, "StopButton", "play-control", "stop");
 
-        this.picker = new Picker({
+        this.picker = new LockedPicker({
             el: this.buttonLayer.node,
             children: ".play-control",
-            class: "active"
+            enableClass: "enable",
+            disableClass: "disable",
+            rules: {
+                ".play": {
+                    enable: [".pause", ".stop"],
+                    disable: [".play"]
+                },
+                ".pause": {
+                    enable: [".play", ".stop"],
+                    disable: [".pause"]
+                },
+                ".stop": {
+                    enable: [".play"],
+                    disable: [".pause", ".stop"]
+                }
+            }
+        });
+
+        this.picker.applyRule({
+            enable: [".play"],
+            disable: [".pause", ".stop"]
         });
 
         function bc (btn, which) {

@@ -1,11 +1,8 @@
-let codeCell = codeCell || {};
-
-export default codeCell;
 
 import program from "program";
 import core from "core";
 
-var codeCells = {
+let codeCells = {
 
     /**
      Conveyor
@@ -94,4 +91,6 @@ var codeCells = {
 
 };
 
-codeCell.codeCells = codeCells;
+export default {
+    codeCells: codeCells
+};
