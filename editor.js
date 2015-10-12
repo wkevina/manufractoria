@@ -333,7 +333,7 @@ class Editor {
 
                 if (type != "Start" && type != "End" && type != "Empty")
 
-                    this.programView.program.setCell(x, y, type, orientationByName(dir, mirrored));
+                    this.programView.program.setCell(x, y, type, orientationByName(data.dir, mirrored));
             }
         }
 
