@@ -1,8 +1,5 @@
-let graphics = {};
 
-export default graphics;
-
-var imageMap = {
+let imageMap = {
     Conveyor: "img/conveyor.svg",
     ConveyorElbow: "img/conveyor-elbow.svg",
     ConveyorTee: "img/conveyor-tee.svg",
@@ -24,11 +21,11 @@ var imageMap = {
     PlayButton: "img/play-button.svg",
     PauseButton: "img/pause-button.svg",
     StopButton:  "img/stop-button.svg"
-};
+},
 
-var globalCanvas = null;
+    globalCanvas = null,
 
-var allImagePromises =
+    allImagePromises =
         Object.keys(imageMap).map(function(key) {
             var url = imageMap[key];
 
@@ -39,16 +36,16 @@ var allImagePromises =
             });
 
             return p;
-        });
+        }),
 
-var preloadPromise = Promise.all(allImagePromises);
+    preloadPromise = Promise.all(allImagePromises);
 
-graphics.preload = function preload(paper) {
+function preload(paper) {
     globalCanvas = paper.g().attr({visibility: "hidden"});
     return preloadPromise;
 };
 
-graphics.getGraphic = function getGraphic(name) {
+function getGraphic(name) {
     var original = imageMap[name];
 
     if (original.parent() !== globalCanvas)
@@ -62,7 +59,7 @@ graphics.getGraphic = function getGraphic(name) {
     return null;
 };
 
-graphics.screenPointToLocal = function screenPointToLocal(x, y, element) {
+function screenPointToLocal(x, y, element) {
     var svg = element.node.ownerSVGElement || element.node,
         spt = svg.createSVGPoint(),
         mat = element.node.getScreenCTM();
@@ -72,6 +69,9 @@ graphics.screenPointToLocal = function screenPointToLocal(x, y, element) {
 
     return spt.matrixTransform(mat.inverse());
 };
+
+export {preload, getGraphic, screenPointToLocal};
+export default {preload, getGraphic, screenPointToLocal};
 
 function getSVG(url) {
     if (!getSVG.cache) {
