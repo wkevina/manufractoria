@@ -1,13 +1,10 @@
-let interpreter = interpreter || {};
-
-export default interpreter;
 
 import program from "program";
 import codeCell from "codeCell";
 import tmath from "tmath";
 import core from "core";
 
-class Interpreter {
+export class Interpreter {
     constructor() {
         this.tape = new core.Tape();
         this.program = null;
@@ -120,7 +117,8 @@ class Interpreter {
         }
 
     }
-}
+};
 
-
-interpreter.Interpreter = Interpreter;
+export default {
+    Interpreter
+};

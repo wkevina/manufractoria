@@ -1,6 +1,6 @@
 
 import program from "program";
-import interpreter from "interpreter";
+import {Interpreter} from "interpreter";
 import graphics from "graphics";
 import * as view from "view";
 import tmath from "tmath";
@@ -201,7 +201,7 @@ class App {
     start() {
         this.isRunning = true;
         this.isPaused = false;
-        this.interpreter = new interpreter.Interpreter();
+        this.interpreter = new Interpreter();
         // Special case for empty testCases
         if (this.testCases.length === 0) {
             this.testCases.push({
