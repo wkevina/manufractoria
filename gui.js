@@ -7,6 +7,7 @@ import graphics from "graphics";
 import codeCell from "codeCell";
 import {toTransformString} from "view";
 import {Picker} from "picker";
+import {orientationByName} from "tmath";
 
 class BaseControl {
     constructor(paper, x, y) {
@@ -300,7 +301,7 @@ export class TileControl extends BaseControl {
         if (this.currentGraphic) {
             let oName = this.currentOrientation,
 
-                o = editor.orientationByName(oName, this.mirror),
+                o = orientationByName(oName, this.mirror),
 
                 rotate = toTransformString(
                     Snap.matrix(o.a, o.b, o.c, o.d, 0, 0)

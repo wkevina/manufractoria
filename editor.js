@@ -1,15 +1,12 @@
 /*global radio */
 
-let editor = editor || {};
-
-export default editor;
-
 import program from "program";
 import graphics from "graphics";
 import * as view from "view";
 import tmath from "tmath";
+import {orientationByName, isMirrored, nameFromOrientation} from "tmath";
 
-editor.events = {
+let events = {
     tileSelected: "tile-selected",
     cellSelected: "cell-selected",
     mirror: "mirror",
@@ -19,59 +16,23 @@ editor.events = {
     hotKey: "hot-key"
 };
 
-editor.trigger = function(event, args) {
+function trigger(event, args) {
     radio(event).broadcast(args);
 };
 
 function registerEvents(evts) {
     Object.keys(evts).forEach(function(key) {
-        radio(editor.events[key]).subscribe(evts[key]);
+        radio(events[key]).subscribe(evts[key]);
     });
 }
-
-editor.registerEvents = registerEvents;
 
 function unregisterEvents(evts) {
     Object.keys(evts).forEach(function(key) {
-        radio(editor.events[key]).unsubscribe(evts[key]);
+        radio(events[key]).unsubscribe(evts[key]);
     });
 }
 
-editor.unregisterEvents = unregisterEvents;
-
-var startEditor = function() {
-
-    var paper = Snap(900, 640);
-
-    graphics.preload(paper).then(function() {
-
-        var programLayer = paper.g().addClass("program-layer");
-
-        paper.appendTo(document.getElementById("main"));
-
-        var palette = new view.Palette(paper, 10, 30, 2),
-
-            currentProgram = new program.Program(10, 10),
-
-            programView = new view.ProgramView(
-                programLayer,
-                10 + palette.drawWidth,
-                30,
-                56,
-                currentProgram
-            ),
-
-            controller = new Editor(paper, programView);
-
-        programView.drawProgram();
-
-        document.body.addEventListener("keydown", dispatchKeyEvents);
-        document.body.addEventListener("mousemove", trackMouse);
-    });
-
-};
-
-editor.init = function () {
+function init() {
     document.body.addEventListener("keydown", dispatchKeyEvents);
     document.body.addEventListener("mousemove", trackMouse);
 };
@@ -85,41 +46,41 @@ function dispatchKeyEvents(evt) {
 
     switch (key) {
         case "r":
-            what = editor.events.rotate;
+            what = events.rotate;
             break;
         case "m":
-            what = (editor.events.mirror);
+            what = (events.mirror);
             break;
         case "s":
-            what = editor.events.setDirection;
+            what = events.setDirection;
             data.dir = "UP";
             break;
         case "d":
-            what = editor.events.setDirection;
+            what = events.setDirection;
             data.dir = "RIGHT";
             break;
         case "w":
-            what = editor.events.setDirection;
+            what = events.setDirection;
             data.dir = "DOWN";
             break;
         case "a":
-            what = editor.events.setDirection;
+            what = events.setDirection;
             data.dir = "LEFT";
             break;
         case "x":
-            what = editor.events.delete;
+            what = events.delete;
             break;
     }
 
     if (!what) {
-        what = editor.events.hotKey;
+        what = events.hotKey;
         data.key = key;
     }
 
-    editor.trigger(what, data);
+    trigger(what, data);
 }
 
-var mousePosition = {
+let mousePosition = {
     x: 0,
     y: 0
 };
@@ -129,7 +90,7 @@ function trackMouse(evt) {
     mousePosition.y = evt.clientY;
 }
 
-var IDLE = Symbol("IDLE"),
+let IDLE = Symbol("IDLE"),
     PLACING = Symbol("PLACING"),
     INPLACE = Symbol("INPLACE");
 
@@ -149,8 +110,6 @@ function cycleGenerator() {
         return oName;
     };
 };
-
-editor.cycleGenerator = cycleGenerator;
 
 let cycleOrientation = cycleGenerator();
 
@@ -473,52 +432,22 @@ class Editor {
     }
 };
 
-editor.Editor = Editor;
+export {
+    Editor,
+    init,
+    events,
+    trigger,
+    registerEvents,
+    unregisterEvents,
+    cycleGenerator
+};
 
-function orientationByName(dir, mirror) {
-    var m = tmath.Mat2x2,
-        regular = {
-            "UP": m.kID,
-            "RIGHT": m.kROT1,
-            "DOWN": m.kROT2,
-            "LEFT": m.kROT3
-        },
-        mirrored = {
-            "UP": m.kMIR,
-            "RIGHT": m.kMROT1,
-            "DOWN": m.kMROT2,
-            "LEFT": m.kMROT3
-        };
-
-    return mirror ? mirrored[dir] : regular[dir];
-}
-
-editor.orientationByName = orientationByName;
-
-function isMirrored(orientation) {
-    var m = tmath.Mat2x2,
-        l = [m.kMIR, m.kMROT1, m.kMROT2, m.kMROT3];
-
-    return l.some(
-        (mat) => _.isEqual(mat, orientation)
-    );
-}
-
-function nameFromOrientation(o) {
-    let mirror = isMirrored(o),
-
-        direction = "UP",
-
-        m = tmath.Mat2x2;
-
-    if (_.isEqual(o, m.kID) || _.isEqual(o, m.kMIR))
-        direction = "UP";
-    if (_.isEqual(o, m.kROT1) || _.isEqual(o, m.kMROT1))
-        direction = "RIGHT";
-    if (_.isEqual(o, m.kROT2) || _.isEqual(o, m.kMROT2))
-        direction = "DOWN";
-    if (_.isEqual(o, m.kROT3) || _.isEqual(o, m.kMROT3))
-        direction = "LEFT";
-
-    return {direction: direction, mirror: mirror};
-}
+export default {
+    Editor,
+    init,
+    events,
+    trigger,
+    registerEvents,
+    unregisterEvents,
+    cycleGenerator
+};
