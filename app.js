@@ -1,14 +1,14 @@
 
-import program from "program";
-import {Interpreter} from "interpreter";
-import graphics from "graphics";
-import * as view from "view";
-import tmath from "tmath";
-import loader from "loader";
-import editor from "editor";
-import core from "core";
-import {Palette, TileControl, PlayControl} from "gui";
-import {Modal} from "modal";
+import program from 'program';
+import {Interpreter} from 'interpreter';
+import graphics from 'graphics';
+import * as view from 'view';
+import tmath from 'tmath';
+import loader from 'loader';
+import editor from 'editor';
+import core from 'core';
+import {Palette, TileControl, PlayControl} from 'gui';
+import {Modal} from 'modal';
 
 const MARGIN = 10, // Space between elements
       PROGRAM_WIDTH = 56 * 9, // program view width, not to exceed
@@ -36,7 +36,7 @@ class App {
         const loadForm = $('#load-form');
         loadForm.find('button').click(this.loadLevel.bind(this));
 
-        radio("play-clicked").subscribe(
+        radio('play-clicked').subscribe(
             () => {
                 if (!this.isRunning) {
                     this.editor.disable();
@@ -48,7 +48,7 @@ class App {
             }
         );
 
-        radio("pause-clicked").subscribe(
+        radio('pause-clicked').subscribe(
             () => {
                 if (this.isRunning) {
                     this.pause(true);
@@ -56,7 +56,7 @@ class App {
             }
         );
 
-        radio("stop-clicked").subscribe(
+        radio('stop-clicked').subscribe(
             () => {
                 this.stop();
                 this.editor.enable();
@@ -88,7 +88,10 @@ class App {
     }
 
     loadLevel() {
-        let loadForm = $('#load-form'), levelString = loadForm.find('input').val().trim(), newProgram = null;
+        let loadForm = $('#load-form'),
+            levelString = loadForm.find('input').val().trim(),
+            newProgram = null;
+
         if (levelString.startsWith('lvl')) {
             newProgram = program.readLegacyProgramString(levelString);
         } else {
@@ -101,12 +104,14 @@ class App {
                 console.log('Unable to load program string');
             }
         }
+
         if (newProgram) {
             this.program = newProgram;
             this.programView.setProgram(newProgram);
             this.programView.drawProgram();
         }
     }
+
     generateLink() {
         if (this.program != null && this.testCases != null) {
             let link = `${ window.location.href.split('#')[0] }#`;
@@ -114,6 +119,7 @@ class App {
             $('#link-form').find('input').val(decodeURI(link));
         }
     }
+
     main() {
         let paper = Snap(document.getElementById('main-svg'));
 
@@ -124,25 +130,25 @@ class App {
         this.paper = paper;
         this.scratch = paper.g();
 
-
-
         // Set up UI elements
         graphics.preload(paper)
             .then(() => {
 
                 const programLayer = paper.g().addClass('program-layer');
+
                 //paper.appendTo(document.getElementById("main"));
 
                 const CONTROL_WIDTH = this.canvasSize.width - CONTROL_X;
 
                 if (this.program == null) {
                     this.program = new program.Program(9, 9);
+
                     // fill in start and end with defaults
                     this.program.setStart(4, 0);
                     this.program.setEnd(4, 8);
                 }
 
-                this.programView = new view.ProgramView(programLayer, MARGIN, MARGIN, this.program, 56*9, 56*9);
+                this.programView = new view.ProgramView(programLayer, MARGIN, MARGIN, this.program, 56 * 9, 56 * 9);
 
                 this.palette = new Palette(
                     paper,
@@ -189,7 +195,7 @@ class App {
             this.paper.rect(
                 0, 0,
                 this.canvasSize.width, this.canvasSize.height)
-                .attr({fill: "white"}),
+                .attr({fill: 'white'}),
             300,
             true
         );
@@ -205,7 +211,9 @@ class App {
         if (!this.token) {
             this.token = this.paper.circle(0, 0, 10);
         }
+
         this.paper.append(this.token);
+
         // make sure token is on top
         let head = this.tapeView.tape.head(), fill;
         if (head && head.symbol != 'empty') {
@@ -213,6 +221,7 @@ class App {
         } else {
             fill = '#E0E';
         }
+
         this.token.animate({ fill: fill }, this.stepTime / 2);
         if (!animate) {
             this.token.transform(mat);
@@ -224,10 +233,12 @@ class App {
             });
         }
     }
+
     start() {
         this.isRunning = true;
         this.isPaused = false;
         this.interpreter = new Interpreter();
+
         // Special case for empty testCases
         if (this.testCases.length === 0) {
             this.testCases.push({
@@ -253,8 +264,9 @@ class App {
             CONTROL_WIDTH - 10,
             (CONTROL_WIDTH - 10) / 10,
             currentTape,
-            Math.floor((this.canvasSize.height/2 - MARGIN) / ((CONTROL_WIDTH - 10) / 10))
+            Math.floor((this.canvasSize.height / 2 - MARGIN) / ((CONTROL_WIDTH - 10) / 10))
         );
+
         // 3 rows
         // hide Palette
         this.palette.show(false);
@@ -264,6 +276,7 @@ class App {
         this.interpreter.start();
         this.update();
     }
+
     stop() {
         this.isRunning = false;
         this.isPaused = false;
@@ -272,9 +285,11 @@ class App {
         this.currentTest.index = 0;
         this.palette.show();
     }
+
     pause(shouldPause) {
         this.isPaused = shouldPause;
     }
+
     // Governor for state when game is running
     // Responsibilities are:
     // Determine if test case has been passed or failed
@@ -286,6 +301,7 @@ class App {
                 // Interpreter has stopped
                 const finishedProperly = int.accept == test.accept, correctOuput = test.output.symbols.length > 0 ? tapesAreEqual(int.tape, test.output) : // compare if output not empty
                           true;
+
                 // otherwise ignore final tape
                 console.log('Test finished.');
                 console.log(finishedProperly && correctOuput ? 'Passed' : 'Failed');
@@ -295,6 +311,7 @@ class App {
                         window.setTimeout(() => this.start());
                     }
                 }
+
                 this.isRunning = false;
             } else {
                 // check for cycle limit
@@ -302,6 +319,7 @@ class App {
             }
         }
     }
+
     run() {
         // If we aren't running, set everything up and start the loop
         if (this.isRunning) {
@@ -315,6 +333,7 @@ class App {
             }
         }
     }
+
     // Calls interpreter's step and manages animation
     _step() {
 
@@ -325,7 +344,6 @@ class App {
                 corner = this.exchange(
                     this.programView.gridView.getGlobalCellMatrix(oldPos.x, oldPos.y, false)
                 );
-
 
             this.drawToken(corner);
             this.interpreter.step();
@@ -353,8 +371,6 @@ class App {
     }
 }
 
-
-
 function setViewbox(svgel, x, y, width, height) {
     svgel.setAttribute('viewBox', [
         x,
@@ -363,9 +379,11 @@ function setViewbox(svgel, x, y, width, height) {
         height
     ].join(','));
 }
+
 function tapesAreEqual(t1, t2) {
     return loader.tapeToJson(t1) == loader.tapeToJson(t2);
 }
+
 export default App;    /*
                         Example hash level:
                         #{"title":"Sample","tape":["BYRGGYRYRGRRGBYRGYRYRGYRGBRYRRBRBGBBYRBYRBGBRBYRRYRYRGBGGBGRYRRGRRYRYRRYRBRRBYRGGRBYRBRBYRRYRGRRGGRRRGYRBYRRRRRRBYRBBGBBRG"],"program":{"cols":9,"rows":9,"cells":[{"x":2,"y":1,"orientation":"ROT3","type":"Conveyor"},{"x":2,"y":2,"orientation":"ROT3","type":"BranchBR"},{"x":2,"y":3,"orientation":"ROT3","type":"BranchBR"},{"x":2,"y":4,"orientation":"ROT3","type":"BranchGY"},{"x":2,"y":5,"orientation":"ROT3","type":"BranchGY"},{"x":3,"y":1,"orientation":"ROT2","type":"Conveyor"},{"x":3,"y":2,"orientation":"ROT2","type":"BranchBR"},{"x":3,"y":3,"orientation":"ROT2","type":"BranchBR"},{"x":3,"y":4,"orientation":"ROT2","type":"BranchGY"},{"x":3,"y":5,"orientation":"ROT2","type":"BranchGY"},{"x":4,"y":1,"orientation":"ROT1","type":"Conveyor"},{"x":4,"y":2,"orientation":"ROT1","type":"BranchBR"},{"x":4,"y":3,"orientation":"ROT1","type":"BranchBR"},{"x":4,"y":4,"orientation":"ROT1","type":"BranchGY"},{"x":4,"y":5,"orientation":"ROT1","type":"BranchGY"},{"x":5,"y":1,"orientation":"ID","type":"Conveyor"},{"x":5,"y":2,"orientation":"MIR","type":"BranchBR"},{"x":5,"y":3,"orientation":"ID","type":"BranchBR"},{"x":5,"y":4,"orientation":"MIR","type":"BranchGY"},{"x":5,"y":5,"orientation":"ID","type":"BranchGY"}],"start":{"x":4,"y":0,"orientation":"ID"},"end":{"x":4,"y":8,"orientation":"ID"}}}
