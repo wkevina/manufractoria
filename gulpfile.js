@@ -1,6 +1,6 @@
 /*global require: true */
 
-var gulp = require('gulp');
+ var gulp = require('gulp');
 var plumber = require('gulp-plumber');
 var babel = require('gulp-babel');
 var sourceMaps = require('gulp-sourcemaps');
@@ -22,7 +22,7 @@ var dir = {
           'node_modules/systemjs/dist/system.*',
           'node_modules/babel-core/browser-polyfill.*',
           'bower_components/**/*'
-	 ],
+         ],
     libOut: './dist/libs',
     img: './img/**/*.svg',
     imgOut: './dist/img/',
@@ -42,7 +42,7 @@ copyTask('img');
 copyTask('lib');
 
 gulp.task('clean-build', function(done) {
-    del([dir.build + "/*.js", dir.build + "/*.map"]).then(function(){done();});
+    del([dir.build + '/*.js', dir.build + '/*.map']).then(function() {done();});
 });
 
 gulp.task('copy-static', function(callback) {
@@ -52,19 +52,18 @@ gulp.task('copy-static', function(callback) {
 gulp.task('compileApp', function() {
 
     var babelOptions = {
-	modules: 'system',
-	moduleIds: true
+        modules: 'system',
+        moduleIds: true
     };
 
-
     return gulp.src(dir.source, {
-	base: dir.sourceDir
+        base: dir.sourceDir
     })
-	.pipe(plumber())
-	.pipe(sourceMaps.init())
-	.pipe(babel(babelOptions))
+        .pipe(plumber())
+        .pipe(sourceMaps.init())
+        .pipe(babel(babelOptions))
         .pipe(concat('all.js'))
-	.pipe(sourceMaps.write('.', {sourceMappingURLPrefix: ''}))
+        .pipe(sourceMaps.write('.', {sourceMappingURLPrefix: ''}))
         .pipe(gulp.dest(dir.build));
 });
 
@@ -85,9 +84,9 @@ gulp.task('watch-scss', function() {
 
 gulp.task('connect', function() {
     return connect.server({
-	root: dir.build,
-	livereload: false,
-	host: 'localhost',
+        root: dir.build,
+        livereload: false,
+        host: 'localhost',
         port: 8081
     });
 });
@@ -108,39 +107,39 @@ gulp.task('default', function(cb) {
 
 gulp.task('bower', ['copy-static'], function() {
     return gulp.src(dir.build + '/index.html')
-	.pipe(wiredep({
-	    cwd: '.',
-	    ignorePath: /\.\.\/bower_components\//,
-	    fileTypes: {
-		html: {
-		    replace: {
-			js: '<script type="text/javascript" src="libs/{{filePath}}"></script>',
-                        css:'<link rel="stylesheet" href="libs/{{filePath}}" />'
-		    }
-		}
-	    }
-	}))
-	.pipe(gulp.dest(dir.build));
+        .pipe(wiredep({
+            cwd: '.',
+            ignorePath: /\.\.\/bower_components\//,
+            fileTypes: {
+        html: {
+            replace: {
+                js: '<script type="text/javascript" src="libs/{{filePath}}"></script>',
+                css:'<link rel="stylesheet" href="libs/{{filePath}}" />'
+            }
+        }
+    }
+        }))
+        .pipe(gulp.dest(dir.build));
 });
 
 gulp.task('bower-scss', function() {
     return gulp.src('scss/main.scss')
-	.pipe(wiredep({
+        .pipe(wiredep({
             overrides: {
                 foundation: {
-                    main: ["./scss/foundation.scss", "./scss/normalize.scss"]
+                    main: ['./scss/foundation.scss', './scss/normalize.scss']
                 }
             }
-	}))
+        }))
         .pipe($.rename('build.scss'))
 
-	.pipe(gulp.dest("scss"));
+        .pipe(gulp.dest('scss'));
 });
 
 gulp.task('scss', ['bower-scss'], function() {
     return gulp.src('scss/build.scss')
-    	.pipe(plumber())
-	.pipe($.sourcemaps.init())
+        .pipe(plumber())
+        .pipe($.sourcemaps.init())
         .pipe($.sass({
             includePaths: ['bower_components/foundation/scss']
         }))
@@ -148,18 +147,17 @@ gulp.task('scss', ['bower-scss'], function() {
         .pipe(gulp.dest(dir.cssOut));
 });
 
-
 gulp.task('icons', ['bower'], function() {
     var favicons = require('gulp-favicons');
 
     return gulp.src(dir.build + '/index.html')
         .pipe(favicons({
             files: {
-                src: "img/icon.png",
-                dest: "img"
+                src: 'img/icon.png',
+                dest: 'img'
             },
             settings: {
-                background: "#333333"
+                background: '#333333'
             }
         }))
         .pipe(gulp.dest(dir.build));

@@ -3,13 +3,18 @@ export class Picker {
 
     constructor(root) {
         let args = {
-            el: null, 		// Root element for picker
-            children: "*",		// Selector for children
-            class: "picker-selected"// Class to add to picked children
+            // Root element for picker
+            el: null,
+
+            // Selector for children
+            children: '*',
+
+            // Class to add to picked children
+            class: 'picker-selected'
         };
 
         if (_.isUndefined(root))
-            console.log("Must pass argument to Picker constructor");
+            console.log('Must pass argument to Picker constructor');
 
         if (_.isObject(root))
             args = _.defaults(_.clone(root), args);
@@ -19,7 +24,7 @@ export class Picker {
         if (_.isString(args.el)) {
             args.el = document.querySelector(args.el);
         } else if (!_.isElement(args.el)) {
-            console.log("Must pass string or element to picker");
+            console.log('Must pass string or element to picker');
         }
 
         // copy properties to this
@@ -31,7 +36,7 @@ export class Picker {
         var children = this.el.querySelectorAll(this.children);
 
         for (var child of children) {
-            child.addEventListener("click", this._clickHandler.bind(this));
+            child.addEventListener('click', this._clickHandler.bind(this));
         }
     }
 
@@ -76,8 +81,8 @@ export class LockedPicker extends Picker {
     constructor(args) {
         super(args);
 
-        this.enableClass = args.enableClass || "enable";
-        this.disableClass = args.disableClass || "disable";
+        this.enableClass = args.enableClass || 'enable';
+        this.disableClass = args.disableClass || 'disable';
         this.rules = args.rules || {};
     };
 

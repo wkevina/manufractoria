@@ -1,26 +1,26 @@
 
 let imageMap = {
-    Conveyor: "img/conveyor.svg",
-    ConveyorElbow: "img/conveyor-elbow.svg",
-    ConveyorTee: "img/conveyor-tee.svg",
-    ConveyorTeeTwo: "img/conveyor-tee-2.svg",
-    ConveyorEx: "img/conveyor-ex.svg",
-    CrossConveyor: "img/cross-conveyor.svg",
-    BranchBR: "img/branch-br.svg",
-    BranchGY: "img/branch-gy.svg",
-    WriteB: "img/write-blue.svg",
-    WriteR: "img/write-red.svg",
-    WriteY: "img/write-yellow.svg",
-    WriteG: "img/write-green.svg",
-    WriterConnector: "img/writer-connector.svg",
-    Start: "img/start.svg",
-    End: "img/end.svg",
+    Conveyor: 'img/conveyor.svg',
+    ConveyorElbow: 'img/conveyor-elbow.svg',
+    ConveyorTee: 'img/conveyor-tee.svg',
+    ConveyorTeeTwo: 'img/conveyor-tee-2.svg',
+    ConveyorEx: 'img/conveyor-ex.svg',
+    CrossConveyor: 'img/cross-conveyor.svg',
+    BranchBR: 'img/branch-br.svg',
+    BranchGY: 'img/branch-gy.svg',
+    WriteB: 'img/write-blue.svg',
+    WriteR: 'img/write-red.svg',
+    WriteY: 'img/write-yellow.svg',
+    WriteG: 'img/write-green.svg',
+    WriterConnector: 'img/writer-connector.svg',
+    Start: 'img/start.svg',
+    End: 'img/end.svg',
 
-    DeleteButton: "img/delete-button.svg",
-    MirrorButton: "img/mirror-button.svg",
-    PlayButton: "img/play-button.svg",
-    PauseButton: "img/pause-button.svg",
-    StopButton:  "img/stop-button.svg"
+    DeleteButton: 'img/delete-button.svg',
+    MirrorButton: 'img/mirror-button.svg',
+    PlayButton: 'img/play-button.svg',
+    PauseButton: 'img/pause-button.svg',
+    StopButton:  'img/stop-button.svg'
 },
 
     globalCanvas = null,
@@ -41,7 +41,7 @@ let imageMap = {
     preloadPromise = Promise.all(allImagePromises);
 
 function preload(paper) {
-    globalCanvas = paper.g().attr({visibility: "hidden"});
+    globalCanvas = paper.g().attr({visibility: 'hidden'});
     return preloadPromise;
 };
 
@@ -51,9 +51,8 @@ function getGraphic(name) {
     if (original.parent() !== globalCanvas)
         globalCanvas.append(original);
 
-
     if (original) {
-        return globalCanvas.use(original).attr({visibility: "visible"});
+        return globalCanvas.use(original).attr({visibility: 'visible'});
     }
 
     return null;
@@ -85,7 +84,7 @@ function getSVG(url) {
                 Snap.load(
                     url,
                     function(fragment) {
-                        var g = fragment.select("g");
+                        var g = fragment.select('g');
                         getSVG.cache[url] = Promise.resolve(g);
 
                         resolve(g.clone());
@@ -97,7 +96,7 @@ function getSVG(url) {
 
         return p;
     } else {
-        return Promise.resolve(getSVG.cache[url]).then(function (g) {
+        return Promise.resolve(getSVG.cache[url]).then(function(g) {
             return g.clone();
         });
     }
