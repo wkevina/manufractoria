@@ -51,6 +51,10 @@ class BaseControl {
     _translate() {
         this._layer.transform(Snap.matrix().translate(this._x, this._y));
     }
+
+    remove() {
+        this._layer.remove();
+    }
 }
 
 class Palette extends BaseControl {

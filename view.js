@@ -183,9 +183,7 @@ export class TapeView {
     }
 
     remove() {
-        if (this.tape)
-            this.tape.changed.remove(this.animate);
-        this.tape = null;
+        this.setTape(null);
 
         this.tapeView.remove();
     }
@@ -421,15 +419,30 @@ export class ProgramView {
             this.program.changed.remove(this.drawProgram);
 
         this.program = p;
-        this.gridView.remove();
-        this.gridView = new GridView(this._layer, this.x, this.y,
-                                     p.cols * this.tileSize,
-                                     p.rows * this.tileSize,
-                                     p.rows, p.cols);
-        this.gridView.drawGrid();
-        this.cells.clear();
 
-        this.calculateTransform();
+        this.gridView.remove();
+
+        if (p) {
+            this.gridView = new GridView(
+                this._layer, this.x, this.y,
+                p.cols * this.tileSize,
+                p.rows * this.tileSize,
+                p.rows, p.cols
+            );
+
+            this.gridView.drawGrid();
+            this.cells.clear();
+
+            this.calculateTransform();
+        }
+    }
+
+    remove() {
+        // Set program to null, which also removes this.gridView
+        this.setProgram(null);
+
+        // Destroy our layer
+        this._layer.remove();
     }
 
     updateCell(data) {
