@@ -344,14 +344,11 @@ function jsonToTestVector(json) {
         output = parts[2],
         limit = parts.length > 3 ? parseInt(parts[3]) : 0;
 
-    if (isNaN(limit))
-        limit = 0;
-
     return {
         accept: accept,
         input: jsonToTape(input),
         output: jsonToTape(output),
-        limit: limit
+        limit: isNaN(limit) ? 0 : limit
     };
 }
 

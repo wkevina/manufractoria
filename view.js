@@ -29,7 +29,7 @@ export class TapeView {
      */
     drawTape() {
         const MAX = this._MAX,
-            sw = this._sw;
+              sw = this._sw;
 
         this.tapeView.clear();
 
@@ -62,8 +62,8 @@ export class TapeView {
         offset = offset || 0;
 
         const sw = this._sw,
-            length = this.tapeView.selectAll('circle').length,
-            coord = this._coordinateForIndex(index);
+              length = this.tapeView.selectAll('circle').length,
+              coord = this._coordinateForIndex(index);
 
         const circle = this.tapeView.circle(coord.x + offset * sw, coord.y, sw / 2 - 2);
 
@@ -105,8 +105,8 @@ export class TapeView {
 
         const slide = (function() {
             const sw = this._sw,
-                allSymbols = this.tapeView.selectAll('circle'),
-                length = allSymbols.length;
+                  allSymbols = this.tapeView.selectAll('circle'),
+                  length = allSymbols.length;
 
             // Append symbol if necessary
             if (length < this._MAX && this.tape.symbols.length > length) {
@@ -314,8 +314,8 @@ export class GridView {
      */
     getCellMatrix(col, row, corner) {
         const mat = Snap.matrix(),
-            sw = this.width / this.cols,
-            sy = this.height / this.rows;
+              sw = this.width / this.cols,
+              sy = this.height / this.rows;
 
         if (!corner) {
             mat.translate(sw / 2, sy / 2);
@@ -355,10 +355,10 @@ export class GridView {
 
     screenPointToCell(x, y) {
         const localPoint = graphics.screenPointToLocal(x, y, this.grid),
-            sw = this.width / this.cols,
-            sy = this.height / this.rows,
-            INDEX_X = Math.floor(localPoint.x / sw),
-            INDEX_Y = Math.floor(localPoint.y / sy);
+              sw = this.width / this.cols,
+              sy = this.height / this.rows,
+              INDEX_X = Math.floor(localPoint.x / sw),
+              INDEX_Y = Math.floor(localPoint.y / sy);
 
         console.log('I think you want ' + INDEX_X + ', ' + INDEX_Y);
 
@@ -448,7 +448,7 @@ export class ProgramView {
     updateCell(data) {
         // coordinates of updated cell
         const x = data.x,
-            y = data.y;
+              y = data.y;
 
         // remove old cells in the region and redraw each
         for (let cx = x - 1; cx <= x + 1; ++cx) {
@@ -468,8 +468,8 @@ export class ProgramView {
 
     drawTile(cell, x, y) {
         const c = cell,
-            paper = this.paper,
-            grid = this.gridView;
+              paper = this.paper,
+              grid = this.gridView;
 
         console.log('draw');
 
@@ -490,8 +490,8 @@ export class ProgramView {
                     this.cells.append(group);
 
                     const corner = grid.getCellMatrix(x, y, true)
-                            .toTransformString()
-                            .toUpperCase();
+                              .toTransformString()
+                              .toUpperCase();
 
                     const o = c.orientation;
 
@@ -524,8 +524,8 @@ export class ProgramView {
 
     drawProgram() {
         const paper = this.paper,
-            grid = this.gridView,
-            program = this.program;
+              grid = this.gridView,
+              program = this.program;
 
         this.cells.clear();
         this.cells.appendTo(this.gridView.grid);
@@ -541,15 +541,15 @@ export class ProgramView {
     drawConveyor(cell, x, y) {
         const neighbors = getNeighbors(this.program, cell, x, y),
 
-            target = {cell: cell, position: new tmath.Vec2(x, y)},
+              target = {cell: cell, position: new tmath.Vec2(x, y)},
 
-            hasLeft = neighbors.left.cell != null ? isPointingTo(neighbors.left, target) : false,
+              hasLeft = neighbors.left.cell != null ? isPointingTo(neighbors.left, target) : false,
 
-            hasRight = neighbors.right.cell != null ? isPointingTo(neighbors.right, target) : false,
+              hasRight = neighbors.right.cell != null ? isPointingTo(neighbors.right, target) : false,
 
-            hasDown = neighbors.down.cell != null ? isPointingTo(neighbors.down, target) : false,
+              hasDown = neighbors.down.cell != null ? isPointingTo(neighbors.down, target) : false;
 
-            image = null,
+        let image = null,
 
             mirror = false;
 
@@ -584,10 +584,10 @@ export class ProgramView {
             this.cells.append(group);
 
             const corner = this.gridView.getCellMatrix(x, y, true)
-                    .toTransformString()
-                    .toUpperCase();
+                      .toTransformString()
+                      .toUpperCase();
 
-            const o = cell.orientation;
+            let o = cell.orientation;
 
             if (mirror) {
                 o = tmath.Mat2x2.kMIR.compose(o);
@@ -610,13 +610,13 @@ export class ProgramView {
     drawWriter(cell, x, y) {
         const neighbors = getNeighbors(this.program, cell, x, y),
 
-            target = {cell: cell, position: new tmath.Vec2(x, y)},
+              target = {cell: cell, position: new tmath.Vec2(x, y)},
 
-            hasLeft = neighbors.left.cell != null ? isPointingTo(neighbors.left, target) : false,
+              hasLeft = neighbors.left.cell != null ? isPointingTo(neighbors.left, target) : false,
 
-            hasRight = neighbors.right.cell != null ? isPointingTo(neighbors.right, target) : false,
+              hasRight = neighbors.right.cell != null ? isPointingTo(neighbors.right, target) : false;
 
-            image = null,
+        let image = null,
 
             leftConnector = null,
 
@@ -640,13 +640,13 @@ export class ProgramView {
                 leftConnector = group.g(graphics.getGraphic('WriterConnector'));
                 group.append(leftConnector);
                 const rot = tmath.Mat2x2.kROT2,
-                    m = Snap.matrix(rot.a, rot.b, rot.c, rot.d, 0, 0);
+                      m = Snap.matrix(rot.a, rot.b, rot.c, rot.d, 0, 0);
                 leftConnector.transform(toTransformString(m));
             }
 
             const corner = this.gridView.getCellMatrix(x, y, true)
-                    .toTransformString()
-                    .toUpperCase();
+                      .toTransformString()
+                      .toUpperCase();
 
             const o = cell.orientation;
 
@@ -667,15 +667,15 @@ export class ProgramView {
 
 function getNeighbors(prog, cell, x, y) {
     const o = cell.orientation,
-        position = new tmath.Vec2(x, y),
-        down = cellToGlobal(program.directions.DOWN, o).add(position),
-        left = cellToGlobal(program.directions.LEFT, o).add(position),
-        right = cellToGlobal(program.directions.RIGHT, o).add(position),
-        neighbors = {
-            down: {cell: null, position: null},
-            left: {cell: null, position: null},
-            right:{cell: null, position: null}
-        };
+          position = new tmath.Vec2(x, y),
+          down = cellToGlobal(program.directions.DOWN, o).add(position),
+          left = cellToGlobal(program.directions.LEFT, o).add(position),
+          right = cellToGlobal(program.directions.RIGHT, o).add(position),
+          neighbors = {
+              down: {cell: null, position: null},
+              left: {cell: null, position: null},
+              right:{cell: null, position: null}
+          };
 
     function safeGetCell(prog, pos) {
         try {
@@ -713,10 +713,11 @@ function getNeighbors(prog, cell, x, y) {
 }
 
 function isPointingTo(source, target) {
-    const direction = cellToGlobal(program.directions.UP, source.cell.orientation),
+    let direction = cellToGlobal(program.directions.UP, source.cell.orientation),
         pointedTo = source.position.add(direction),
-        same = pointedTo.equals(target.position),
-        isBranch = source.cell.type.indexOf('Branch') != -1;
+        same = pointedTo.equals(target.position);
+
+    const isBranch = source.cell.type.indexOf('Branch') != -1;
 
     if (!same && (source.cell.type == 'CrossConveyor' ||
                   isBranch)) {
