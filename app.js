@@ -9,6 +9,8 @@ import editor from 'editor';
 import core from 'core';
 import {Palette, TileControl, PlayControl} from 'gui';
 import {Modal} from 'modal';
+import {Stage} from 'stage';
+import {LevelEditor, Level} from 'level';
 
 const MARGIN = 10, // Space between elements
       PROGRAM_WIDTH = 56 * 9, // program view width, not to exceed
@@ -36,32 +38,32 @@ class App {
         const loadForm = $('#load-form');
         loadForm.find('button').click(this.loadLevel.bind(this));
 
-        radio('play-clicked').subscribe(
-            () => {
-                if (!this.isRunning) {
-                    this.editor.disable();
-                    this.start();
-                } else if (this.isRunning && this.isPaused) {
-                    this.editor.disable();
-                    this.pause(false); // or unpause
-                }
-            }
-        );
+        // radio('play-clicked').subscribe(
+        //     () => {
+        //         if (!this.isRunning) {
+        //             this.editor.disable();
+        //             this.start();
+        //         } else if (this.isRunning && this.isPaused) {
+        //             this.editor.disable();
+        //             this.pause(false); // or unpause
+        //         }
+        //     }
+        // );
 
-        radio('pause-clicked').subscribe(
-            () => {
-                if (this.isRunning) {
-                    this.pause(true);
-                }
-            }
-        );
+        // radio('pause-clicked').subscribe(
+        //     () => {
+        //         if (this.isRunning) {
+        //             this.pause(true);
+        //         }
+        //     }
+        // );
 
-        radio('stop-clicked').subscribe(
-            () => {
-                this.stop();
-                this.editor.enable();
-            }
-        );
+        // radio('stop-clicked').subscribe(
+        //     () => {
+        //         this.stop();
+        //         this.editor.enable();
+        //     }
+        // );
 
         this.loadFromHash();
 
@@ -130,58 +132,78 @@ class App {
         this.paper = paper;
         this.scratch = paper.g();
 
+        this.stage = new Stage(paper);
+
+        editor.init();
+
         // Set up UI elements
         graphics.preload(paper)
             .then(() => {
 
-                const programLayer = paper.g().addClass('program-layer');
+                let tempProgram = new program.Program(9, 9);
 
-                //paper.appendTo(document.getElementById("main"));
+                // fill in start and end with defaults
+                tempProgram.setStart(4, 0);
+                tempProgram.setEnd(4, 8);
 
-                const CONTROL_WIDTH = this.canvasSize.width - CONTROL_X;
-
-                if (this.program == null) {
-                    this.program = new program.Program(9, 9);
-
-                    // fill in start and end with defaults
-                    this.program.setStart(4, 0);
-                    this.program.setEnd(4, 8);
-                }
-
-                this.programView = new view.ProgramView(programLayer, MARGIN, MARGIN, this.program, 56 * 9, 56 * 9);
-
-                this.palette = new Palette(
-                    paper,
-                    CONTROL_X + CONTROL_WIDTH / 8,
-                    this.canvasSize.height / 2,
-                    CONTROL_WIDTH * 3 / 4,
-                    4
+                this.stage.push(
+                    new LevelEditor(
+                        this.paper,
+                        0, 0,
+                        this.canvasSize.width,
+                        this.canvasSize.height,
+                        new Level('Test', tempProgram, [])
+                    )
                 );
 
-                this.tileControl = new TileControl(
-                    paper,
-                    CONTROL_X + 40, // x
-                    MARGIN, // y
-                    CONTROL_WIDTH / 2 - MARGIN / 2, // width
-                    0    // height
-                );
+                // const programLayer = paper.g().addClass('program-layer');
 
-                this.playButton = new PlayControl(
-                    paper,
-                    CONTROL_X,
-                    this.canvasSize.height - 68 - MARGIN,
-                    68
-                );
+                // //paper.appendTo(document.getElementById("main"));
 
-                this.playButton.x = CONTROL_X + CONTROL_WIDTH / 2 - this.playButton.width / 2;
+                // const CONTROL_WIDTH = this.canvasSize.width - CONTROL_X;
 
-                this.editor = new editor.Editor(paper, this.programView, this.tileControl);
+                // if (this.program == null) {
+                //     this.program = new program.Program(9, 9);
 
-                this.programView.drawProgram();
+                //     // fill in start and end with defaults
+                //     this.program.setStart(4, 0);
+                //     this.program.setEnd(4, 8);
+                // }
 
-                editor.init();
+                // this.programView = new view.ProgramView(programLayer, MARGIN, MARGIN, this.program, 56 * 9, 56 * 9);
 
-                this.editor.enable();
+                // this.palette = new Palette(
+                //     paper,
+                //     CONTROL_X + CONTROL_WIDTH / 8,
+                //     this.canvasSize.height / 2,
+                //     CONTROL_WIDTH * 3 / 4,
+                //     4
+                // );
+
+                // this.tileControl = new TileControl(
+                //     paper,
+                //     CONTROL_X + 40, // x
+                //     MARGIN, // y
+                //     CONTROL_WIDTH / 2 - MARGIN / 2, // width
+                //     0    // height
+                // );
+
+                // this.playButton = new PlayControl(
+                //     paper,
+                //     CONTROL_X,
+                //     this.canvasSize.height - 68 - MARGIN,
+                //     68
+                // );
+
+                // this.playButton.x = CONTROL_X + CONTROL_WIDTH / 2 - this.playButton.width / 2;
+
+                // this.editor = new editor.Editor(paper, this.programView, this.tileControl);
+
+                // this.programView.drawProgram();
+
+                // editor.init();
+
+                // this.editor.enable();
 
             })
             .then(() => {

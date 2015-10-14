@@ -9,7 +9,7 @@ import {toTransformString} from 'view';
 import {LockedPicker} from 'picker';
 import {orientationByName} from 'tmath';
 
-class BaseControl {
+export class BaseControl {
     constructor(paper, x, y) {
         this.paper = paper;
         this._x = x;
@@ -17,6 +17,8 @@ class BaseControl {
 
         this._layer = paper.g();
         this._translate();
+
+        this.visible = false;
     }
 
     get x() {
@@ -48,6 +50,14 @@ class BaseControl {
         });
     }
 
+    onVisible() {
+        this.visible = false;
+    }
+
+    onHidden() {
+        this.visible = true;
+    }
+
     _translate() {
         this._layer.transform(Snap.matrix().translate(this._x, this._y));
     }
@@ -55,7 +65,7 @@ class BaseControl {
     remove() {
         this._layer.remove();
     }
-}
+};
 
 export class Palette extends BaseControl {
 
