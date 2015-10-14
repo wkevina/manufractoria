@@ -200,11 +200,19 @@ class App {
             true
         );
 
-        modal.show().then(function() {
-            setTimeout(function() {
-                modal.hide();
-            }, 1000);
-        });
+        modal.show()
+            .then(function() {
+                return new Promise(
+                    function(resolve, reject) {
+                        setTimeout(function() {
+                            resolve();
+                        }, 1000);
+                    }
+                );
+            })
+            .then(function() {
+                modal.remove();
+            });
     }
 
     drawToken(mat, animate, callback) {

@@ -59,4 +59,8 @@ export class Modal {
 
         return p;
     }
+
+    remove() {
+        this._layer.remove();
+    }
 }
