@@ -1,8 +1,8 @@
 
-import program from "program";
-import codeCell from "codeCell";
-import tmath from "tmath";
-import core from "core";
+import program from 'program';
+import codeCell from 'codeCell';
+import tmath from 'tmath';
+import core from 'core';
 
 export class Interpreter {
     constructor() {
@@ -34,7 +34,7 @@ export class Interpreter {
         // Go to the start
         for (let x of _.range(this.program.cols)) {
             for (let y of _.range(this.program.rows)) {
-                if (this.program.getCell(x, y).type == "Start") {
+                if (this.program.getCell(x, y).type == 'Start') {
                     this.position.x = x;
                     this.position.y = y;
                 }
@@ -61,7 +61,7 @@ export class Interpreter {
         let result = null;
 
         if (cellFunc) {
-            if (cell.type == "CrossConveyor") {
+            if (cell.type == 'CrossConveyor') {
                 // Special case. Convert this.facing into cell coordinates for CrossConveyor's function:
                 let cellFacing = this.convertDirectionGlobalToCell(this.facing, cell);
                 result = cellFunc(tapeHead, cellFacing);
@@ -75,7 +75,7 @@ export class Interpreter {
             return result;
         }
 
-        console.log("Invalid cell type.");
+        console.log('Invalid cell type.');
 
         return [false, null, program.directions.UP];
     }
@@ -89,10 +89,10 @@ export class Interpreter {
         let head = this.tape.head();
 
         // Check if done
-        if (cell.type == "Empty" || (cell.type == "Start" && this.cycles > 0)) {
+        if (cell.type == 'Empty' || (cell.type == 'Start' && this.cycles > 0)) {
             this.running = false;
             this.accept = false;
-        } else if (cell.type == "End") {
+        } else if (cell.type == 'End') {
             this.running = false;
             this.accept = true;
         } else {

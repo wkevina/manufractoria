@@ -1,6 +1,6 @@
 
-import program from "program";
-import core from "core";
+import program from 'program';
+import core from 'core';
 
 let codeCells = {
 

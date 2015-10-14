@@ -1,5 +1,5 @@
 
-import signals from "signals.js";
+import signals from 'signals.js';
 
 /* Symbols */
 let EMPTY = {symbol: 'empty'},
@@ -37,7 +37,7 @@ export class Tape {
     pop() {
         if (this.symbols.length > 0) {
             var popped = this.symbols.shift();
-            this.changed.dispatch("pop");
+            this.changed.dispatch('pop');
             return popped;
         } else {
             return core.EMPTY;
@@ -46,7 +46,7 @@ export class Tape {
 
     append(s) {
         this.symbols.push(s);
-        this.changed.dispatch("append");
+        this.changed.dispatch('append');
     }
 
     static clone(otherTape) {
