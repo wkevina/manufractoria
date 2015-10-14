@@ -57,7 +57,7 @@ class BaseControl {
     }
 }
 
-class Palette extends BaseControl {
+export class Palette extends BaseControl {
 
     constructor(paper, x, y, maxWidth, columns, margin) {
         super(paper, x, y);
