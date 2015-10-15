@@ -12,7 +12,7 @@ export class Stage {
 
         this.layers = [];
 
-        this._layer = paper.g();
+        this._layer = paper.g().addClass('stage');
     }
 
     /**
