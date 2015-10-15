@@ -1,6 +1,5 @@
 /*global radio */
 
-
 import program from 'program';
 import {Interpreter} from 'interpreter';
 import graphics from 'graphics';
@@ -141,104 +140,55 @@ class App {
 
         editor.init();
 
-        // Set up UI elements
-        graphics.preload(paper)
-            .then(() => {
+        this.showWelcome().then((modal) => {
+            // Set up UI elements
+            graphics.preload(paper)
+                .then(() => {
 
-                let tempProgram = new program.Program(9, 9);
+                    let tempProgram = new program.Program(9, 9);
 
-                // fill in start and end with defaults
-                tempProgram.setStart(4, 0);
-                tempProgram.setEnd(4, 8);
+                    // fill in start and end with defaults
+                    tempProgram.setStart(4, 0);
+                    tempProgram.setEnd(4, 8);
 
-                let level = new Level(
-                    'Test',
-                    tempProgram,
-                    [{
-                        accept: true,
-                        input: new core.Tape(),
-                        output: new core.Tape(),
-                        limit: 0
-                     }]
-                );
+                    let level = new Level(
+                        'Test',
+                        tempProgram,
+                        [{
+                            accept: true,
+                            input: new core.Tape(),
+                            output: new core.Tape(),
+                            limit: 0
+                        }]
+                    );
 
-                this.stage.push(
-                    new LevelEditor(
-                        this.paper,
-                        0, 0,
-                        this.canvasSize.width,
-                        this.canvasSize.height,
-                        level
-                    )
-                );
-
-                radio('editor:start-level').subscribe((args) => {
                     this.stage.push(
-                        new LevelRunner(
+                        new LevelEditor(
                             this.paper,
                             0, 0,
                             this.canvasSize.width,
                             this.canvasSize.height,
-                            args.level
+                            level
                         )
                     );
+
+                    radio('editor:start-level').subscribe((args) => {
+                        this.stage.push(
+                            new LevelRunner(
+                                this.paper,
+                                0, 0,
+                                this.canvasSize.width,
+                                this.canvasSize.height,
+                                args.level
+                            )
+                        );
+                    });
+
+                    radio('runner:stop').subscribe((args) => this.stage.pop());
+
+                    modal.hide().then(() => modal.remove());
                 });
-
-                radio('runner:stop').subscribe((args) => this.stage.pop());
-
-                // const programLayer = paper.g().addClass('program-layer');
-
-                // //paper.appendTo(document.getElementById("main"));
-
-                // const CONTROL_WIDTH = this.canvasSize.width - CONTROL_X;
-
-                // if (this.program == null) {
-                //     this.program = new program.Program(9, 9);
-
-                //     // fill in start and end with defaults
-                //     this.program.setStart(4, 0);
-                //     this.program.setEnd(4, 8);
-                // }
-
-                // this.programView = new view.ProgramView(programLayer, MARGIN, MARGIN, this.program, 56 * 9, 56 * 9);
-
-                // this.palette = new Palette(
-                //     paper,
-                //     CONTROL_X + CONTROL_WIDTH / 8,
-                //     this.canvasSize.height / 2,
-                //     CONTROL_WIDTH * 3 / 4,
-                //     4
-                // );
-
-                // this.tileControl = new TileControl(
-                //     paper,
-                //     CONTROL_X + 40, // x
-                //     MARGIN, // y
-                //     CONTROL_WIDTH / 2 - MARGIN / 2, // width
-                //     0    // height
-                // );
-
-                // this.playButton = new PlayControl(
-                //     paper,
-                //     CONTROL_X,
-                //     this.canvasSize.height - 68 - MARGIN,
-                //     68
-                // );
-
-                // this.playButton.x = CONTROL_X + CONTROL_WIDTH / 2 - this.playButton.width / 2;
-
-                // this.editor = new editor.Editor(paper, this.programView, this.tileControl);
-
-                // this.programView.drawProgram();
-
-                // editor.init();
-
-                // this.editor.enable();
-
-            })
-            .then(() => {
-                this.showWelcome();
-            });
+        });
     }
 
     showWelcome() {
@@ -248,23 +198,11 @@ class App {
                 0, 0,
                 this.canvasSize.width, this.canvasSize.height)
                 .attr({fill: 'white'}),
-            300,
+            100,
             true
         );
 
-        modal.show()
-            .then(function() {
-                return new Promise(
-                    function(resolve, reject) {
-                        setTimeout(function() {
-                            resolve();
-                        }, 1000);
-                    }
-                );
-            })
-            .then(function() {
-                modal.remove();
-            });
+        return modal.show().then(() => Promise.resolve(modal));
     }
 
     drawToken(mat, animate, callback) {
