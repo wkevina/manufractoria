@@ -10,7 +10,7 @@ import layout from 'layout';
 
 import {Editor} from 'editor';
 
-import {ProgramView, TapeView} from 'view';
+import {ProgramView, TapeView, colorForSymbol} from 'view';
 
 import {Tape} from 'core';
 
@@ -133,6 +133,9 @@ export class LevelRunner extends LevelDisplay {
         this.progression = new TestVectorProgression(this.level.testCases);
         this.currentTest = null;
 
+        // Time between program iterations
+        this.stepTime = 500;
+
         this._createControls();
     }
 
@@ -204,7 +207,7 @@ export class LevelRunner extends LevelDisplay {
         // make sure token is on top
         let head = this.tapeView.tape.head(), fill;
         if (head && head.symbol != 'empty') {
-            fill = view.colorForSymbol(head);
+            fill = colorForSymbol(head);
         } else {
             fill = '#E0E';
         }
