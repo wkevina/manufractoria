@@ -95,7 +95,7 @@ export class LevelEditor extends LevelDisplay {
     onHidden() {
         super.onHidden();
 
-        radio('play-clicked').unsubscribe([this._onPlayClicked, this]);
+        radio('play-clicked').unsubscribe(this._onPlayClicked);
     }
 
     _onPlayClicked() {
@@ -175,9 +175,9 @@ export class LevelRunner extends LevelDisplay {
     onHidden() {
         super.onHidden();
 
-        radio('play-clicked').unsubscribe([this._onPlayClicked, this]);
-        radio('pause-clicked').unsubscribe([this._onPauseClicked, this]);
-        radio('stop-clicked').unsubscribe([this._onStopClicked, this]);
+        radio('play-clicked').unsubscribe(this._onPlayClicked);
+        radio('pause-clicked').unsubscribe(this._onPauseClicked);
+        radio('stop-clicked').unsubscribe(this._onStopClicked);
     }
 
     _onPlayClicked() {
