@@ -51,11 +51,11 @@ export class BaseControl {
     }
 
     onVisible() {
-        this.visible = false;
+        this.visible = true;
     }
 
     onHidden() {
-        this.visible = true;
+        this.visible = false;
     }
 
     _translate() {
