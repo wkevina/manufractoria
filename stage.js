@@ -79,4 +79,21 @@ export class Stage {
 
     }
 
+    /**
+     * clear
+     * Pops all layers from stack
+     */
+    clear() {
+
+        this._layer.clear();
+
+        while (this.layers.length > 0) {
+            let p = this.layers.pop();
+            if (p) {
+                p.onHidden && p.onHidden();
+                p.remove && p.remove();
+            }
+        }
+    }
+
 };

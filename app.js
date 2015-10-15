@@ -40,37 +40,53 @@ class App {
         linkForm.find('button').click(this.generateLink.bind(this));
         linkForm.find('input').val('');
         const loadForm = $('#load-form');
-        loadForm.find('button').click(this.loadLevel.bind(this));
+        loadForm.find('button').click(
+            () => {
+                let level = this.loadFromInput();
+                if (level)
+                    this.startLevel(level);
+            }
+        );
 
-        // radio('play-clicked').subscribe(
-        //     () => {
-        //         if (!this.isRunning) {
-        //             this.editor.disable();
-        //             this.start();
-        //         } else if (this.isRunning && this.isPaused) {
-        //             this.editor.disable();
-        //             this.pause(false); // or unpause
-        //         }
-        //     }
-        // );
+        window.addEventListener(
+            "hashchange",
+            () => {
+                let level = this.loadFromHash();
+                if (level)
+                    this.startLevel(level);
+            }
+        );
 
-        // radio('pause-clicked').subscribe(
-        //     () => {
-        //         if (this.isRunning) {
-        //             this.pause(true);
-        //         }
-        //     }
-        // );
+        radio('editor:start-level').subscribe((args) => {
+            this.stage.push(
+                new LevelRunner(
+                    this.paper,
+                    0, 0,
+                    this.canvasSize.width,
+                    this.canvasSize.height,
+                    args.level
+                )
+            );
+        });
 
-        // radio('stop-clicked').subscribe(
-        //     () => {
-        //         this.stop();
-        //         this.editor.enable();
-        //     }
-        // );
+        radio('runner:stop').subscribe((args) => this.stage.pop());
 
-        this.loadFromHash();
 
+
+    }
+
+    startLevel(level) {
+        this.stage.clear();
+
+        this.stage.push(
+            new LevelEditor(
+                this.paper,
+                0, 0,
+                this.canvasSize.width,
+                this.canvasSize.height,
+                level
+            )
+        );
     }
 
     loadFromHash() {
@@ -83,39 +99,39 @@ class App {
             } else {
                 const level = loader.fromJson(hash);
                 if (level) {
-                    this.program = level.program;
-                    this.testCases = level.testCases;
+                    return level;
                 } else {
-                    // Error case
                     console.log('Unable to load program string');
                 }
             }
         }
+
+        return null;
     }
 
-    loadLevel() {
-        let loadForm = $('#load-form'),
-            levelString = loadForm.find('input').val().trim(),
-            newProgram = null;
+    loadFromInput() {
+        const loadForm = $('#load-form'),
+              levelString = loadForm.find('input').val().trim();
+            //     newProgram = null;
 
-        if (levelString.startsWith('lvl')) {
-            newProgram = program.readLegacyProgramString(levelString);
+            //        if (levelString.startsWith('lvl')) {
+            //            newProgram = program.readLegacyProgramString(levelString);
+            //      } else {
+        const level = loader.fromJson(levelString);
+        if (level) {
+            return level;
         } else {
-            const level = loader.fromJson(levelString);
-            if (level) {
-                newProgram = level.program;
-                this.testCases = level.testCases;
-            } else {
-                // Error case
-                console.log('Unable to load program string');
-            }
+            // Error case
+            console.log('Unable to load program string');
+            return null;
         }
+        //}
 
-        if (newProgram) {
-            this.program = newProgram;
-            this.programView.setProgram(newProgram);
-            this.programView.drawProgram();
-        }
+        // if (newProgram) {
+        //     this.program = newProgram;
+        //     this.programView.setProgram(newProgram);
+        //     this.programView.drawProgram();
+        // }
     }
 
     generateLink() {
@@ -145,46 +161,30 @@ class App {
             graphics.preload(paper)
                 .then(() => {
 
-                    let tempProgram = new program.Program(9, 9);
+                    const level = this.loadFromHash();
 
-                    // fill in start and end with defaults
-                    tempProgram.setStart(4, 0);
-                    tempProgram.setEnd(4, 8);
+                    if (level) {
+                        this.startLevel(level);
+                    } else {
+                        let tempProgram = new program.Program(9, 9);
 
-                    let level = new Level(
-                        'Test',
-                        tempProgram,
-                        [{
-                            accept: true,
-                            input: new core.Tape(),
-                            output: new core.Tape(),
-                            limit: 0
-                        }]
-                    );
+                        // fill in start and end with defaults
+                        tempProgram.setStart(4, 0);
+                        tempProgram.setEnd(4, 8);
 
-                    this.stage.push(
-                        new LevelEditor(
-                            this.paper,
-                            0, 0,
-                            this.canvasSize.width,
-                            this.canvasSize.height,
-                            level
-                        )
-                    );
-
-                    radio('editor:start-level').subscribe((args) => {
-                        this.stage.push(
-                            new LevelRunner(
-                                this.paper,
-                                0, 0,
-                                this.canvasSize.width,
-                                this.canvasSize.height,
-                                args.level
-                            )
+                        const level = new Level(
+                            'Test',
+                            tempProgram,
+                            [{
+                                accept: true,
+                                input: new core.Tape(),
+                                output: new core.Tape(),
+                                limit: 0
+                            }]
                         );
-                    });
 
-                    radio('runner:stop').subscribe((args) => this.stage.pop());
+                        this.startLevel(level);
+                    }
 
                     modal.hide().then(() => modal.remove());
                 });
