@@ -373,11 +373,19 @@ function jsonToLevel(json) {
 }
 
 function fromJson(jsonString) {
-    var dejsoned = JSON.parse(jsonString);
-    if (!isValid(dejsoned))
-        return null;
+    try {
+        const dejsoned = JSON.parse(jsonString);
 
-    return jsonToLevel(dejsoned);
+        if (!isValid(dejsoned))
+            return null;
+
+        return jsonToLevel(dejsoned);
+
+    } catch (e) {
+        return null;
+    }
+
+
 };
 
 function toJson(title, tapes, prog) {
