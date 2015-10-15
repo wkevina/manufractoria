@@ -68,7 +68,7 @@ export class Stage {
         if (layerCount > 0) {
             let newTop = this.layers[layerCount - 1];
 
-            this._layer.add(newTop);
+            this._layer.add(newTop._layer);
 
             if (newTop.onVisible) {
                 newTop.onVisible();

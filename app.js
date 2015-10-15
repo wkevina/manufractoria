@@ -1,3 +1,5 @@
+/*global radio */
+
 
 import program from 'program';
 import {Interpreter} from 'interpreter';
@@ -10,7 +12,10 @@ import core from 'core';
 import {Palette, TileControl, PlayControl} from 'gui';
 import {Modal} from 'modal';
 import {Stage} from 'stage';
-import {LevelEditor, Level} from 'level';
+
+import {LevelEditor,
+        LevelRunner,
+        Level} from 'level';
 
 const MARGIN = 10, // Space between elements
       PROGRAM_WIDTH = 56 * 9, // program view width, not to exceed
@@ -146,15 +151,40 @@ class App {
                 tempProgram.setStart(4, 0);
                 tempProgram.setEnd(4, 8);
 
+                let level = new Level(
+                    'Test',
+                    tempProgram,
+                    [{
+                        accept: true,
+                        input: new core.Tape(),
+                        output: new core.Tape(),
+                        limit: 0
+                     }]
+                );
+
                 this.stage.push(
                     new LevelEditor(
                         this.paper,
                         0, 0,
                         this.canvasSize.width,
                         this.canvasSize.height,
-                        new Level('Test', tempProgram, [])
+                        level
                     )
                 );
+
+                radio('editor:start-level').subscribe((args) => {
+                    this.stage.push(
+                        new LevelRunner(
+                            this.paper,
+                            0, 0,
+                            this.canvasSize.width,
+                            this.canvasSize.height,
+                            args.level
+                        )
+                    );
+                });
+
+                radio('runner:stop').subscribe((args) => this.stage.pop());
 
                 // const programLayer = paper.g().addClass('program-layer');
 

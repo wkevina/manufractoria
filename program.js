@@ -74,7 +74,6 @@ class Program {
 
     setEnd(x, y) {
         this.setCell(x, y, 'End');
-        this.start = {x: x, y: y};
     }
 };
 

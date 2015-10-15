@@ -1,5 +1,6 @@
 
 import signals from 'signals.js';
+import {tapeToJson} from 'loader';
 
 /* Symbols */
 let EMPTY = {symbol: 'empty'},
@@ -53,6 +54,10 @@ export class Tape {
         var newTape = new Tape();
         newTape.symbols = otherTape.symbols.slice(0);
         return newTape;
+    }
+
+    static isEqual(t1, t2) {
+        return tapeToJson(t1) == tapeToJson(t2);
     }
 
 };
