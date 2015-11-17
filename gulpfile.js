@@ -16,11 +16,8 @@ var dir = {
     index: ['./index.html', 'main.js'],
     sourceDir: './',
     source: ['./*.js', '!./gulpfile.js', '!main.js'],
-    lib: ['!*.json',
-          'libs/**/*.js',
-          'libs/**/*map*',
-          'node_modules/systemjs/dist/system.*',
-          'node_modules/babel-core/browser-polyfill.*',
+    lib: ['node_modules/systemjs/dist/system.*',
+          'node_modules/gulp-babel/node_modules/babel-core/browser-polyfill.*',
           'bower_components/**/*'
          ],
     libOut: './dist/libs',
